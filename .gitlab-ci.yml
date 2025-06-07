@@ -22,14 +22,14 @@ Development:
 
     # --- Start of the corrected script ---
     # This loop will process one file at a time, but uses lftp's ability
-    # to create parent directories, which the basic 'ftp' client cannot do.
     - |
       while IFS= read -r file; do
         if [ -f "$file" ]; then # Ensure the item is a file
           echo "Uploading: $file"
-          lftp -c "
+          # We've added the '-d' flag here to enable debug mode
+          lftp -d -c "
           set ftp:ssl-allow no;
-          open -u ${FTP_USER},${FTP_PASSWORD} ${FTP_HOST};
+          open -u ${FTP_USER},${FTP_PASSWORD} ftp.paenergy.ph;
           put -O /home/uub4rmw23inpzxn9/public_html/erp/ '$file'
           "
         fi
