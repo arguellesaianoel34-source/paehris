@@ -7,11 +7,9 @@ Development:
     - main
   stage: main
   before_script:
-    # We will install the more powerful 'lftp' client instead of 'ftp'
     - apt-get update -yqq
     - apt-get install -y lftp
   script:
-    # This part for getting the file list is correct and remains the same
     - git diff --name-only ${CI_COMMIT_BEFORE_SHA}...${CI_COMMIT_SHA} > /temp-deployment-text-${CI_JOB_ID}.txt
     - |
       echo "------------------------------------------------------"
@@ -22,16 +20,21 @@ Development:
       echo "Syncing to destination server: /home/uub4rmw23inpzxn9/public_html/erp/"
       echo "------------------------------------------------------"
 
-    # --- Start of the corrected deployment script ---
-    # This single 'lftp' command replaces the entire 'while' loop.
-    # It connects once, creates all necessary directories, and uploads all files from the list.
+    # --- Start of the corrected script ---
+    # This loop will process one file at a time, but uses lftp's ability
+    # to create parent directories, which the basic 'ftp' client cannot do.
     - |
-      lftp -c "
-      set ftp:ssl-allow no;
-      open -u ${FTP_USER},${FTP_PASSWORD} ${FTP_HOST};
-      mirror -R --verbose --parallel=5 --only-newer --files-from=/temp-deployment-text-${CI_JOB_ID}.txt . /home/uub4rmw23inpzxn9/public_html/erp/
-      "
-    # --- End of the corrected deployment script ---
+      while IFS= read -r file; do
+        if [ -f "$file" ]; then # Ensure the item is a file
+          echo "Uploading: $file"
+          lftp -c "
+          set ftp:ssl-allow no;
+          open -u ${FTP_USER},${FTP_PASSWORD} ${FTP_HOST};
+          put -O /home/uub4rmw23inpzxn9/public_html/erp/ '$file'
+          "
+        fi
+      done < /temp-deployment-text-${CI_JOB_ID}.txt
+    # --- End of the corrected script ---
 
     - |
       echo "------------------------------------------------------"
