@@ -27,16 +27,13 @@ Development:
         if [ -f "$file" ]; then
           echo "Uploading: $file"
           
-          # Using lftp to ls and then put the file
           lftp -c "
           set ftp:ssl-allow no;
           open -u ${FTP_USER},${FTP_PASSWORD} ftp.paenergy.ph;
-          !echo '---[DEBUG] Listing root directory---';
-          ls
           
-          # This command will now attempt to upload the file directly
-          # It assumes the full subdirectory path already exists on the server
-          put -O \"/\" \"${file}\";
+          # Corrected command:
+          # The target is now '.', which means 'the current directory'.
+          mirror -R --verbose \"${file}\" .
           "
         fi
       done < /temp-deployment-text-${CI_JOB_ID}.txt
