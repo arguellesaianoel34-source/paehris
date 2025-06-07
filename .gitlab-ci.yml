@@ -33,14 +33,9 @@ Development:
           open -u ${FTP_USER},${FTP_PASSWORD} ftp.paenergy.ph;
           !echo '---[DEBUG] Listing root directory---';
           ls
-          # --- Debugging directory listing ---
-          !echo '---[DEBUG] Listing public_html/erp/ directory---';
-          ls 'public_html/erp/';
-          !echo '---[DEBUG] End of directory listing ---';
-          
           # This command will now attempt to upload the file directly
           # It assumes the full subdirectory path already exists on the server
-          put -O \"public_html/erp/\" \"${file}\";
+          put -O \"/\" \"${file}\";
           "
         fi
       done < /temp-deployment-text-${CI_JOB_ID}.txt
