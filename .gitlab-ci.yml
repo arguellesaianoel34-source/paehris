@@ -34,6 +34,7 @@ Development:
           
           # --- Debugging directory listing ---
           !echo '---[DEBUG] Listing public_html/erp/ directory---';
+          ls
           ls 'public_html/erp/';
           !echo '---[DEBUG] End of directory listing ---';
           
