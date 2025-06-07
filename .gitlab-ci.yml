@@ -27,10 +27,17 @@ Development:
     #   --exclude '.git'
     #   --exclude 'storage'
     #   . ${FTP_USER}@${FTP_HOST}:${CI_PROJECT_DIR}
-
-
     - |
       echo ------------------------------------------------------
-      echo Executing Directory Permission
+      echo Uploading files via FTP...
       echo ------------------------------------------------------
-    - ssh ${FTP_USER}@${FTP_HOST} "chown apache -R ${CI_PROJECT_DIR}"
+      while IFS= read -r file; do
+        echo "Uploading: $file"
+        ftp -n -i ftp.paenergy.ph << EOF
+        user dev@paenergy.ph p@3_D3v2025##
+        binary
+        put "$file" "/home/uub4rmw23inpzxn9/public_html/erp/$file"
+        bye
+      EOF
+      done < /temp-deployment-text-${CI_JOB_ID}.txt
+
