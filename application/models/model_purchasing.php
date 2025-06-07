@@ -56,8 +56,7 @@ class Model_purchasing extends CI_Model
                 $control .= '<a href="frm_edit_supplier" data-arr="' . $row->sysid . '" data-toggle="ajax-modal" title="Edit Supplier" class="btn btn-primary btn-sm inline"><i class="fa fa-edit"></i> </a>';
                 $control .= '<button class="btn btn-danger btn-sm inline" id="prf_item_delete" data-id="'.$row->sysid.'"><i class="fa fa-times"></i></button>';
                 $control .= '</div>';
-
-                $data['list'][] = array(
+                $data['list'][] = [
                     'expand' => $num++,
                     'name' => $row->descs,
                     'address' => $row->address,
@@ -65,9 +64,9 @@ class Model_purchasing extends CI_Model
                     'email' => $email,
                     'products' => ($purchase_qry) ? $purchase_qry->products : 0,
                     'purchasedqty' => ($purchase_qry) ? number_format($purchase_qry->qty, 0) : 0,
-                    'purchasedamt' => ($purchase_qry) ? '<span class="pull-left">'.get_currency($row->currency)->symbol.'</span> '.number_format($purchase_qry->amt, 2) : 0.00,
+                    'purchasedamt' => ($purchase_qry) ? '<span class="pull-left">'.( (is_object(get_currency($row->currency))) ? get_currency($row->currency)->symbol : '').'</span> '.number_format($purchase_qry->amt, 2) : 0.00,
                     'control' => $control
-                );
+                ];
             }
         }
 
