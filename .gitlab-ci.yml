@@ -17,7 +17,7 @@ Development:
       echo ------------------------------------------------------
       echo Syncing to destination server: ${CI_PROJECT_DIR}
       echo ------------------------------------------------------
-      
+
     # - eval rsync -a -u -i -r --ignore-errors --progress --human-readable --delete --verbose --timeout=600
     #   --files-from=/temp-deployment-text-${CI_JOB_ID}.txt
     #   --exclude '.gitlab-ci.yml'
@@ -27,6 +27,7 @@ Development:
     #   --exclude '.git'
     #   --exclude 'storage'
     #   . ${FTP_USER}@${FTP_HOST}:${CI_PROJECT_DIR}
+
 
     - |
       echo ------------------------------------------------------
