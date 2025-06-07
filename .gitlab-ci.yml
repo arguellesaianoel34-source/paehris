@@ -6,6 +6,9 @@ Development:
   only:
     - main
   stage: main
+  before_script:
+    - apt-get update -yqq
+    - apt-get install -y ftp
   script:
     - touch /temp-deployment-text-${CI_JOB_ID}.txt
     - git diff --name-only ${CI_COMMIT_BEFORE_SHA}...${CI_COMMIT_SHA} > /temp-deployment-text-${CI_JOB_ID}.txt
