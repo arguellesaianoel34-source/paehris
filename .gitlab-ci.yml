@@ -31,10 +31,10 @@ Development:
           lftp -c "
           set ftp:ssl-allow no;
           open -u ${FTP_USER},${FTP_PASSWORD} ftp.paenergy.ph;
-          
+          !echo '---[DEBUG] Listing root directory---';
+          ls
           # --- Debugging directory listing ---
           !echo '---[DEBUG] Listing public_html/erp/ directory---';
-          ls
           ls 'public_html/erp/';
           !echo '---[DEBUG] End of directory listing ---';
           
