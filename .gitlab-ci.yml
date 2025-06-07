@@ -7,40 +7,33 @@ Development:
     - main
   stage: main
   before_script:
+    # Add lftp to the installation
     - apt-get update -yqq
-    - apt-get install -y ftp
+    - apt-get install -y lftp
   script:
-    - touch /temp-deployment-text-${CI_JOB_ID}.txt
+    # This part remains the same
     - git diff --name-only ${CI_COMMIT_BEFORE_SHA}...${CI_COMMIT_SHA} > /temp-deployment-text-${CI_JOB_ID}.txt
     - |
-      echo ------------------------------------------------------
-      echo Listing the files to be deploy....
-      echo ------------------------------------------------------
+      echo "------------------------------------------------------"
+      echo "Listing the files to be deployed...."
+      echo "------------------------------------------------------"
       cat /temp-deployment-text-${CI_JOB_ID}.txt
-      echo ------------------------------------------------------
-      echo Syncing to destination server: ///
-      echo ------------------------------------------------------
+      echo "------------------------------------------------------"
+      echo "Syncing to destination server: /home/uub4rmw23inpzxn9/public_html/erp/"
+      echo "------------------------------------------------------"
 
-    # - eval rsync -a -u -i -r --ignore-errors --progress --human-readable --delete --verbose --timeout=600
-    #   --files-from=/temp-deployment-text-${CI_JOB_ID}.txt
-    #   --exclude '.gitlab-ci.yml'
-    #   --exclude 'vendor'
-    #   --exclude '.env'
-    #   --exclude '.idea'
-    #   --exclude '.git'
-    #   --exclude 'storage'
-    #   . ${FTP_USER}@${FTP_HOST}:${CI_PROJECT_DIR}
+    # --- Start of the corrected script ---
+    # Use lftp to upload all files from the list in one go.
+    # It will create directories automatically.
     - |
-      echo ------------------------------------------------------
-      echo Uploading files via FTP...
-      echo ------------------------------------------------------
-      while IFS= read -r file; do
-        echo "Uploading: $file"
-        ftp -n -i ftp.paenergy.ph << EOF
-        user dev@paenergy.ph p@3_D3v2025##
-        binary
-        put "$file" "/home/uub4rmw23inpzxn9/public_html/erp/$file"
-        bye
-      EOF
-      done < /temp-deployment-text-${CI_JOB_ID}.txt
+      lftp -c "
+      set ftp:ssl-allow no;
+      open -u dev@paenergy.ph,p@3_D3v2025## ftp.paenergy.ph;
+      mirror -R --verbose --parallel=5 --only-newer --files-from=/temp-deployment-text-${CI_JOB_ID}.txt . /home/uub4rmw23inpzxn9/public_html/erp/
+      "
+    # --- End of the corrected script ---
 
+    - |
+      echo "------------------------------------------------------"
+      echo "Deployment finished successfully."
+      echo "------------------------------------------------------"
