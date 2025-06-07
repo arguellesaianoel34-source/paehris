@@ -24,13 +24,22 @@ Development:
     # This loop will process one file at a time, but uses lftp's ability
     - |
       while IFS= read -r file; do
-        if [ -f "$file" ]; then # Ensure the item is a file
+        if [ -f "$file" ]; then
           echo "Uploading: $file"
-          # We've added the '-d' flag here to enable debug mode
-          lftp -d -c "
+          
+          # Using lftp to ls and then put the file
+          lftp -c "
           set ftp:ssl-allow no;
-          open -u ${FTP_USER},${FTP_PASSWORD} 18.204.167.93;
-          put -O public_html/erp/ '$file'
+          open -u ${FTP_USER},${FTP_PASSWORD} ftp.paenergy.ph;
+          
+          # --- Debugging directory listing ---
+          !echo '---[DEBUG] Listing public_html/erp/ directory---';
+          ls 'public_html/erp/';
+          !echo '---[DEBUG] End of directory listing ---';
+          
+          # This command will now attempt to upload the file directly
+          # It assumes the full subdirectory path already exists on the server
+          put -O \"public_html/erp/\" \"${file}\";
           "
         fi
       done < /temp-deployment-text-${CI_JOB_ID}.txt
