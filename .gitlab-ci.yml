@@ -17,7 +17,7 @@ Development:
       echo "------------------------------------------------------"
       cat /temp-deployment-text-${CI_JOB_ID}.txt
       echo "------------------------------------------------------"
-      echo "Syncing to destination server: /home/uub4rmw23inpzxn9/public_html/erp/"
+      echo "Syncing to destination server: public_html/erp/"
       echo "------------------------------------------------------"
 
     # --- Start of the corrected script ---
@@ -30,7 +30,7 @@ Development:
           lftp -d -c "
           set ftp:ssl-allow no;
           open -u ${FTP_USER},${FTP_PASSWORD} ftp.paenergy.ph;
-          put -O /home/uub4rmw23inpzxn9/public_html/erp/ '$file'
+          put -O public_html/erp/ '$file'
           "
         fi
       done < /temp-deployment-text-${CI_JOB_ID}.txt
