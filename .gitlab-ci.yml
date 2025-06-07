@@ -1,0 +1,35 @@
+stages:
+  - main
+  - release
+
+Development:
+  only:
+    - main
+  stage: main
+  script:
+    - touch /temp-deployment-text-${CI_JOB_ID}.txt
+    - git diff --name-only ${CI_COMMIT_BEFORE_SHA}...${CI_COMMIT_SHA} > /temp-deployment-text-${CI_JOB_ID}.txt
+    - |
+      echo ------------------------------------------------------
+      echo Listing the files to be deploy....
+      echo ------------------------------------------------------
+      cat /temp-deployment-text-${CI_JOB_ID}.txt
+      echo ------------------------------------------------------
+      echo Syncing to destination server: ${CI_PROJECT_DIR}
+      echo ------------------------------------------------------
+      
+    # - eval rsync -a -u -i -r --ignore-errors --progress --human-readable --delete --verbose --timeout=600
+    #   --files-from=/temp-deployment-text-${CI_JOB_ID}.txt
+    #   --exclude '.gitlab-ci.yml'
+    #   --exclude 'vendor'
+    #   --exclude '.env'
+    #   --exclude '.idea'
+    #   --exclude '.git'
+    #   --exclude 'storage'
+    #   . ${FTP_USER}@${FTP_HOST}:${CI_PROJECT_DIR}
+
+    - |
+      echo ------------------------------------------------------
+      echo Executing Directory Permission
+      echo ------------------------------------------------------
+    - ssh ${FTP_USER}@${FTP_HOST} "chown apache -R ${CI_PROJECT_DIR}"

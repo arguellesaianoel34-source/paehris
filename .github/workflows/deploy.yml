@@ -1,0 +1,28 @@
+# .github/workflows/deploy.yml
+name: Deploy on Push to Main
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Get list of changed files
+        id: diff
+        run: |
+          git fetch --all --tags
+          git diff --name-only ${github.event.before}...${github.sha}
+
+      - name: Show changed files
+        run: echo "$CHANGED_FILES"
+
+      - name: Sync changed files via rsync
+        run: |
+          echo "testing rsync"
