@@ -29,7 +29,7 @@ Development:
           # We've added the '-d' flag here to enable debug mode
           lftp -d -c "
           set ftp:ssl-allow no;
-          open -u ${FTP_USER},${FTP_PASSWORD} ftp.paenergy.ph;
+          open -u ${FTP_USER},${FTP_PASSWORD} 18.204.167.93;
           put -O public_html/erp/ '$file'
           "
         fi
