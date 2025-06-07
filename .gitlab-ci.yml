@@ -25,15 +25,21 @@ Development:
     - |
       while IFS= read -r file; do
         if [ -f "$file" ]; then
+          # Get the directory path from the file (e.g., "app/Models")
+          dir_path=$(dirname "$file")
+          
           echo "Uploading: $file"
           
           lftp -c "
           set ftp:ssl-allow no;
           open -u ${FTP_USER},${FTP_PASSWORD} ftp.paenergy.ph;
           
-          # Corrected command:
-          # The target is now '.', which means 'the current directory'.
-          mirror -R --verbose \"${file}\" .
+          # STEP 1: Create the directory. -p is safe and does nothing if it already exists.
+          mkdir -p \"${dir_path}\";
+          
+          # STEP 2: Put the file into the directory we just created.
+          # The -O flag here correctly places the file inside the specified directory.
+          put -O \"${dir_path}/\" \"${file}\";
           "
         fi
       done < /temp-deployment-text-${CI_JOB_ID}.txt
