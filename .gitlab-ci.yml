@@ -35,7 +35,7 @@ Development:
           ls
           # This command will now attempt to upload the file directly
           # It assumes the full subdirectory path already exists on the server
-          put \"${file}\" \"/${file}\";
+          put \"${file}\" \"/public_html/erp/${file}\;
           "
         fi
       done < /temp-deployment-text-${CI_JOB_ID}.txt
