@@ -15,7 +15,7 @@ Development:
       echo ------------------------------------------------------
       cat /temp-deployment-text-${CI_JOB_ID}.txt
       echo ------------------------------------------------------
-      echo Syncing to destination server: ${CI_PROJECT_DIR}
+      echo Syncing to destination server: ///
       echo ------------------------------------------------------
 
     # - eval rsync -a -u -i -r --ignore-errors --progress --human-readable --delete --verbose --timeout=600
