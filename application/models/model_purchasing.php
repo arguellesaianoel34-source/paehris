@@ -2258,7 +2258,9 @@ class Model_purchasing extends CI_Model
                                 $supplist['total'] = '<span id="supplier_soc" data-id="' . $supplier->sysid . '">'.number_format($total,2).'</span>';
                             } else {
                                 $gtotal['total'][] = $total_php;
-                                $supplist['php_total'] = '<span id="php_supplier_soc" data-id="' . $supplier->sysid . '">1.00</span>';
+                                
+                                $total_c = $total * ceil($currency->conversion);
+                                $supplist['php_total'] = '<span id="php_supplier_soc" data-id="' . $supplier->sysid . '">' . number_format($total_c, 2) . '</span>';
                                 $supplist['total'] = '<span id="supplier_soc" data-id="' . $supplier->sysid . '">'.number_format($total_php,2).'</span>';
                             }
                         }
