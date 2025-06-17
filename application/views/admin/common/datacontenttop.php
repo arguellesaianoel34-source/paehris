@@ -20,10 +20,11 @@ if ($task_notify->qry) {
 }
 
 $module_request = module_request_navigation($approval);
-$level = ($module_request->qry) ? $module_request->currtrn->lvl : 'Unknown';
-$desc = ($module_request->qry) ? $module_request->currtrn->desc : 'Unknown';
-$date = ($module_request->qry) ? $module_request->currtrn->date : 'Unknown';
-$name = ($module_request->qry) ? $module_request->currtrn->name : 'Unknown';
+
+$level = (isset($module_request->currtrn) && is_object($module_request->currtrn) && $module_request->qry) ? $module_request->currtrn->lvl : 'Unknown';
+$desc  = (isset($module_request->currtrn) && is_object($module_request->currtrn) && $module_request->qry) ? $module_request->currtrn->desc : 'Unknown';
+$date  = (isset($module_request->currtrn) && is_object($module_request->currtrn) && $module_request->qry) ? $module_request->currtrn->date : 'Unknown';
+$name  = (isset($module_request->currtrn) && is_object($module_request->currtrn) && $module_request->qry) ? $module_request->currtrn->name : 'Unknown';
 ?>
 <div class="row margin-bottom-10">
     <div class="col-md-12">
