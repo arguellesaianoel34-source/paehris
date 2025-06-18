@@ -2260,6 +2260,7 @@ class Model_purchasing extends CI_Model
                                 $gtotal['total'][] = $total_php;
                                 $total_c = $total * ceil($currency->conversion);
                                 $supplist['php_total'] = '<span id="php_supplier_soc" data-id="' . $supplier->sysid . '">' . number_format($total_c, 2) . '</span>';
+                                $total_php = $total_c + $supplier->shipping;
                                 $supplist['total'] = '<span id="supplier_soc" data-id="' . $supplier->sysid . '">'.number_format($total_php,2).'</span>';
                             }
                         }
@@ -2273,7 +2274,9 @@ class Model_purchasing extends CI_Model
                         $col = $cr_c.'_total';
                         $supplist[$col] = '<span id="' . $cr_c . '_supplier_soc" data-id="' . $supplier->sysid . '">' . number_format($total, 2) . '</span>';
                         $total_c = $total * ceil($currency->conversion);
-                        $supplist['php_total'] = '<span id="php_supplier_soc" data-id="' . $supplier->sysid . '">' . number_format($total_c, 2) . '</span>';
+                        $total_php = $total_c + $supplier->shipping;
+                        $supplist['php_total'] = '<span id="php_supplier_soc" data-id="' . $supplier->sysid . '">' . number_format($total_php, 2) . '</span>';
+
                     } else {
                         $supplist['total'] = '<span id="supplier_soc" data-id="' . $supplier->sysid . '">' . number_format($total, 2) . '</span>';
                     }
