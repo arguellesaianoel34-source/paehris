@@ -340,7 +340,7 @@ $user_role = get_users_roles_matrix_id_arr();
 
 
     <?php
-        echo user_info()->user_id;
+        echo print_r(user_info());
     ?>
 
 </div>
