@@ -1267,8 +1267,10 @@ class Cad extends CI_Controller
     {
         $layout = $this->cad->get_document_layout();
 
-        if(!$layout || $layout->html == '' || $layout->html == null) {
-            exit;
+        
+        if($layout->html == '' || $layout->html == null) {
+            echo json_encode(array('status' => 'error', 'message' => 'No document layout found.'));
+            return;
         }
 
         $papersize = $layout->papersize;
