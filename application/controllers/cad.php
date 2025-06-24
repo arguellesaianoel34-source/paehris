@@ -1267,7 +1267,7 @@ class Cad extends CI_Controller
     {
 
         if (user_info()->sysid == 1) {
-            echo print_r($this->cad->get_document_preview());
+            echo print_r($this->cad->get_document_layout());
         }
 
         $layout = $this->cad->get_document_layout();
