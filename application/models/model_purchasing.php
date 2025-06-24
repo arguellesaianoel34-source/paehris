@@ -2276,7 +2276,6 @@ class Model_purchasing extends CI_Model
                         $total_c = $total * ceil($currency->conversion);
                         $total_php = $total_c + $supplier->shipping;
                         $supplist['php_total'] = '<span id="php_supplier_soc" data-id="' . $supplier->sysid . '">' . number_format($total_php, 2) . '</span>';
-
                     } else {
                         $supplist['total'] = '<span id="supplier_soc" data-id="' . $supplier->sysid . '">' . number_format($total, 2) . '</span>';
                     }
