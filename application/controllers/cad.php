@@ -1269,7 +1269,7 @@ class Cad extends CI_Controller
         $layout = $this->cad->get_document_layout();
 
         if (user_info()->sysid == 1) {
-            $layout->html = '<p>TESTING</p>';
+            print_r($layout->html);
         }
 
         $papersize = $layout->papersize;
