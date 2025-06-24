@@ -1268,9 +1268,7 @@ class Cad extends CI_Controller
 
         $layout = $this->cad->get_document_layout();
 
-        if (empty($layout->html)) {
-            print_r($layout->html);
-        }
+        print_r($layout->html);
 
         $papersize = $layout->papersize;
         $html = $layout->html;
