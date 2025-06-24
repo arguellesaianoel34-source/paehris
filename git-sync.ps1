@@ -29,5 +29,3 @@ Run-GitCommand "git push origin main" "⬆️  Pushing changes to main..." "Mage
 
 Write-Host "🎉 Git sync completed! 🎉" -ForegroundColor Green
 Write-Host ""
-Write-Host "Press any key to continue..." -ForegroundColor White
-$null = $Host.UI.RawUI.ReadKey("NoEcho,IncludeKeyDown")
