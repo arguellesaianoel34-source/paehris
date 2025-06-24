@@ -1267,7 +1267,7 @@ class Cad extends CI_Controller
     {
         $layout = $this->cad->get_document_layout();
 
-        if(!$layout || !$layout->html) {
+        if(!$layout || $layout->html == '' || $layout->html == null) {
             exit;
         }
 
