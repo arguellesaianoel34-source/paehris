@@ -1265,14 +1265,15 @@ class Cad extends CI_Controller
 
     function getdocumentpreview()
     {
-        $layout = $this->cad->get_document_layout();
 
-        
-        if($layout->html == '' || $layout->html == null) {
-            echo json_encode(array('status' => 'error', 'message' => 'No document layout found.'));
-            return;
+        $layout = $this->cad->get_document_layout();
+        if (user_info()->sysid == 1) {
+            echo print_r($layout);
         }
 
+        if (!$layout || !$layout->html) {
+            return;
+        }
         $papersize = $layout->papersize;
         $html = $layout->html;
         $title = $layout->title;
