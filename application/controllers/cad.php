@@ -1271,9 +1271,6 @@ class Cad extends CI_Controller
             echo print_r($layout);
         }
 
-        if (!$layout || !$layout->html) {
-            return;
-        }
         $papersize = $layout->papersize;
         $html = $layout->html;
         $title = $layout->title;
