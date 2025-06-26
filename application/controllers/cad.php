@@ -1284,7 +1284,7 @@ class Cad extends CI_Controller
         $dompdf->render();
         // Add PDF Document Information
         $dompdf->add_info('Subject', $title);
-        $dompdf->add_info('Author', user_info()->username);
+        $dompdf->add_info('Author', user_info()->username ?? '');
         $dompdf->add_info('Creator', 'ITD');
         $dompdf->add_info('Keywords', $title);
         $dompdf->stream($filename, array('Attachment' => false));
