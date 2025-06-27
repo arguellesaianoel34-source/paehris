@@ -2426,7 +2426,14 @@ class Model_purchasing extends CI_Model
             } else {
                 $c = get_currency($supplier->currency);
                 $netvat[$quotationid] = $totalamt;
-                $ewt[$quotationid] = 0;
+
+                
+                $ewtrate = 0;
+                if ($supplier->type == 4002) {
+                    $ewtrate = 0.02;
+                }
+
+                $ewt[$quotationid] = ($supplier->exrate <= 1) ? round($netvat[$quotationid] * $ewtrate, 2) : 0;
                 $vat[$quotationid] = 0;
                 $gross[$quotationid] = 0;
 
