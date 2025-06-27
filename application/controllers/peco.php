@@ -18,7 +18,7 @@ class Peco extends CI_Controller {
     function index() {
         $data = array();
         if (user_id() > 0) {
-            if((check_access() && check_access()->accesstype < 5) || user_id()==1){
+            //if((check_access() && check_access()->accesstype < 5) || user_id()==1){
                 if (check_user_lock()) {
                     $data['pagetitle'] = 'Login';
                     $this->load->helper(array('form'));
@@ -30,19 +30,19 @@ class Peco extends CI_Controller {
                 } else {
                     redirect(base_url() . 'admin/dashboard');
                 }
-            }else{
-                redirect(base_url() . 'guest');
-            }
+            // }else{
+            //     redirect(base_url() . 'guest');
+            // }
         } else {
-            if((check_access() && check_access()->accesstype < 5) || user_id()==1){
+           // if((check_access() && check_access()->accesstype < 5) || user_id()==1){
                 $this->load->helper(array('form'));
                 $data['pagetitle'] = 'Welcome | Login';
                 $this->load->view('admin/common/head', $data);
                 $this->load->view('redirects/forms/view_login');
                 $this->load->view('admin/common/scripts');
-            }else {
-                redirect(base_url() . 'guest');
-            }
+            // }else {
+            //     redirect(base_url() . 'guest');
+            // }
         }
     }
 

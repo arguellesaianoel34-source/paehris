@@ -388,7 +388,9 @@ $user_role = get_users_roles_matrix_id_arr();
 
                     </div>
                     <div class="portlet-footer btn-group" id="preview_actions">
-
+<?php
+                                    echo user_info()->user_id;
+                                ?>
 
                     </div>
                 </div>

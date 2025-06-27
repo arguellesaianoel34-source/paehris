@@ -454,7 +454,7 @@ var ATTACHEMENTS = function() {
         tab.find('#iframe_' + elem + '_preview').each(function () {
             $(this).remove();
         });
-        var new_ifrm = $('<iframe></iframe>').attr({
+        var new_ifrm = $('<iframe frameborder="0" border="0"></iframe>').attr({
             id: 'iframe_' + elem + '_preview',
             src: '',
             style: 'width:100%; height:500px;'

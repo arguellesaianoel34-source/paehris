@@ -4,24 +4,27 @@ if (!defined('BASEPATH'))
     exit('No direct script access allowed');
 session_start(); // STARTING SESSION DATA
 
-class Cad extends CI_Controller {
-    public function __construct() {
+class Cad extends CI_Controller
+{
+    public function __construct()
+    {
         parent::__construct();
         $this->load->model('model_admin');
         $this->load->model('model_query');
         $this->load->model('model_cad', 'cad');
         $this->load->helper('cad_helper');
-        if(check_user_lock()) {
+        if (check_user_lock()) {
             redirect(base_url(), 'refresh');
         }
     }
 
 
-    function select2routes() {
+    function select2routes()
+    {
         $data = array();
         $route = $this->input->post('data');
 
-        if ($route ) {
+        if ($route) {
             if (is_array($route)) {
                 $this->db->where_in('levels', $route);
             } else {
@@ -33,11 +36,11 @@ class Cad extends CI_Controller {
 
         $qry = $this->db->select()
             ->from('prime_transaction_flow_main_stages')
-            ->where(array('flowid' => 2,'status' => 1))
+            ->where(array('flowid' => 2, 'status' => 1))
             ->order_by('levels')
             ->get();
-        if($qry->num_rows() > 0) {
-            foreach($qry->result() as $row) {
+        if ($qry->num_rows() > 0) {
+            foreach ($qry->result() as $row) {
                 $data['list'][] = array(
                     'id' => $row->levels,
                     'text' => $row->levels . ' - ' . $row->desc
@@ -49,51 +52,63 @@ class Cad extends CI_Controller {
         echo json_encode($data);
     }
 
-    function getinstallationteam() {
+    function getinstallationteam()
+    {
         echo $this->cad->get_installation_team();
     }
 
-    function getapplicaitonsubdetails() {
+    function getapplicaitonsubdetails()
+    {
         echo $this->cad->get_application_details();
     }
 
-    function getnewconnectionlist() {
+    function getnewconnectionlist()
+    {
         echo $this->cad->get_new_connection_lists();
     }
 
-    function setstatus() {
+    function setstatus()
+    {
         echo $this->cad->set_status();
     }
 
-    function savenewaccount() {
+    function savenewaccount()
+    {
         echo $this->cad->save_new_application();
     }
 
-    function saveonlineaccount() {
+    function saveonlineaccount()
+    {
         echo $this->cad->save_online_application();
     }
 
-    function getapplications() {
+    function getapplications()
+    {
         echo $this->cad->get_applications_report();
     }
 
-    function getapplicationinfo() {
+    function getapplicationinfo()
+    {
         echo $this->cad->get_application_info();
     }
 
-    function serviceslastname() {
+    function serviceslastname()
+    {
         echo $this->cad->get_services_lastname();
     }
 
-    function servicestart() {
+    function servicestart()
+    {
         echo $this->cad->get_services_starts();
     }
 
-    function submiteditable() {
+    function submiteditable()
+    {
         echo $this->cad->submit_editable();
     }
 
-    function searchrequirements() {
+    function searchrequirements()
+    {
         $term = $this->input->post('term');
         $q = $this->db->select('prp.sysid AS PRPSYSID, prp.names AS PRPNAMES, prp.desc AS PRPDESC')
             ->from('requirements_parameters AS pcar')
@@ -102,8 +117,8 @@ class Cad extends CI_Controller {
             ->like('prp.desc', $term)->get();
         $res_num = $q->num_rows();
         $qry = false;
-        if($res_num>0 && $term!='') {
-            foreach($q->result() as $row) {
+        if ($res_num > 0 && $term != '') {
+            foreach ($q->result() as $row) {
                 $data['list'][] = array('id' => $row->PRPSYSID, 'text' => $row->PRPNAMES);
             }
             $qry = true;
@@ -115,7 +130,8 @@ class Cad extends CI_Controller {
     }
 
 
-    function updategdlb() {
+    function updategdlb()
+    {
         $data = array();
         $msg = '';
         $func = 'error';
@@ -131,14 +147,14 @@ class Cad extends CI_Controller {
         $qry_seq = $this->db->select_max('sysid')->from('application_customers_sequence')->get()->row();
         $new_seq = ($qry_seq) ? $qry_seq->sysid + 1 : 1;
 
-        if($qry_gdlb_final->d==5){
+        if ($qry_gdlb_final->d == 5) {
             $gdlb_final_dcode = 'S';
-        }else{
+        } else {
             $gdlb_final_dcode = get_district_name($qry_gdlb_final->d) ? get_district_name($qry_gdlb_final->d)[0] : '';
         }
 
         // SERVNO
-        $servno = $gdlb_final_dcode.str_pad($new_seq, 6, "0", STR_PAD_LEFT);
+        $servno = $gdlb_final_dcode . str_pad($new_seq, 6, "0", STR_PAD_LEFT);
         // INSERT SEQUENCE
         $this->db->insert("application_customers_sequence", array('appid' => $appid, 'createdby' => user_id()));
         $data['err'] = $this->db->_error_message();
@@ -161,12 +177,12 @@ class Cad extends CI_Controller {
         );
         $audit_ins = audit_insert($audit_ins_arr);
 
-        if($this->db->trans_status() && $audit_ins==true) {
+        if ($this->db->trans_status() && $audit_ins == true) {
             $this->db->trans_commit();
             $qry = true;
             $msg = 'GDLB is now updated!';
             $func = 'success';
-        }else{
+        } else {
             $this->db->trans_rollback();
             $msg = 'Error GDLB SQL Update';
         }
@@ -177,7 +193,8 @@ class Cad extends CI_Controller {
         echo json_encode($data);
     }
 
-    function getacctrequirements($appid = false) {
+    function getacctrequirements($appid = false)
+    {
         if (!$appid) {
             $id = $this->input->post('id');
         } else {
@@ -207,23 +224,23 @@ class Cad extends CI_Controller {
         $res_num = $q->num_rows();
         $res_comp = 0;
 
-        if($res_num>0) {
+        if ($res_num > 0) {
             $num = 1;
-            foreach($q->result() as $row) {
+            foreach ($q->result() as $row) {
                 $status = 'INCOMPLETE';
-                if($row->comply == 1){
+                if ($row->comply == 1) {
                     $status = 'COMPLETE';
                 }
                 $html .= '<tr>';
-                $html .= '<td>'.$num++.'</td>';
-                $html .= '<td>'.$row->REQID.' - '.$row->PRPNAMES.'</td>';
-                $html .= '<td>'.$status.'</td>';
+                $html .= '<td>' . $num++ . '</td>';
+                $html .= '<td>' . $row->REQID . ' - ' . $row->PRPNAMES . '</td>';
+                $html .= '<td>' . $status . '</td>';
                 $html .= '</tr>';
 
                 $stat = '';
                 $data['list'][] = array(
                     'id' => $row->PRPSYSID,
-                    'text' => $row->REQID.' - '.$row->PRPNAMES,
+                    'text' => $row->REQID . ' - ' . $row->PRPNAMES,
                     'stat' => ''
                 );
             }
@@ -239,7 +256,8 @@ class Cad extends CI_Controller {
         echo json_encode($data);
     }
 
-    function getselectednamematched() {
+    function getselectednamematched()
+    {
         $data = array();
         $accountexists = false;
         $personid = $this->input->post('personid');
@@ -262,7 +280,7 @@ class Cad extends CI_Controller {
             ->like('nl.name', $lastname)->get();
 
 
-        if($qry_accoutns_legacy->num_rows()>0) {
+        if ($qry_accoutns_legacy->num_rows() > 0) {
             foreach ($qry_accoutns_legacy->result() as $row) {
                 $first_array[] = array('sysid' => $row->sysid, 'firstname' => $row->name, 'middlename' => $row->name, 'district' => $row->d);
                 $data['personarr'] = $first_array;
@@ -270,7 +288,7 @@ class Cad extends CI_Controller {
             $search_firstname = array_contains_key($first_array, 'firstname', 'sysid', $firstname);
             $search_firstname_cnt = count($search_firstname);
             $data['searchfirstname'] = $search_firstname;
-            if($search_firstname_cnt) {
+            if ($search_firstname_cnt) {
                 $person_exists = true;
             }
         }
@@ -279,7 +297,7 @@ class Cad extends CI_Controller {
         $html_normalized = '';
         $html_legacy = '';
 
-        if($qry_accounts) {
+        if ($qry_accounts) {
             $html_cont = true;
             $html_normalized .= $qry_accounts->accountid;
         }
@@ -290,11 +308,13 @@ class Cad extends CI_Controller {
         echo json_encode($data);
     }
 
-    function getcustomerrequirements() {
+    function getcustomerrequirements()
+    {
         echo $this->cad->get_customer_requirements();
     }
 
-    function getrequirementsres() {
+    function getrequirementsres()
+    {
         $ids = $this->input->post('ids');
         //$ids = '1,2,3,4,5,6,7,8,24,25,26,27';
         $req_sysids_arr = explode(',', $ids);
@@ -305,8 +325,8 @@ class Cad extends CI_Controller {
             ->group_by('prp.sysid')->get();
         $res_num = $q->num_rows();
 
-        if($res_num>0) {
-            foreach($q->result() as $row) {
+        if ($res_num > 0) {
+            foreach ($q->result() as $row) {
                 $data['list'][] = array(
                     'id' => $row->PRPSYSID,
                     'text' => $row->PRPNAMES,
@@ -318,19 +338,23 @@ class Cad extends CI_Controller {
         echo json_encode($data);
     }
 
-    function getadditionalrequirements() {
+    function getadditionalrequirements()
+    {
         echo $this->cad->get_additional_requirements();
     }
 
-    function addrequirement() {
+    function addrequirement()
+    {
         echo $this->cad->add_requirement();
     }
 
-    function deleterequirement() {
+    function deleterequirement()
+    {
         echo $this->cad->delete_requirement();
     }
 
-    function cadcontract($appid) {
+    function cadcontract($appid)
+    {
         $data['appid'] = $appid;
 
         //@TODO create checking of contract if already generated and uploaded
@@ -352,9 +376,9 @@ class Cad extends CI_Controller {
 
         //check if contract file already exist
 
-        $upload_path = FCPATH.'uploads/attachments/cad/applications/'.str_pad($appid,6,'0',STR_PAD_LEFT).'/';
+        $upload_path = FCPATH . 'uploads/attachments/cad/applications/' . str_pad($appid, 6, '0', STR_PAD_LEFT) . '/';
 
-        $filename = 'CONTRACT_'.$essr_no.'.pdf';
+        $filename = 'CONTRACT_' . $essr_no . '.pdf';
 
         $attachment_id = $this->db->select('acr.sysid')
             ->from('application_customers_requirements AS acr')
@@ -457,31 +481,37 @@ class Cad extends CI_Controller {
 
         $this->load->helper('download');
 
-        force_download($filename,$contents);
+        force_download($filename, $contents);
     }
 
-    function getrequirements() {
+    function getrequirements()
+    {
         echo $this->cad->get_requirements_list();
     }
 
-    function getapplicationparam() {
+    function getapplicationparam()
+    {
         echo $this->cad->get_application_param();
     }
 
-    function addcustomercharges() {
+    function addcustomercharges()
+    {
         echo $this->cad->add_customer_charges();
     }
 
-    function checkonlineticketstatus() {
+    function checkonlineticketstatus()
+    {
         echo $this->cad->check_online_ticket_status();
     }
 
-    function submitonlinerowdata() {
+    function submitonlinerowdata()
+    {
         echo $this->cad->submit_online_row_data();
     }
 
 
-    function clearcadtrans() {
+    function clearcadtrans()
+    {
         $data = array();
         $msg = '';
         $func = 'error';
@@ -510,16 +540,15 @@ class Cad extends CI_Controller {
 
         $qry_flows = $this->db->select()->from('transaction_request_main')
             ->where(array('flowid' => $flowid))->get();
-        if($qry_flows->num_rows()>0) {
-            foreach($qry_flows->result() as $row)
-            {
+        if ($qry_flows->num_rows() > 0) {
+            foreach ($qry_flows->result() as $row) {
 
                 $data['trnid'][] = $row->sysid;
                 $qry_flow_stages = $this->db->select()
                     ->from('transaction_request_main_trails')
                     ->where('trnid', $row->sysid)
                     ->get()->row();
-                if($qry_flow_stages) {
+                if ($qry_flow_stages) {
                     $stage_id = $qry_flow_stages->sysid;
                     $data['TRAILID'][] = $stage_id;
                     $this->db->where('trailid', $stage_id);
@@ -547,18 +576,20 @@ class Cad extends CI_Controller {
         echo json_encode($data);
     }
 
-    function getcustomerservices() {
+    function getcustomerservices()
+    {
         echo $this->cad->get_application_services();
     }
 
-    function selectservicematerials() {
+    function selectservicematerials()
+    {
         $data = array();
         $query = $this->db->select('a.sysid, c.codes, c.descs')
             ->from('customer_charges AS a')
             ->join('prime_chart_of_accounts AS c', 'a.acctid = c.sysid')
             ->where(array('a.status' => 1))->get();
-        if($query->num_rows()>0) {
-            foreach($query->result() as $row) {
+        if ($query->num_rows() > 0) {
+            foreach ($query->result() as $row) {
                 $data['list'][] = array(
                     'id' => $row->sysid,
                     'text' => $row->codes . ' - ' . $row->descs,
@@ -568,47 +599,57 @@ class Cad extends CI_Controller {
         echo json_encode($data);
     }
 
-    function addservicefee() {
+    function addservicefee()
+    {
         echo json_encode($this->cad->insert_services_fee());
     }
-    function delservicesfee() {
+    function delservicesfee()
+    {
         echo $this->cad->del_services_fee();
     }
-    function processar() {
+    function processar()
+    {
         echo $this->cad->process_account_receivable();
     }
-    function customerslistbasic() {
+    function customerslistbasic()
+    {
         echo $this->cad->get_customers_lists();
     }
-    function getrangecustomerlist() {
+    function getrangecustomerlist()
+    {
         echo $this->cad->get_ranged_customers_list();
     }
-    function setcookiecustomerlistup() {
+    function setcookiecustomerlistup()
+    {
         echo $this->cad->setcookie_customer_lists_up();
     }
-    function updatecustomerinfo() {
+    function updatecustomerinfo()
+    {
         echo $this->cad->update_customer_info();
     }
-    function deletecookie($mode = '') {
+    function deletecookie($mode = '')
+    {
         $offset = $_COOKIE['cust_list_offset'];
 
-        echo 'Offset: '. $offset;
+        echo 'Offset: ' . $offset;
 
-        if($mode=='del') {
+        if ($mode == 'del') {
             setcookie('cust_list_offset', -1, time() + (86400 * 30), "/"); // 86400 = 1 day
         }
     }
 
-    function executeaccomplishment() {
+    function executeaccomplishment()
+    {
         echo $this->cad->execute_accomplishement();
     }
-    function getjobtype(){
+    function getjobtype()
+    {
         $data = array();
         $sql = $this->db->select("sysid,names,desc")
             ->from("prime_types_parameter")
             ->where(array('codes' => 'APPJOBTYPE'))->get();
-        if($sql->num_rows()>0) {
-            foreach($sql->result() as $row) {
+        if ($sql->num_rows() > 0) {
+            foreach ($sql->result() as $row) {
                 $data['list'][] = array(
                     'id' => $row->sysid,
                     'text' => $row->names . ' - ' . $row->desc,
@@ -618,19 +659,23 @@ class Cad extends CI_Controller {
         echo json_encode($data);
     }
 
-    function getappmeterconn() {
+    function getappmeterconn()
+    {
         echo $this->cad->get_applicaton_meter_connections();
     }
 
-    function unreleasemeter() {
+    function unreleasemeter()
+    {
         echo $this->cad->unrelease_meter();
     }
 
-    function releasethismeter() {
+    function releasethismeter()
+    {
         echo $this->cad->release_this_meter();
     }
 
-    function uploadreqdata(){
+    function uploadreqdata()
+    {
         $data = array();
         $reqid = $this->input->post('reqid');
         $dataid = $this->input->post('appid');
@@ -640,7 +685,7 @@ class Cad extends CI_Controller {
         $func = '';
 
 
-        if(isset($_FILES["uploadfiles"])) {
+        if (isset($_FILES["uploadfiles"])) {
             $new_name = $_FILES["uploadfiles"]['name'];
 
             $file_directory = FCPATH . "uploads/attachments/cad/applications/" . str_pad($dataid, 6, "0", STR_PAD_LEFT) . "/";
@@ -656,7 +701,7 @@ class Cad extends CI_Controller {
             $config['encrypt_name'] = TRUE;
             $config['file_name'] = $new_name;
             $this->load->library('upload', $config);
-            $location = 'uploads/attachments/cad/applications/'.str_pad($dataid,6,"0",STR_PAD_LEFT).'/'.$new_name;
+            $location = 'uploads/attachments/cad/applications/' . str_pad($dataid, 6, "0", STR_PAD_LEFT) . '/' . $new_name;
             // ###############################################
             // CREATE DIRECTORY
             if (!is_dir($file_directory)) {
@@ -674,7 +719,7 @@ class Cad extends CI_Controller {
 
                 $this->db->trans_begin();
 
-                $datenow  = date("Y-m-d h:i:s");
+                $datenow = date("Y-m-d h:i:s");
 
                 $updatearr = array(
                     'comply' => 1,
@@ -682,22 +727,22 @@ class Cad extends CI_Controller {
                     'complyby' => user_id(),
                     'fileurl' => $location
                 );
-                $this->db->where(array("sysid" => $reqid , "appid" => $dataid , "status" => 1));
-                $sql = $this->db->update("application_customers_requirements" , $updatearr);
+                $this->db->where(array("sysid" => $reqid, "appid" => $dataid, "status" => 1));
+                $sql = $this->db->update("application_customers_requirements", $updatearr);
                 $data['errorquery'] = $this->db->_error_message();
-                if($this->db->trans_status() == true && $sql){
+                if ($this->db->trans_status() == true && $sql) {
                     $this->db->trans_commit();
                     $qry = true;
                     $msg = 'Data has been uploaded.';
                     $func = 'success';
-                }else{
+                } else {
                     $this->db->trans_rollback();
                     $msg = 'Failed to upload data.';
                     $func = 'error';
                     $qry = false;
                 }
             }
-        }else{
+        } else {
             $msg = 'Drop the file again!';
         }
 
@@ -712,7 +757,8 @@ class Cad extends CI_Controller {
         echo json_encode($data);
     }
 
-    function removeattachment(){
+    function removeattachment()
+    {
         $data = array();
         $dataid = $this->input->post('dataid');
 
@@ -725,13 +771,13 @@ class Cad extends CI_Controller {
             'fileurl' => null
         );
         $this->db->where(array("sysid" => $dataid));
-        $sql = $this->db->update("application_customers_requirements" , $updatearr);
-        if($this->db->trans_status() == true && $sql){
+        $sql = $this->db->update("application_customers_requirements", $updatearr);
+        if ($this->db->trans_status() == true && $sql) {
             $this->db->trans_commit();
             $msg = 'Attachment has been removed.';
             $func = 'success';
             $qry = true;
-        }else{
+        } else {
             $this->db->trans_status();
             $msg = 'Failed to remove attachement';
             $func = 'error';
@@ -742,19 +788,20 @@ class Cad extends CI_Controller {
         $data['qry'] = $qry;
         echo json_encode($data);
     }
-    function submitcustomeratt(){
+    function submitcustomeratt()
+    {
         $data = array();
         $ids = $this->input->post('ids');
         $attachments = $this->input->post('checkimg');
 
         $this->db->trans_begin();
 
-        if(empty($attachments)){
+        if (empty($attachments)) {
             $this->db->trans_status();
             $msg = 'No attachment selected!';
             $func = 'info';
             $qry = false;
-        }else {
+        } else {
             $updatearr = array(
                 'comply' => 1
             );
@@ -792,40 +839,41 @@ class Cad extends CI_Controller {
         $data['qry'] = $qry;
         echo json_encode($data);
     }
-    function deleteattachment(){
+    function deleteattachment()
+    {
         $data = array();
         $dataid = $this->input->post('dataid');
         $appid = $this->input->post('appid');
-        $data['dataid'] =$dataid;
+        $data['dataid'] = $dataid;
         $this->db->trans_begin();
         $filecount = 0;
         $updatearr = array(
             'status' => 0
         );
-        $this->db->where(array("sysid" => $dataid , "status" => 1));
-        $sql = $this->db->update("application_customers_attachments" , $updatearr);
+        $this->db->where(array("sysid" => $dataid, "status" => 1));
+        $sql = $this->db->update("application_customers_attachments", $updatearr);
 
         $checkfilecount = $this->db->select("COUNT(sysid) as filecount")->from("application_customers_attachments")
-            ->where(array("attachmentid" => $appid , "status" => 1))->get()->row();
-        if($checkfilecount){
+            ->where(array("attachmentid" => $appid, "status" => 1))->get()->row();
+        if ($checkfilecount) {
             $filecount = $checkfilecount->filecount;
-            if($filecount == 0){
+            if ($filecount == 0) {
                 $data['filecount'] = $filecount;
                 $data['sysid'] = $appid;
                 $applicationarr = array(
                     'comply' => 0
                 );
                 $this->db->where(array("sysid" => $appid));
-                $this->db->update("application_customers_requirements" , $applicationarr);
+                $this->db->update("application_customers_requirements", $applicationarr);
             }
         }
 
-        if($this->db->trans_status() == true && $sql){
+        if ($this->db->trans_status() == true && $sql) {
             $this->db->trans_commit();
             $msg = 'Attachment has been remove.';
             $func = 'success';
             $qry = true;
-        }else{
+        } else {
             $this->db->trans_status();
             $msg = 'Failed to remove attachement';
             $func = 'error';
@@ -838,11 +886,13 @@ class Cad extends CI_Controller {
         echo json_encode($data);
     }
 
-    function autoassignrequirements() {
+    function autoassignrequirements()
+    {
         echo $this->cad->auto_assign_requirements();
     }
 
-    function editinfo(){
+    function editinfo()
+    {
         $input = $this->input->post();
         $inputname = $input['name'];
         $dataid = $input['pk'];
@@ -850,41 +900,41 @@ class Cad extends CI_Controller {
 
         $this->db->trans_begin();
         $sql = '';
-        if($inputname == 'seniorvaliid'){
+        if ($inputname == 'seniorvaliid') {
             $update = array(
                 'seniorid' => $val
             );
             $this->db->where(array("sysid" => $dataid));
-            $sql = $this->db->update("application_customers_details" , $update);
+            $sql = $this->db->update("application_customers_details", $update);
 
         }
-        if($inputname == 'seniordatefrom'){
+        if ($inputname == 'seniordatefrom') {
             $update = array(
                 'seniordatefrom' => $val
             );
             $this->db->where(array("sysid" => $dataid));
-            $sql = $this->db->update("application_customers_details" , $update);
+            $sql = $this->db->update("application_customers_details", $update);
         }
-        if($inputname == 'seniordateto'){
+        if ($inputname == 'seniordateto') {
             $update = array(
                 'seniordateto' => $val
             );
             $this->db->where(array("sysid" => $dataid));
-            $sql = $this->db->update("application_customers_details" , $update);
+            $sql = $this->db->update("application_customers_details", $update);
         }
 
-        if($inputname == 'essrnoprofile'){
+        if ($inputname == 'essrnoprofile') {
             $update = array(
                 'essrno' => $val
             );
             $this->db->where(array("sysid" => $dataid));
-            $sql = $this->db->update("application_customers_details" , $update);
+            $sql = $this->db->update("application_customers_details", $update);
         }
 
-        if($this->db->trans_status() == true && $sql){
+        if ($this->db->trans_status() == true && $sql) {
             $this->db->trans_commit();
             $qry = true;
-        }else{
+        } else {
             $this->db->trans_status();
             $qry = false;
         }
@@ -893,18 +943,19 @@ class Cad extends CI_Controller {
         $data['input'] = $this->input->post();
         echo json_encode($data);
     }
-    function getbarangays(){
-        $data=  array();
+    function getbarangays()
+    {
+        $data = array();
         $distid = $this->input->post('data');
-        if($distid > 0){
+        if ($distid > 0) {
             $this->db->where(array("distid" => $distid));
         }
         $sql = $this->db->select("sysid , texts")->from("address_barangay")->get();
-        if($sql->num_rows() > 0){
-            foreach ($sql->result() as $row){
+        if ($sql->num_rows() > 0) {
+            foreach ($sql->result() as $row) {
                 $data['list'][] = array(
                     'id' => $row->sysid,
-                    'text' =>  $row->texts.' - '.''
+                    'text' => $row->texts . ' - ' . ''
                 );
             }
         }
@@ -912,52 +963,64 @@ class Cad extends CI_Controller {
         echo json_encode($data);
     }
 
-    function editowner() {
+    function editowner()
+    {
         echo $this->cad->edit_owner();
     }
 
-    function dtsubowners() {
+    function dtsubowners()
+    {
         echo $this->cad->dt_sub_owners();
     }
 
-    function removesubowner() {
+    function removesubowner()
+    {
         echo $this->cad->remove_subowner();
     }
 
-    function loadcsv() {
+    function loadcsv()
+    {
         echo $this->cad->load_csv();
     }
 
-    function uploadonlineapplication(){
+    function uploadonlineapplication()
+    {
         echo $this->cad->upload_online_application();
     }
 
-    function address($type,$id){
-        echo address_name($type,$id);
+    function address($type, $id)
+    {
+        echo address_name($type, $id);
         print_r($this->db->last_query());
     }
 
-    function select2rateclass() {
+    function select2rateclass()
+    {
         echo get_rate_class_select();
     }
 
-    function addrequirementlist() {
+    function addrequirementlist()
+    {
         echo $this->cad->add_requirement_list();
     }
 
-    function sendfinalrequirementlist() {
+    function sendfinalrequirementlist()
+    {
         echo $this->cad->send_final_list_requirements();
     }
 
-    function printrequirements($appid) {
+    function printrequirements($appid)
+    {
         echo $this->cad->print_requirements($appid);
     }
 
-    function printinspectionlist() {
+    function printinspectionlist()
+    {
         echo $this->cad->print_inspection_list();
     }
 
-    function summaryofcost($id = false) {
+    function summaryofcost($id = false)
+    {
         $data = array();
         if ($id == false) {
             $id = $this->input->post('appid');
@@ -976,17 +1039,21 @@ class Cad extends CI_Controller {
         }
     }
 
-    function overrideamt() {
+    function overrideamt()
+    {
         echo $this->cad->override_amt();
     }
-    function getrefdetails() {
+    function getrefdetails()
+    {
         echo $this->cad->get_referrals_details();
     }
-    function getassessmentdetails() {
+    function getassessmentdetails()
+    {
         echo $this->cad->get_assessment_details();
     }
-    function getproposalpdf($id = false) {
-        $proposal =  $this->cad->get_proposal_pdf($id);
+    function getproposalpdf($id = false)
+    {
+        $proposal = $this->cad->get_proposal_pdf($id);
 
 
         $html = $proposal->html;
@@ -1003,10 +1070,11 @@ class Cad extends CI_Controller {
         $dompdf->add_info('Author', 'PA Energy, Inc.');
         $dompdf->add_info('Creator', 'PAE');
         $dompdf->add_info('Keywords', 'PROPOSAL');
-        $dompdf->stream($filename,array('Attachment' => false));
+        $dompdf->stream($filename, array('Attachment' => false));
     }
 
-    function aurepform() {
+    function aurepform()
+    {
         $appid = $this->input->post('appid');
         $type = $this->input->post('type'); // edit or add
         $data = array();
@@ -1019,89 +1087,106 @@ class Cad extends CI_Controller {
         }
     }
 
-    function getproposal($id = false) {
+    function getproposal($id = false)
+    {
         $id = ($id) ? $id : $this->input->post('id');
-        $prop =  $this->cad->get_proposal_pdf($id);
+        $prop = $this->cad->get_proposal_pdf($id);
         echo json_encode($prop);
     }
 
-    function getproposallayout($id = false) {
+    function getproposallayout($id = false)
+    {
         $id = ($id) ? $id : $this->input->post('id');
-        $prop =  $this->cad->get_proposal_pdf($id);
+        $prop = $this->cad->get_proposal_pdf($id);
         echo $prop->html;
     }
 
-    function select2du() {
+    function select2du()
+    {
         echo $this->cad->select2_du();
     }
 
-    function updatedistutility() {
+    function updatedistutility()
+    {
         echo $this->cad->update_dist_utility();
     }
 
-    function saveproposedsystemrates() {
+    function saveproposedsystemrates()
+    {
         echo $this->cad->save_proposed_system_rates();
     }
 
-    function finalizedocument() {
+    function finalizedocument()
+    {
         echo $this->cad->finalize_document();
     }
 
-    function deletedocument() {
+    function deletedocument()
+    {
         echo $this->cad->delete_document();
     }
 
-    function updatereplaceowner() {
+    function updatereplaceowner()
+    {
         echo $this->cad->update_replace_owner();
     }
 
-    function initownerinfo() {
+    function initownerinfo()
+    {
         $id = $this->input->post('id');
         $info = get_application_details($id);
         echo json_encode($info->info);
     }
 
-    function printtest($id) {
+    function printtest($id)
+    {
         $proposal = $this->cad->get_proposal_pdf($id);
         $png = ($proposal) ? rehash_pdf_img($proposal->html) : array();
 
-            echo "<pre>";
-            print_r($png);
-            echo "</pre>";
+        echo "<pre>";
+        print_r($png);
+        echo "</pre>";
 
 
     }
 
-    function retrieveapplicationinfo() {
+    function retrieveapplicationinfo()
+    {
         echo $this->cad->retrieve_application_info();
     }
 
-    function degdec() {
+    function degdec()
+    {
         echo "<pre>";
-        print_r (convert_degrees_to_decimal('10deg43\'08.6"N 122deg34\'29.1"E'));
+        print_r(convert_degrees_to_decimal('10deg43\'08.6"N 122deg34\'29.1"E'));
         echo "</pre>";
 
     }
 
-    function getapplicationbasicinfo() {
+    function getapplicationbasicinfo()
+    {
         echo $this->cad->get_application_basic_info();
     }
 
-    function updateapplicationownerinfo() {
+    function updateapplicationownerinfo()
+    {
         echo $this->cad->update_application_owner_info();
     }
 
-    function uploadrequirements() {
+    function uploadrequirements()
+    {
         echo $this->cad->upload_requirements();
     }
 
-    function extractexceltssr($dataid = false, $print = false) {
+    function extractexceltssr($dataid = false, $print = false)
+    {
         echo $this->cad->extract_excel_tssr($dataid, $print);
     }
 
-    function exceltest() {
+    function exceltest()
+    {
         $this->load->library('excel');
-        $xls = PHPExcel_IOFactory::load(FCPATH.'uploads/temp/tssr.xlsx');
+        $xls = PHPExcel_IOFactory::load(FCPATH . 'uploads/temp/tssr.xlsx');
         $xls->setActiveSheetIndex(0);
 
 
@@ -1109,17 +1194,17 @@ class Cad extends CI_Controller {
         $drawings = $xls->getActiveSheet()->getDrawingCollection();
         $i = 0;
         $image_fields = [];
-        foreach ($drawings AS $drawing) {
+        foreach ($drawings as $drawing) {
             if ($drawing instanceof PHPExcel_Worksheet_Drawing) {
                 $zipReader = fopen($drawing->getPath(), 'r');
                 $imageContents = '';
-                while (! feof($zipReader)) {
+                while (!feof($zipReader)) {
                     $imageContents .= fread($zipReader, 1024);
                 }
                 fclose($zipReader);
                 $extension = $drawing->getExtension();
-                $myFileName = 'questions/questions_' . ++$i.time() . '.' . $extension;
-                $image_fields[$drawing->getCoordinates()] = '<img src="data:image/jpeg;base64,'.base64_encode($imageContents).'">';
+                $myFileName = 'questions/questions_' . ++$i . time() . '.' . $extension;
+                $image_fields[$drawing->getCoordinates()] = '<img src="data:image/jpeg;base64,' . base64_encode($imageContents) . '">';
                 //$path = Storage::put($myFileName, $imageContents);
                 //$image_fields[$drawing->getCoordinates()] = '<img src="'.asset('storage/'.$myFileName).'">';
             }
@@ -1132,22 +1217,22 @@ class Cad extends CI_Controller {
                 $imageContents = ob_get_contents();
                 ob_end_clean();
 
-                $image_fields[$drawing->getCoordinates()] = '<img src="data:image/jpeg;base64,'.base64_encode($imageContents).'"><br>'.$drawing->getCoordinates().'<br>';
+                $image_fields[$drawing->getCoordinates()] = '<img src="data:image/jpeg;base64,' . base64_encode($imageContents) . '"><br>' . $drawing->getCoordinates() . '<br>';
             }
         }
 
         //Finding and fetching data from cell
-        for ($row = 1;$row <=500;$row++) {
-            $val = $xls->getActiveSheet()->getCell('A'.$row)->getValue();
+        for ($row = 1; $row <= 500; $row++) {
+            $val = $xls->getActiveSheet()->getCell('A' . $row)->getValue();
             if ($val == 'LOCATION OF TAPPING POINT') {
                 $tp = array(
-                    'pictures' => $xls->getActiveSheet()->getCell('B'.($row+1))->getValue(),
+                    'pictures' => $xls->getActiveSheet()->getCell('B' . ($row + 1))->getValue(),
                 );
 
-                for ($imgrow = $row;$imgrow <= 33;$imgrow++) {
-                    $columns = array('A','B','C','D','E','F','G','H');
+                for ($imgrow = $row; $imgrow <= 33; $imgrow++) {
+                    $columns = array('A', 'B', 'C', 'D', 'E', 'F', 'G', 'H');
                     foreach ($columns as $col) {
-                        $cellVal = $image_fields[$col.$row];
+                        $cellVal = $image_fields[$col . $row];
                         if ($cellVal != '') {
                             $tp['img'][] = $cellVal;
                         }
@@ -1157,14 +1242,15 @@ class Cad extends CI_Controller {
         }
     }
 
-    function getpdfimages() {
-        $file = FCPATH.'uploads/temp/cca.pdf';
-        $pdfimages = FCPATH.'exec/bin/pdfimages';
-        $target = FCPATH.'uploads/temp/cca/';
-        exec($pdfimages.' -j '.$file.' '.$target.'images');
+    function getpdfimages()
+    {
+        $file = FCPATH . 'uploads/temp/cca.pdf';
+        $pdfimages = FCPATH . 'exec/bin/pdfimages';
+        $target = FCPATH . 'uploads/temp/cca/';
+        exec($pdfimages . ' -j ' . $file . ' ' . $target . 'images');
         $extracted = directory_map($target, FALSE, TRUE);
         if ($extracted && count($extracted) > 0) {
-            foreach($extracted as $sub => $file) {
+            foreach ($extracted as $sub => $file) {
                 if (is_array($file)) {
 
                 }
@@ -1172,12 +1258,18 @@ class Cad extends CI_Controller {
         }
     }
 
-    function getdoctype() {
+    function getdoctype()
+    {
         echo $this->cad->get_doctype();
     }
 
-    function getdocumentpreview() {
+    function getdocumentpreview()
+    {
+
         $layout = $this->cad->get_document_layout();
+
+        echo $layout->html;
+
         $papersize = $layout->papersize;
         $html = $layout->html;
         $title = $layout->title;
@@ -1192,14 +1284,15 @@ class Cad extends CI_Controller {
         $dompdf->render();
         // Add PDF Document Information
         $dompdf->add_info('Subject', $title);
-        $dompdf->add_info('Author', user_info()->username);
+        $dompdf->add_info('Author', user_info()->username ?? '');
         $dompdf->add_info('Creator', 'ITD');
         $dompdf->add_info('Keywords', $title);
-        $dompdf->stream($filename,array('Attachment' => false));
+        $dompdf->stream($filename, array('Attachment' => false));
     }
 
-    function getdocumentlayout($dataid = false,$doctype = false) {
-        $data = $this->cad->get_document_layout($dataid,$doctype);
+    function getdocumentlayout($dataid = false, $doctype = false)
+    {
+        $data = $this->cad->get_document_layout($dataid, $doctype);
         if ($dataid && $doctype) {
             echo $data->html;
         } else {
@@ -1208,61 +1301,63 @@ class Cad extends CI_Controller {
 
     }
 
-    function savecustomerplan() {
+    function savecustomerplan()
+    {
         echo $this->cad->save_customer_plan();
     }
-    function select2planduration() {
+    function select2planduration()
+    {
         $data = array();
         $dataid = $this->input->post('data');
         $amount_lookup = $this->db->select('sg.appid,sg.desc as sizename,p.outright,p.twoyrs,p.threeyrs,p.fiveyrs,p.tenyrs,p.monthlyave,p.summerave,p.buildtime')
             ->from('customer_system_group AS sg')
-            ->join('proposal_nonstandard_system_rates AS p','sg.sysid = p.systemsizeid AND p.`status` = 1','left')
-            ->where(array('sg.appid' => $dataid,'sg.status' => 1))
+            ->join('proposal_nonstandard_system_rates AS p', 'sg.sysid = p.systemsizeid AND p.`status` = 1', 'left')
+            ->where(array('sg.appid' => $dataid, 'sg.status' => 1))
             ->get()->row();
 
         if ($amount_lookup) {
             $id = 0;
-            foreach ($amount_lookup AS $key => $value) {
+            foreach ($amount_lookup as $key => $value) {
                 if ($key == 'outright') {
-                    $data['list'][] = array('id' => 0,'text' => 'Outright');
+                    $data['list'][] = array('id' => 0, 'text' => 'Outright');
                 }
 
-                if (strpos($key,'yrs') && $value > 0) {
-                    $yrs = str_replace('yrs','',$key);
+                if (strpos($key, 'yrs') && $value > 0) {
+                    $yrs = str_replace('yrs', '', $key);
                     switch (trim($yrs)) {
-                        case 'one' :
+                        case 'one':
                             $id = 1;
                             break;
-                        case 'two' :
+                        case 'two':
                             $id = 2;
                             break;
-                        case 'three' :
+                        case 'three':
                             $id = 3;
                             break;
-                        case 'four' :
+                        case 'four':
                             $id = 4;
                             break;
-                        case 'five' :
+                        case 'five':
                             $id = 5;
                             break;
-                        case 'six' :
+                        case 'six':
                             $id = 6;
                             break;
-                        case 'seven' :
+                        case 'seven':
                             $id = 7;
                             break;
-                        case 'eigh' :
+                        case 'eigh':
                             $id = 8;
                             break;
-                        case 'nine' :
+                        case 'nine':
                             $id = 9;
                             break;
-                        case 'ten' :
+                        case 'ten':
                             $id = 10;
                             break;
                     }
 
-                    $data['list'][] = array('id' => $id,'text' => $id.' Years');
+                    $data['list'][] = array('id' => $id, 'text' => $id . ' Years');
                 }
             }
         }
@@ -1277,37 +1372,44 @@ class Cad extends CI_Controller {
         echo json_encode($data);
     }
 
-    function applicationinfo($id) {
+    function applicationinfo($id)
+    {
         $info = application_info($id);
 
         echo "<pre>";
-        print_r ($info);
+        print_r($info);
         echo "</pre>";
 
     }
 
 
-    function createproposaldraft() {
+    function createproposaldraft()
+    {
         echo $this->cad->create_proposal_draft();
     }
 
-    function getsignedproposallist() {
+    function getsignedproposallist()
+    {
         echo $this->cad->get_signed_proposal_list();
     }
 
-    function updateapplicationcustomerinfo() {
+    function updateapplicationcustomerinfo()
+    {
         echo $this->cad->update_application_customer_info();
     }
 
-    function saveextractedtssrdata() {
+    function saveextractedtssrdata()
+    {
         echo $this->cad->save_extracted_tssr_data_ii();
     }
 
-    function getselectedplanamount() {
+    function getselectedplanamount()
+    {
         echo $this->cad->get_selected_plan_amount();
     }
 
-    function select2apptransactions() {
+    function select2apptransactions()
+    {
         $stageid = $this->input->post('stageid');
         if (!super_admin()) {
             $stageids = explode(',', $this->input->post('data')) ?? false;
@@ -1317,22 +1419,22 @@ class Cad extends CI_Controller {
 
         $stages = array(
             92 => array(
-                'url' => base_url().'inspection/uploadsurveypics',
+                'url' => base_url() . 'inspection/uploadsurveypics',
                 'location' => get_stage_specific(92)->desc,
                 'description' => get_stage_specific(92)->desc
             ),
             93 => array(
-                'url' => base_url().'inspection/uploadsurveypics',
+                'url' => base_url() . 'inspection/uploadsurveypics',
                 'location' => get_stage_specific(92)->desc,
                 'description' => get_stage_specific(93)->desc
             ),
             95 => array(
-                'url' => base_url().'cad/uploadrequirements',
+                'url' => base_url() . 'cad/uploadrequirements',
                 'location' => get_stage_specific(95)->desc,
                 'description' => get_stage_specific(95)->desc
             ),
             100 => array(
-                'url' => base_url().'cad/uploadrequirements',
+                'url' => base_url() . 'cad/uploadrequirements',
                 'location' => get_stage_specific(95)->desc,
                 'description' => get_stage_specific(100)->desc
             ),
@@ -1343,14 +1445,14 @@ class Cad extends CI_Controller {
                 $data = $stages[$stageid];
             } else {
                 $data = array(
-                    'url' => base_url().'admin/uploadapplicationfiles',
+                    'url' => base_url() . 'admin/uploadapplicationfiles',
                     'location' => '',
                     'description' => ''
                 );
             }
         } else {
             if (isset($stageids)) {
-                foreach ($stageids AS $stage) {
+                foreach ($stageids as $stage) {
                     $data['list'][] = array(
                         'id' => $stage,
                         'text' => $stages[$stage]['description']
@@ -1369,67 +1471,82 @@ class Cad extends CI_Controller {
         echo json_encode($data);
     }
 
-    function getassigendso() {
+    function getassigendso()
+    {
         echo $this->cad->get_assigend_so();
     }
 
-    function select2salesofficer() {
+    function select2salesofficer()
+    {
         echo $this->cad->select2_sales_officer();
     }
 
-    function assignsalesofficer() {
+    function assignsalesofficer()
+    {
         echo $this->cad->assign_sales_officer();
     }
 
-    function deletesalesofficer() {
+    function deletesalesofficer()
+    {
         echo $this->cad->delete_sales_officer();
     }
 
-    function appinfo($appid) {
+    function appinfo($appid)
+    {
         $appdetails = application_info($appid);
         echo "<pre>";
-        print_r ($appdetails);
+        print_r($appdetails);
         echo "</pre>";
 
     }
 
-    function savetempinfo() {
+    function savetempinfo()
+    {
         echo $this->cad->save_temp_info();
     }
 
-    function getapplicationdocumentslist() {
+    function getapplicationdocumentslist()
+    {
         echo $this->cad->get_application_documents_list();
     }
 
-    function savetempdocs() {
+    function savetempdocs()
+    {
         echo $this->cad->save_temp_docs();
     }
 
-    function deletetempdoc() {
+    function deletetempdoc()
+    {
         echo $this->cad->delete_temp_doc();
     }
 
-    function addnewdocument() {
+    function addnewdocument()
+    {
         echo $this->cad->add_new_document();
     }
 
-    function select2doctypes() {
+    function select2doctypes()
+    {
         echo $this->cad->select2_doctypes();
     }
 
-    function select2requirecodes() {
+    function select2requirecodes()
+    {
         echo $this->cad->select2_requirecodes();
     }
 
-    function processcustomerapplication() {
+    function processcustomerapplication()
+    {
         echo $this->cad->process_customer_application();
     }
 
-    function cancelcustomerapplication() {
+    function cancelcustomerapplication()
+    {
         echo $this->cad->cancel_customer_application();
     }
 
-function getcancelledapplications() {
+    function getcancelledapplications()
+    {
         echo $this->cad->get_cancelled_applications();
     }
 
