@@ -24,19 +24,20 @@ class Model_purchasing extends CI_Model
             GROUP BY
                 s.sysid,
                 s.descs,
-                esa.address");
-        if($sql->num_rows()>0) {
+                esa.address"
+        );
+        if ($sql->num_rows() > 0) {
             $num = 1;
-            foreach($sql->result() as $row) {
+            foreach ($sql->result() as $row) {
                 $email = '';
                 $phone = '';
                 $contact_arr = explode(',', $row->contact_arr);
-                if(is_array($contact_arr) & count($contact_arr)>0) {
-                    foreach($contact_arr as $crow) {
+                if (is_array($contact_arr) & count($contact_arr) > 0) {
+                    foreach ($contact_arr as $crow) {
                         $contact_arr_1 = explode('-', $crow);
-                        if($contact_arr_1[0] == 1053) { // EMAIL CODE
+                        if ($contact_arr_1[0] == 1053) { // EMAIL CODE
                             $email = $contact_arr_1[1];
-                        }else{
+                        } else {
                             $phone = $contact_arr_1[1];
                         }
                     }
@@ -45,16 +46,16 @@ class Model_purchasing extends CI_Model
                 //ADD VALUE TO PRODUCTS, QUANTITY AND AMOUNT
                 $purchase_qry = $this->db->select('COUNT(item.sysid) AS products,SUM(eti.qty) AS qty,SUM(eti.qty * qd.amount) AS amt')
                     ->from('eprs_quotation_details AS qd')
-                    ->join('eprs_transaction_items AS eti','qd.prfitemid = eti.sysid','left')
-                    ->join('items_main_description AS item','eti.itemid = item.sysid','left')
-                    ->join('eprs_quotation_suppliers AS qs','qs.sysid = qd.quotationid','left')
-                    ->where(array('qs.supplierid' => $row->sysid,'qd.status' => 301))
+                    ->join('eprs_transaction_items AS eti', 'qd.prfitemid = eti.sysid', 'left')
+                    ->join('items_main_description AS item', 'eti.itemid = item.sysid', 'left')
+                    ->join('eprs_quotation_suppliers AS qs', 'qs.sysid = qd.quotationid', 'left')
+                    ->where(array('qs.supplierid' => $row->sysid, 'qd.status' => 301))
                     ->get()->row();
 
                 $control = '';
                 $control .= '<div class="btn-group">';
                 $control .= '<a href="frm_edit_supplier" data-arr="' . $row->sysid . '" data-toggle="ajax-modal" title="Edit Supplier" class="btn btn-primary btn-sm inline"><i class="fa fa-edit"></i> </a>';
-                $control .= '<button class="btn btn-danger btn-sm inline" id="prf_item_delete" data-id="'.$row->sysid.'"><i class="fa fa-times"></i></button>';
+                $control .= '<button class="btn btn-danger btn-sm inline" id="prf_item_delete" data-id="' . $row->sysid . '"><i class="fa fa-times"></i></button>';
                 $control .= '</div>';
 
                 // updated 
@@ -66,28 +67,29 @@ class Model_purchasing extends CI_Model
                     'email' => $email,
                     'products' => ($purchase_qry) ? $purchase_qry->products : 0,
                     'purchasedqty' => ($purchase_qry) ? number_format($purchase_qry->qty, 0) : 0,
-                    'purchasedamt' => ($purchase_qry) ? '<span class="pull-left">'.( (is_object(get_currency($row->currency))) ? get_currency($row->currency)->symbol : '').'</span> '.number_format($purchase_qry->amt, 2) : 0.00,
+                    'purchasedamt' => ($purchase_qry) ? '<span class="pull-left">' . ((is_object(get_currency($row->currency))) ? get_currency($row->currency)->symbol : '') . '</span> ' . number_format($purchase_qry->amt, 2) : 0.00,
                     'control' => $control
                 ];
             }
         }
 
         $data['columns'] = array(
-            dt_column_array('expand','#',false,'20px'),
-            dt_column_array('name','Supplier\'s Name'),
-            dt_column_array('address','Address',false,'25%'),
-            dt_column_array('phone','Contact'),
-            dt_column_array('email','Email Address'),
-            dt_column_array('products','Products','number'),
-            dt_column_array('purchasedqty','Purchased Qty','number'),
-            dt_column_array('purchasedamt','Purchased Amt','number'),
-            dt_column_array('control','Control','text-align-center controls'),
+            dt_column_array('expand', '#', false, '20px'),
+            dt_column_array('name', 'Supplier\'s Name'),
+            dt_column_array('address', 'Address', false, '25%'),
+            dt_column_array('phone', 'Contact'),
+            dt_column_array('email', 'Email Address'),
+            dt_column_array('products', 'Products', 'number'),
+            dt_column_array('purchasedqty', 'Purchased Qty', 'number'),
+            dt_column_array('purchasedamt', 'Purchased Amt', 'number'),
+            dt_column_array('control', 'Control', 'text-align-center controls'),
         );
 
         return json_encode($data);
     }
 
-    function add_prf_item() {
+    function add_prf_item()
+    {
         $data = array();
         $itemid = $this->input->post('itemid');
         $unitid = $this->input->post('unitid');
@@ -100,10 +102,10 @@ class Model_purchasing extends CI_Model
         //GET TRN HISTORY
         $stages_qry = $this->db->select('trmt.*,tfms.`desc`')
             ->from('transaction_request_main_trails as trmt')
-            ->join('prime_transaction_flow_main_stages as tfms','trmt.stageid = tfms.sysid','left')
-            ->where('trmt.dataid',$prfid)
-            ->where('trmt.trnid',$trnid)
-            ->order_by('trmt.datecreated','DESC')
+            ->join('prime_transaction_flow_main_stages as tfms', 'trmt.stageid = tfms.sysid', 'left')
+            ->where('trmt.dataid', $prfid)
+            ->where('trmt.trnid', $trnid)
+            ->order_by('trmt.datecreated', 'DESC')
             ->get();
 
         if ($stages_qry->num_rows() > 0) {
@@ -120,12 +122,12 @@ class Model_purchasing extends CI_Model
         $unit = unit_query($unitid);
 
         $item = array(
-            'unit' => ($unit) ? (($unit->name == $unit->code) ? $unit->name : $unit->name.' ('.$unit->code.')') : 'unit',
+            'unit' => ($unit) ? (($unit->name == $unit->code) ? $unit->name : $unit->name . ' (' . $unit->code . ')') : 'unit',
             'remarks' => $remarks,
             'qty' => $qty
         );
 
-        $findexistWhere = array('itemid' => $itemid,'createdby' => user_id());
+        $findexistWhere = array('itemid' => $itemid, 'createdby' => user_id());
 
         if ($prfid) {
             $findexistWhere['prfid'] = $prfid;
@@ -153,14 +155,14 @@ class Model_purchasing extends CI_Model
             $items = $this->input->post();
             if ($prfid) {
                 //CHECK IF ONE OR MORE ITEMS IS STATUS 305
-                if (count($stages) > 0 && in_array(104,$stages)) {
+                if (count($stages) > 0 && in_array(104, $stages)) {
                     $items['status'] = 305;
                 } else {
                     $items['status'] = 300;
                 }
             }
             unset($items['trnid']);
-            $insertitem = insert_db($this->db,'eprs_transaction_items', $items);
+            $insertitem = insert_db($this->db, 'eprs_transaction_items', $items);
             if ($insertitem->qry) {
                 $this->db->trans_commit();
                 //$data['itemSaved'] = $items;
@@ -172,15 +174,15 @@ class Model_purchasing extends CI_Model
 
                 $item_info = $this->db->select('fulldescription')
                     ->from('items_main_description')
-                    ->where('sysid',$itemid)->get()->row();
+                    ->where('sysid', $itemid)->get()->row();
 
                 if ($item_info) {
                     $item['desc'] = $item_info->fulldescription;
-                    $item['prsitem'] = '<input type="hidden" name="prsitemid" value="'.$prsitemid.'">';
+                    $item['prsitem'] = '<input type="hidden" name="prsitemid" value="' . $prsitemid . '">';
                     $control = '';
                     $control .= '<div class="btn-group">';
-                    $control .= '<button class="btn btn-primary inline" id="prf_item_edit" data-id="'.$itemid.'"><i class="fa fa-edit"></i> </button>';
-                    $control .= '<button class="btn btn-danger inline" id="prf_item_delete" data-id="'.$itemid.'"><i class="fa fa-times"></i></button>';
+                    $control .= '<button class="btn btn-primary inline" id="prf_item_edit" data-id="' . $itemid . '"><i class="fa fa-edit"></i> </button>';
+                    $control .= '<button class="btn btn-danger inline" id="prf_item_delete" data-id="' . $itemid . '"><i class="fa fa-times"></i></button>';
                     $control .= '</div>';
                     $item['controls'] = $control;
                 }
@@ -202,51 +204,52 @@ class Model_purchasing extends CI_Model
         return json_encode($data);
     }
 
-    function dt_prf_items() {
+    function dt_prf_items()
+    {
         $data = array();
         $prfid = $this->input->post('prfid');
 
         if ($prfid) {
-            $this->db->where('eti.prfid',$prfid);
+            $this->db->where('eti.prfid', $prfid);
         } else {
-            $this->db->where('eti.prfid IS NULL',null);
-            $this->db->where('eti.createdby',user_id());
+            $this->db->where('eti.prfid IS NULL', null);
+            $this->db->where('eti.createdby', user_id());
         }
 
         $prf_qry = $this->db->select('eti.itemid,eti.sysid,eti.prfid,imd.fulldescription,eti.qty,eti.remarks,u.unit_name,u.unit_code,eti.unitid')
             ->from('eprs_transaction_items AS eti')
-            ->join('items_main_description AS imd','eti.itemid = imd.sysid','left')
-            ->join('prime_unit AS u','eti.unitid = u.sysid','left')
-            ->where_in('eti.status',array(300,305,307))
+            ->join('items_main_description AS imd', 'eti.itemid = imd.sysid', 'left')
+            ->join('prime_unit AS u', 'eti.unitid = u.sysid', 'left')
+            ->where_in('eti.status', array(300, 305, 307))
             ->get();
 
         if ($prf_qry->num_rows() > 0) {
             $n = 1;
-            foreach ($prf_qry->result() AS $item) {
+            foreach ($prf_qry->result() as $item) {
                 $unit = unit_query($item->unitid);
                 $control = '';
                 $control .= '<div class="btn-group">';
-                $control .= '<button class="btn btn-primary inline" id="prf_item_edit" data-id="'.$item->itemid.'"><i class="fa fa-edit"></i> </button>';
-                $control .= '<button class="btn btn-danger inline" id="prf_item_delete" data-id="'.$item->itemid.'"><i class="fa fa-times"></i></button>';
+                $control .= '<button class="btn btn-primary inline" id="prf_item_edit" data-id="' . $item->itemid . '"><i class="fa fa-edit"></i> </button>';
+                $control .= '<button class="btn btn-danger inline" id="prf_item_delete" data-id="' . $item->itemid . '"><i class="fa fa-times"></i></button>';
                 $control .= '</div>';
 
-                $unitn = ($unit) ? (($unit->name == $unit->code) ? $unit->name : $unit->name.' ('.$unit->code.')') : 'unit';
+                $unitn = ($unit) ? (($unit->name == $unit->code) ? $unit->name : $unit->name . ' (' . $unit->code . ')') : 'unit';
                 $data['itemlist'][] = array(
-                    'num' => $n++.'<input type="hidden" id="prf_item_id" name="prfitemid" value="'.$item->sysid.'">',
+                    'num' => $n++ . '<input type="hidden" id="prf_item_id" name="prfitemid" value="' . $item->sysid . '">',
                     'item' => $item->fulldescription,
-                    'qty' => '<span id="prf_qty">'.$item->qty.'</span>',
-                    'unit' => '<span id="prf_unit_name">'.$unitn.'</span><input type="hidden" id="prf_item_unit" style="width: 100% !important;" class="form-control" name="prsunitid" value="'.$item->unitid.'">',
-                    'remarks' => '<span id="prf_remarks">'.$item->remarks.'</span>',
+                    'qty' => '<span id="prf_qty">' . $item->qty . '</span>',
+                    'unit' => '<span id="prf_unit_name">' . $unitn . '</span><input type="hidden" id="prf_item_unit" style="width: 100% !important;" class="form-control" name="prsunitid" value="' . $item->unitid . '">',
+                    'remarks' => '<span id="prf_remarks">' . $item->remarks . '</span>',
                     'control' => $control
                 );
-
             }
         }
 
         return json_encode($data);
     }
 
-    function save_prf_draft() {
+    function save_prf_draft()
+    {
         $data = array();
         $title = '';
         $msg = '';
@@ -256,15 +259,15 @@ class Model_purchasing extends CI_Model
         $justification = $this->input->post('justification');
 
         $this->db->trans_begin();
-        $prf = insert_db($this->db,'eprs_transaction',array('typesid' => 1026,'justification' => $justification,'status' => 307));
+        $prf = insert_db($this->db, 'eprs_transaction', array('typesid' => 1026, 'justification' => $justification, 'status' => 307));
         if ($prf->qry) {
             $prsid = $prf->insert_id;
-            $prfnum = 'PRF'.date('ym').str_pad($prsid,5,'0',STR_PAD_LEFT);
-            $update = update_db($this->db,'eprs_transaction_items',array('prfid' => $prsid),array('prfid IS NULL' => null,'status' => 307));
+            $prfnum = 'PRF' . date('ym') . str_pad($prsid, 5, '0', STR_PAD_LEFT);
+            $update = update_db($this->db, 'eprs_transaction_items', array('prfid' => $prsid), array('prfid IS NULL' => null, 'status' => 307));
             if ($update->qry) {
                 $updated = $update->updated;
                 $title = $prfnum;
-                $msg = $updated.' items has been saved as draft with PRF# <b>'.$prfnum.'</b>.';
+                $msg = $updated . ' items has been saved as draft with PRF# <b>' . $prfnum . '</b>.';
                 $func = 'success';
                 $qry = true;
                 $this->db->trans_commit();
@@ -291,7 +294,8 @@ class Model_purchasing extends CI_Model
         return json_encode($data);
     }
 
-    function save_item_edit() {
+    function save_item_edit()
+    {
         $data = array();
 
         $prsitemid = $this->input->post('id');
@@ -309,14 +313,14 @@ class Model_purchasing extends CI_Model
 
         $prsitem = $this->db->select('unitid,qty,remarks')
             ->from('eprs_transaction_items')
-            ->where(array('sysid' => $prsitemid,'status !=' => 0))
+            ->where(array('sysid' => $prsitemid, 'status !=' => 0))
             ->get()->row();
 
         if ($prsitem) {
             if ($prsitem->unitid != $unitid) {
                 $update_arr['unitid'] = $unitid;
                 $unit = unit_query($unitid);
-                $unitn = ($unit) ? (($unit->name == $unit->code) ? $unit->name : $unit->name.' ('.$unit->code.')') : 'unit';
+                $unitn = ($unit) ? (($unit->name == $unit->code) ? $unit->name : $unit->name . ' (' . $unit->code . ')') : 'unit';
                 $updated['prf_unit_name'] = $unitn;
             }
             if ($prsitem->qty != $qty) {
@@ -330,7 +334,7 @@ class Model_purchasing extends CI_Model
         }
 
         $this->db->trans_begin();
-        $update = update_db($this->db,'eprs_transaction_items',$update_arr,array('sysid' => $prsitemid));
+        $update = update_db($this->db, 'eprs_transaction_items', $update_arr, array('sysid' => $prsitemid));
 
         if ($update && $update->qry == true) {
             $this->db->trans_commit();
@@ -355,7 +359,8 @@ class Model_purchasing extends CI_Model
         return json_encode($data);
     }
 
-    function remove_prs_item() {
+    function remove_prs_item()
+    {
         $data = array();
 
         $prsitemid = $this->input->post('itemid');
@@ -366,7 +371,7 @@ class Model_purchasing extends CI_Model
         $title = '';
 
         $this->db->trans_begin();
-        $update = update_db($this->db,'eprs_transaction_items',array('status' => 0),array('sysid' => $prsitemid));
+        $update = update_db($this->db, 'eprs_transaction_items', array('status' => 0), array('sysid' => $prsitemid));
         if ($update && $update->qry == true) {
             $this->db->trans_commit();
             $msg = 'Item has been removed from the list.';
@@ -389,7 +394,8 @@ class Model_purchasing extends CI_Model
         return json_encode($data);
     }
 
-    function discard_prf() {
+    function discard_prf()
+    {
         $prfid = $this->input->post('prfid');
 
         $data = array();
@@ -405,11 +411,11 @@ class Model_purchasing extends CI_Model
 
         $this->db->trans_begin();
         if ($prfid && $prfid != 0) {
-            $updateprf = update_db($this->db,'eprs_transaction',array('status' => 0),array('sysid' => $prfid));
+            $updateprf = update_db($this->db, 'eprs_transaction', array('status' => 0), array('sysid' => $prfid));
 
             if ($updateprf->qry) {
                 $dbwhere['prfid'] = $prfid;
-                $updateitems = update_db($this->db,'eprs_transaction_items',array('status' => 0),$dbwhere);
+                $updateitems = update_db($this->db, 'eprs_transaction_items', array('status' => 0), $dbwhere);
 
                 if ($updateitems->qry && $updateitems->updated > 0) {
                     $this->db->trans_commit();
@@ -434,7 +440,7 @@ class Model_purchasing extends CI_Model
         } else {
             $dbwhere['prfid IS NULL'] = null;
             $dbwhere['createdby'] = user_id();
-            $updateitems = update_db($this->db,'eprs_transaction_items',array('status' => 0),$dbwhere);
+            $updateitems = update_db($this->db, 'eprs_transaction_items', array('status' => 0), $dbwhere);
 
             if ($updateitems->qry && $updateitems->updated > 0) {
                 $this->db->trans_commit();
@@ -460,7 +466,8 @@ class Model_purchasing extends CI_Model
         return json_encode($data);
     }
 
-    function send_prf_approval() {
+    function send_prf_approval()
+    {
         $prfid = $this->input->post('prfid');
         $justification = $this->input->post('justification');
         $justification = ($justification == false || $justification == '') ? 'N/A' : $justification;
@@ -490,12 +497,12 @@ class Model_purchasing extends CI_Model
             $prf = insert_db($this->db, 'eprs_transaction', array('typesid' => 1026, 'justification' => $justification, 'status' => 300));
             if ($prf->qry) {
                 $prfid = $prf->insert_id;
-                $prfnum = 'PRF'.date('ym').str_pad($prfid,5,'0',STR_PAD_LEFT);
-                $update = update_db($this->db,'eprs_transaction_items',array('prfid' => $prfid,'status' => 300),array('prfid IS NULL' => null,'status' => 307, 'createdby' => user_id()));
+                $prfnum = 'PRF' . date('ym') . str_pad($prfid, 5, '0', STR_PAD_LEFT);
+                $update = update_db($this->db, 'eprs_transaction_items', array('prfid' => $prfid, 'status' => 300), array('prfid IS NULL' => null, 'status' => 307, 'createdby' => user_id()));
                 if ($update->qry) {
                     $updated = $update->updated;
                     $title = $prfnum;
-                    $msg = $updated.' items has been sent for GM\'s approval with PRF# <b>'.$prfnum.'</b>.';
+                    $msg = $updated . ' items has been sent for GM\'s approval with PRF# <b>' . $prfnum . '</b>.';
                     $func = 'success';
                     $qry = true;
                     $this->db->trans_commit();
@@ -573,24 +580,23 @@ class Model_purchasing extends CI_Model
                         'createdby' => user_id()
                     );
                     audit_insert($audit_data);
-
                 }
 
                 //FORWARD TO APPROVAL SINCE STEP 1 IS STILL THE REQUEST FORM
                 $trn_data = $this->db->select('trnid')
                     ->from('transaction_request_main_trails')
-                    ->where(array('stageid' => 102,'dataid' => $prfid,'status' => 1))
+                    ->where(array('stageid' => 102, 'dataid' => $prfid, 'status' => 1))
                     ->order_by('datecreated DESC')->get()->row();
 
                 if ($trn_data) {
-                    $trail_arr = array (
+                    $trail_arr = array(
                         'trnid' => $trn_data->trnid,
                         'stageid' => 103,
                         'dataid' => $prfid,
                         'createdby' => user_id(),
                     );
 
-                    task_ins_process($trail_arr,null,null);
+                    task_ins_process($trail_arr, null, null);
                 }
             } else {
 
@@ -598,11 +604,11 @@ class Model_purchasing extends CI_Model
 
                 $nextroute_qry = $this->db->select('sysid')
                     ->from('prime_transaction_flow_main_stages')
-                    ->where(array('flowid' => $flowid,'levels >' => $stage->levels,'status' => 1))
+                    ->where(array('flowid' => $flowid, 'levels >' => $stage->levels, 'status' => 1))
                     ->get()->row();
 
                 if ($nextroute_qry) {
-                    $trail_arr = array (
+                    $trail_arr = array(
                         'trnid' => $trnid,
                         'stageid' => $nextroute_qry->sysid,
                         'dataid' => $prfid,
@@ -610,24 +616,23 @@ class Model_purchasing extends CI_Model
                         //'status' => $stats
                     );
 
-                    $forward = task_ins_process($trail_arr,null,null);
+                    $forward = task_ins_process($trail_arr, null, null);
                     $typename = get_types_name($type);
                     $data['type'] = $typename->names;
                     if ($forward->qry) {
                         $this->db->trans_commit();
                         $qry = true;
-                        $msg = 'You have approved this '.$typename->names.' and is forwarded to the next stage.';
+                        $msg = 'You have approved this ' . $typename->names . ' and is forwarded to the next stage.';
                         $func = 'success';
-                        $title = $typename->names.' Approved!';
+                        $title = $typename->names . ' Approved!';
                         $url = base_url('module/49e3d046636e06b2d82ee046db8e6eb9a2e11e16/view/' . $prfid);
                         $data['url'] = $url;
                     } else {
                         $this->db->trans_rollback();
                         $qry = true;
-                        $msg = 'Failed to approve this '.$typename->names.'.';
+                        $msg = 'Failed to approve this ' . $typename->names . '.';
                         $func = 'error';
-                        $title = $typename->names.' Approval Failed!';
-
+                        $title = $typename->names . ' Approval Failed!';
                     }
                 }
             }
@@ -642,7 +647,8 @@ class Model_purchasing extends CI_Model
         return json_encode($data);
     }
 
-    function get_prs_list() {
+    function get_prs_list()
+    {
         $data = array();
 
         $route = $this->input->post('route');
@@ -653,13 +659,13 @@ class Model_purchasing extends CI_Model
         $where_stages = ($app_flow_ids_arr) ? " AND flowid IN ($app_flow_ids) " : "";
         $data['traillast'] = $where_trails_last;
 
-        if($route && ((is_array($route) && count($route) > 0) || $route > 0)) {
+        if ($route && ((is_array($route) && count($route) > 0) || $route > 0)) {
 
             $levels = '';
             if (is_array($route)) {
-                $levels = 'levels IN ('.implode(',',$route).')';
+                $levels = 'levels IN (' . implode(',', $route) . ')';
             } else {
-                $levels = ($route > 0) ? 'levels = '.$route : 'levels = ""';
+                $levels = ($route > 0) ? 'levels = ' . $route : 'levels = ""';
             }
 
             $sql_stages = $this->db->query("
@@ -668,7 +674,7 @@ class Model_purchasing extends CI_Model
                 WHERE $levels AND `status` = 1 $where_stages
                 ");
 
-            if($sql_stages->num_rows()>0) {
+            if ($sql_stages->num_rows() > 0) {
                 foreach ($sql_stages->result() as $srow) {
                     $stages_ids[] = $srow->sysid;
                 }
@@ -682,7 +688,7 @@ class Model_purchasing extends CI_Model
                 WHERE `status` = 1 $where_stages
                 ");
 
-            if($sql_stages->num_rows()>0) {
+            if ($sql_stages->num_rows() > 0) {
                 foreach ($sql_stages->result() as $srow) {
                     $stages_ids[] = $srow->sysid;
                 }
@@ -724,7 +730,7 @@ class Model_purchasing extends CI_Model
         //$data['sql'] = $this->db->last_query();
 
         if ($qry_details->num_rows() > 0) {
-            foreach ($qry_details->result() AS $row) {
+            foreach ($qry_details->result() as $row) {
                 $prsid = $row->sysid;
                 $trnid = $row->trnid;
                 $stageid = $row->stageid;
@@ -738,7 +744,7 @@ class Model_purchasing extends CI_Model
                 $requestor = '';
 
                 if ($creator) {
-                    $requestor = ucfirst($creator->firstname.' '.$creator->lastname);
+                    $requestor = ucfirst($creator->firstname . ' ' . $creator->lastname);
                 }
 
                 $comment_cnt = '';
@@ -747,7 +753,7 @@ class Model_purchasing extends CI_Model
                     ->from('transaction_request_trails_comments AS tc')
                     ->where(array('tc.trnid' => $trnid, 'status' => 1))
                     ->get()->row();
-                if($qry_comments_cnt && $qry_comments_cnt->cnt>0) {
+                if ($qry_comments_cnt && $qry_comments_cnt->cnt > 0) {
 
                     $qry_comments_msg = $this->db->select('remarks')
                         ->from('transaction_request_trails_comments AS tc')
@@ -757,12 +763,11 @@ class Model_purchasing extends CI_Model
                     $comment_msg = ($qry_comments_msg) ? $qry_comments_msg->remarks : '';
                     $max_length = 45;
 
-                    if (strlen($comment_msg) > $max_length)
-                    {
+                    if (strlen($comment_msg) > $max_length) {
                         $offset = ($max_length - 3) - strlen($comment_msg);
                         $comment_msg = substr($comment_msg, 0, strrpos($comment_msg, ' ', $offset)) . ' ...';
                     }
-                    $comment_cnt = '<span class="badge badge-danger pull-right" style="margin-left: 5px;">'.$qry_comments_cnt->cnt.'</span>';
+                    $comment_cnt = '<span class="badge badge-danger pull-right" style="margin-left: 5px;">' . $qry_comments_cnt->cnt . '</span>';
                 }
 
                 $creation_date = '';
@@ -778,8 +783,8 @@ class Model_purchasing extends CI_Model
 
                 //$data['traillast_qry'] = $this->db->last_query();
                 $show = true;
-                if($route && $route > 0) {
-                    if($qry_trails_last && $qry_trails_last->stageid != $stageid) {
+                if ($route && $route > 0) {
+                    if ($qry_trails_last && $qry_trails_last->stageid != $stageid) {
                         $show = false;
                     }
                 }
@@ -790,7 +795,7 @@ class Model_purchasing extends CI_Model
                 $from_created_by = 'None';
 
 
-                if($qry_trails_last) {
+                if ($qry_trails_last) {
                     $creation_date = $row->datecreated;
                     $updated_date = $qry_trails_last->datecreated;
 
@@ -808,31 +813,30 @@ class Model_purchasing extends CI_Model
                     $button .= btn_view_trn($qry_trails_last->sysid, $qry_trails_last->dataid, 'send');
 
                     $button .= '</div>';
-
                 }
 
                 $trn_elapse = time_elapsed_diff($creation_date, $updated_date, true);
                 $ovr_elapse = time_elapsed_diff($creation_date, date('Y-m-d h:m:s'));
 
-                $time = $datesubmitted . '<br><small class="text-info">' . timeago($row->datecreated, sql_time()->DATETIME).'</small>';
-                $time_updated = $updated_date . '<br><small class="text-info">' . timeago($updated_date, sql_time()->DATETIME).'</small>';
+                $time = $datesubmitted . '<br><small class="text-info">' . timeago($row->datecreated, sql_time()->DATETIME) . '</small>';
+                $time_updated = $updated_date . '<br><small class="text-info">' . timeago($updated_date, sql_time()->DATETIME) . '</small>';
 
-                if($row->status==1) {
+                if ($row->status == 1) {
                     $status = 'Pending';
-                }else{
+                } else {
                     $status = get_types_label_format($row->status);
                 }
 
-                if($show) {
-                    $prfno = 'PRF'.date('ym',strtotime($created)).str_pad($prsid,5,'0',STR_PAD_LEFT);
+                if ($show) {
+                    $prfno = 'PRF' . date('ym', strtotime($created)) . str_pad($prsid, 5, '0', STR_PAD_LEFT);
 
                     $po = $this->db->select('ponumber as number')
                         ->from('eprs_po')
-                        ->where(array('prfid' => $prsid,'status' => 1))
+                        ->where(array('prfid' => $prsid, 'status' => 1))
                         ->get()->row();
 
                     if ($po) {
-                        $ponum = 'PAE-'.str_pad($po->number,8,'0',STR_PAD_LEFT);
+                        $ponum = 'PAE-' . str_pad($po->number, 8, '0', STR_PAD_LEFT);
                         $hide = 'hidden';
                     } else {
                         $ponum = 'N/A';
@@ -840,7 +844,7 @@ class Model_purchasing extends CI_Model
                     }
                     $data['list'][] = array(
                         'expand' => btn_expand($prsid),
-                        'prfno' => '<h4 class="text-danger bold" style="margin: 0px 0px;">' .$prfno. ' </h4> ',
+                        'prfno' => '<h4 class="text-danger bold" style="margin: 0px 0px;">' . $prfno . ' </h4> ',
                         'pono' => $ponum,
                         'submitted' => $time,
                         'from' => $from_created_by,
@@ -860,23 +864,24 @@ class Model_purchasing extends CI_Model
         }
 
         $data['columns'] = array(
-            dt_column_array('expand',false,'text-align-center','1%'),
-            dt_column_array('prfno',false,'text-primary bold','10%'),
-            dt_column_array('pono',false,'text-primary bold','10%'),
-            dt_column_array('submitted',false,false,'10%'),
-            dt_column_array('updated',false,false,'10%'),
-            dt_column_array('items',false,'number'),
-            dt_column_array('justification',false,false,'300px'),
-            dt_column_array('trn',false,'text-danger','150px'),
-            dt_column_array('remarks',false,'text-info','150px'),
-            dt_column_array('status',false,'text-info'),
-            dt_column_array('status',false,'controls','13%'),
+            dt_column_array('expand', false, 'text-align-center', '1%'),
+            dt_column_array('prfno', false, 'text-primary bold', '10%'),
+            dt_column_array('pono', false, 'text-primary bold', '10%'),
+            dt_column_array('submitted', false, false, '10%'),
+            dt_column_array('updated', false, false, '10%'),
+            dt_column_array('items', false, 'number'),
+            dt_column_array('justification', false, false, '300px'),
+            dt_column_array('trn', false, 'text-danger', '150px'),
+            dt_column_array('remarks', false, 'text-info', '150px'),
+            dt_column_array('status', false, 'text-info'),
+            dt_column_array('status', false, 'controls', '13%'),
         );
 
         return json_encode($data);
     }
 
-    function get_prf_items_for_approval() {
+    function get_prf_items_for_approval()
+    {
         $data = array();
         $prfid = $this->input->post('prfid');
 
@@ -889,22 +894,22 @@ class Model_purchasing extends CI_Model
 
         $request = $this->db->select()
             ->from('eprs_transaction')
-            ->where('sysid',$prfid)
+            ->where('sysid', $prfid)
             ->get()->row();
 
         $prf_qry = $this->db->select('eti.itemid,eti.sysid,eti.prfid,imd.fulldescription,eti.qty,eti.remarks,u.unit_name,u.unit_code,eti.unitid')
             ->from('eprs_transaction_items AS eti')
-            ->join('items_main_description AS imd','eti.itemid = imd.sysid','left')
-            ->join('prime_unit AS u','eti.unitid = u.sysid','left')
-            ->where_in('eti.status',array(300,305))
-            ->where('eti.prfid',$prfid)
+            ->join('items_main_description AS imd', 'eti.itemid = imd.sysid', 'left')
+            ->join('prime_unit AS u', 'eti.unitid = u.sysid', 'left')
+            ->where_in('eti.status', array(300, 305))
+            ->where('eti.prfid', $prfid)
             ->get();
 
         //$data['query'] = $this->db->last_query();
 
         if ($prf_qry->num_rows() > 0) {
             $n = 1;
-            foreach ($prf_qry->result() AS $item) {
+            foreach ($prf_qry->result() as $item) {
                 $comments = $this->db->select('COUNT(messages) AS cnt')
                     ->from('comments')
                     ->where(array(
@@ -917,47 +922,49 @@ class Model_purchasing extends CI_Model
                 $unit = unit_query($item->unitid);
                 $control = '';
                 $control .= '<div class="btn-group">';
-                $control .= btn_comment($item->sysid,$comments->cnt);
-                if ($request && !in_array($request->status,array(302,303))) {
+                $control .= btn_comment($item->sysid, $comments->cnt);
+                if ($request && !in_array($request->status, array(302, 303))) {
                     $control .= '<button class="btn btn-primary inline" id="prf_item_edit" data-id="' . $item->itemid . '"><i class="fa fa-edit"></i> </button>';
                     $control .= '<button class="btn btn-danger inline" id="prf_item_disapprove" data-id="' . $item->itemid . '"><i class="fa fa-times"></i></button>';
                 }
                 $control .= '</div>';
 
-                $unitn = ($unit) ? (($unit->name == $unit->code) ? $unit->name : $unit->name.' ('.$unit->code.')') : 'unit';
+                $unitn = ($unit) ? (($unit->name == $unit->code) ? $unit->name : $unit->name . ' (' . $unit->code . ')') : 'unit';
                 $data['itemlist'][] = array(
-                    'num' => $n++.'<input type="hidden" id="prf_item_id" name="prfitemid" value="'.$item->sysid.'">',
+                    'num' => $n++ . '<input type="hidden" id="prf_item_id" name="prfitemid" value="' . $item->sysid . '">',
                     'item' => $item->fulldescription,
-                    'qty' => '<span id="prf_qty">'.$item->qty.'</span>',
-                    'unit' => '<span id="prf_unit_name">'.$unitn.'</span><input type="hidden" id="prf_item_unit" class="form-control" name="prsunitid" value="'.$item->unitid.'">',
-                    'remarks' => '<span id="prf_remarks">'.ellipsis($item->remarks,20).'</span>',
+                    'qty' => '<span id="prf_qty">' . $item->qty . '</span>',
+                    'unit' => '<span id="prf_unit_name">' . $unitn . '</span><input type="hidden" id="prf_item_unit" class="form-control" name="prsunitid" value="' . $item->unitid . '">',
+                    'remarks' => '<span id="prf_remarks">' . ellipsis($item->remarks, 20) . '</span>',
                     'control' => $control
                 );
-
             }
         }
 
         return json_encode($data);
     }
 
-    function show_prf_item_comments() {
+    function show_prf_item_comments()
+    {
         $data = array();
         $dataid = $this->input->post('id');
 
-        $data['html'] = comment_section(3438,214,$dataid,103);
+        $data['html'] = comment_section(3438, 214, $dataid, 103);
         return json_encode($data);
     }
 
-    function show_rfq_item_comments() {
+    function show_rfq_item_comments()
+    {
         $data = array();
         $dataid = $this->input->post('id');
 
 
-        $data['html'] = comment_section(3438,193,$dataid,104);
+        $data['html'] = comment_section(3438, 193, $dataid, 104);
         return json_encode($data);
     }
 
-    function disapprove_prf_item() {
+    function disapprove_prf_item()
+    {
         $data = array();
         $itemid = $this->input->post('itemid');
         $remarks = $this->input->post('remarks');
@@ -972,7 +979,7 @@ class Model_purchasing extends CI_Model
         }
 
         $this->db->trans_begin();
-        $disapprove = update_db($this->db,'eprs_transaction_items',$update_arr,array('sysid' => $itemid));
+        $disapprove = update_db($this->db, 'eprs_transaction_items', $update_arr, array('sysid' => $itemid));
         if ($disapprove->qry) {
             $this->db->trans_commit();
             $qry = true;
@@ -987,7 +994,8 @@ class Model_purchasing extends CI_Model
         return json_encode($data);
     }
 
-    function approve_prf() {
+    function approve_prf()
+    {
         //add remarks for approval if available and add to PRF logs.
         //Create same behavior as transferring to next stage.
         $data = array();
@@ -1017,7 +1025,7 @@ class Model_purchasing extends CI_Model
             'statusid' => 301,
         );
 
-        $insert_log = insert_db($this->db,'eprs_transaction_logs',$eprs_log);
+        $insert_log = insert_db($this->db, 'eprs_transaction_logs', $eprs_log);
 
         if ($insert_log->qry) {
             $typename = get_types_name($type);
@@ -1042,7 +1050,7 @@ class Model_purchasing extends CI_Model
             //IF TYPE IS RFQ AND PCEO APPROVED
             if ($type == 1207 && $stage->moduleid == 215) {
                 $quotations = $this->save_quotation();
-                $transactions = array_merge($transactions,$quotations->trn);
+                $transactions = array_merge($transactions, $quotations->trn);
                 //UPDATE ALL 305 TO 301
                 //lookup items associated with PRF id and update status 305 to 301 of corresponding prf items
                 $table = 'eprs_quotation_details';
@@ -1052,7 +1060,7 @@ class Model_purchasing extends CI_Model
 
                 $quotations_qry = $this->db->select('eqd.sysid,eqd.quotationid')
                     ->from('eprs_quotation_details AS eqd')
-                    ->join('eprs_quotation_suppliers AS eqs','eqd.quotationid = eqs.sysid','left')
+                    ->join('eprs_quotation_suppliers AS eqs', 'eqd.quotationid = eqs.sysid', 'left')
                     ->where(array(
                         'eqd.status' => 305,
                         'eqs.prfid' => $prfid,
@@ -1062,23 +1070,23 @@ class Model_purchasing extends CI_Model
                 if ($quotations_qry->num_rows() > 0) {
                     $in = array();
                     $supp = array();
-                    foreach ($quotations_qry->result() AS $quote) {
+                    foreach ($quotations_qry->result() as $quote) {
                         $in[] = $quote->sysid;
                         $supp[] = $quote->quotationid;
                     }
-                    $wherein .= implode(',',$in);
+                    $wherein .= implode(',', $in);
                 }
 
                 $where = array(
-                    'sysid IN ('.$wherein.')' => null
+                    'sysid IN (' . $wherein . ')' => null
                 );
-                $supplier = implode(',',array_unique($supp));
+                $supplier = implode(',', array_unique($supp));
 
-                update_db($this->db,'eprs_quotation_suppliers',array('status' => 301),array('sysid IN ('.$supplier.')' => null));
+                update_db($this->db, 'eprs_quotation_suppliers', array('status' => 301), array('sysid IN (' . $supplier . ')' => null));
             }
 
             if ($table != '' && count($set) > 0 && count($where) > 0) {
-                $approve_trn_items = update_db($this->db,$table,$set,$where);
+                $approve_trn_items = update_db($this->db, $table, $set, $where);
 
                 if ($approve_trn_items->qry) {
                     if ($type == 1207 && $stage->moduleid == 215) {
@@ -1098,22 +1106,22 @@ class Model_purchasing extends CI_Model
                 }
             }
 
-            if(trim($remarks) != ''){
+            if (trim($remarks) != '') {
                 $comments_arr = array(
                     'trnid' => $trnid,
                     'trailid' => $stageid,
                     'remarks' => $remarks
                 );
-                insert_db($this->db,'transaction_request_trails_comments',$comments_arr);
+                insert_db($this->db, 'transaction_request_trails_comments', $comments_arr);
             }
 
             $nextroute_qry = $this->db->select('sysid')
                 ->from('prime_transaction_flow_main_stages')
-                ->where(array('flowid' => $flowid,'levels >' => $stage->levels,'status' => 1))
+                ->where(array('flowid' => $flowid, 'levels >' => $stage->levels, 'status' => 1))
                 ->get()->row();
 
             if ($nextroute_qry) {
-                $trail_arr = array (
+                $trail_arr = array(
                     'trnid' => $trnid,
                     'stageid' => $nextroute_qry->sysid,
                     'dataid' => $prfid,
@@ -1121,21 +1129,20 @@ class Model_purchasing extends CI_Model
                     //'status' => $stats
                 );
 
-                $forward = task_ins_process($trail_arr,null,null);
-                if ($forward->qry && !in_array(false,$transactions)) {
+                $forward = task_ins_process($trail_arr, null, null);
+                if ($forward->qry && !in_array(false, $transactions)) {
                     $this->db->trans_commit();
                     $qry = true;
-                    $msg = 'You have approved this '.$typename->names.' and is forwarded to the next stage.';
+                    $msg = 'You have approved this ' . $typename->names . ' and is forwarded to the next stage.';
                     $func = 'success';
-                    $title = $typename->names.' Approved!';
+                    $title = $typename->names . ' Approved!';
                     $url = base_url('module/49e3d046636e06b2d82ee046db8e6eb9a2e11e16/view/' . $prfid);
                 } else {
                     $this->db->trans_rollback();
                     $qry = true;
-                    $msg = 'Failed to approve this '.$typename->names.'.';
+                    $msg = 'Failed to approve this ' . $typename->names . '.';
                     $func = 'error';
-                    $title = $typename->names.' Approval Failed!';
-
+                    $title = $typename->names . ' Approval Failed!';
                 }
             }
         }
@@ -1149,7 +1156,8 @@ class Model_purchasing extends CI_Model
         return json_encode($data);
     }
 
-    function disapprove_prf() {
+    function disapprove_prf()
+    {
         $data = array();
         $prfid = $this->input->post('prfid');
         $remarks = $this->input->post('remarks');
@@ -1164,12 +1172,12 @@ class Model_purchasing extends CI_Model
         $qry = false;
 
         //CHANGE STATUS OF QUOTATIONS TO 302
-        if (in_array($type,array(1206,1207))) {
+        if (in_array($type, array(1206, 1207))) {
             $this->db->trans_begin();
-            $disapprove = update_db($this->db,'eprs_transaction',array('status' => 302),array('sysid' => $prfid));
+            $disapprove = update_db($this->db, 'eprs_transaction', array('status' => 302), array('sysid' => $prfid));
 
             if ($disapprove->qry) {
-                update_db($this->db,'transaction_request_main_trails',array('status' => 0),array('dataid' => $prfid,'trnid' => $trnid,'status' => 1));
+                update_db($this->db, 'transaction_request_main_trails', array('status' => 0), array('dataid' => $prfid, 'trnid' => $trnid, 'status' => 1));
                 $this->db->trans_commit();
                 $msg = 'This PRF has been disapproved!';
                 $func = 'success';
@@ -1191,7 +1199,8 @@ class Model_purchasing extends CI_Model
         return json_encode($data);
     }
 
-    function requote_rfq() {
+    function requote_rfq()
+    {
         $data = array();
         $prfid = $this->input->post('prfid');
         $remarks = $this->input->post('remarks');
@@ -1204,7 +1213,7 @@ class Model_purchasing extends CI_Model
         $url = '';
 
         //Remove previous logs and
-        $update_logs = update_db($this->db,'eprs_transaction_logs',array('status' => 0),array('prsid' => $prfid,'typesid' => $type,'status' => 1));
+        $update_logs = update_db($this->db, 'eprs_transaction_logs', array('status' => 0), array('prsid' => $prfid, 'typesid' => $type, 'status' => 1));
         if ($update_logs->qry) {
             $stage = get_stage_details($stageid);
 
@@ -1218,7 +1227,7 @@ class Model_purchasing extends CI_Model
                 'status' => 0
             );
 
-            $insert_log = insert_db($this->db,'eprs_transaction_logs',$eprs_log);
+            $insert_log = insert_db($this->db, 'eprs_transaction_logs', $eprs_log);
             if ($insert_log->qry) {
                 $logged = true;
             }
@@ -1226,7 +1235,7 @@ class Model_purchasing extends CI_Model
 
         //Return to RFQ. Allow Purchasing to bypass qty.
 
-        $trail_arr = array (
+        $trail_arr = array(
             'trnid' => $trnid,
             'stageid' => 104,
             'dataid' => $prfid,
@@ -1234,7 +1243,7 @@ class Model_purchasing extends CI_Model
             //'status' => $stats
         );
 
-        $sendback = task_ins_process($trail_arr,null,null);
+        $sendback = task_ins_process($trail_arr, null, null);
         if ($logged && $sendback->qry) {
             $this->db->trans_commit();
             $qry = true;
@@ -1259,7 +1268,8 @@ class Model_purchasing extends CI_Model
         return json_encode($data);
     }
 
- function return_prf() {
+    function return_prf()
+    {
         $data = array();
         $prfid = $this->input->post('prfid');
         $remarks = $this->input->post('remarks');
@@ -1273,7 +1283,7 @@ class Model_purchasing extends CI_Model
 
         //Return to RFQ. Allow Purchasing to bypass qty.
 
-        $trail_arr = array (
+        $trail_arr = array(
             'trnid' => $trnid,
             'stageid' => 102,
             'dataid' => $prfid,
@@ -1281,7 +1291,7 @@ class Model_purchasing extends CI_Model
             //'status' => $stats
         );
 
-        $sendback = task_ins_process($trail_arr,null,null);
+        $sendback = task_ins_process($trail_arr, null, null);
         if ($sendback->qry) {
             $this->db->trans_commit();
             $qry = true;
@@ -1306,14 +1316,15 @@ class Model_purchasing extends CI_Model
         return json_encode($data);
     }
 
-    function get_rfq_items_list() {
+    function get_rfq_items_list()
+    {
         $data = array();
         $columns = array(
-            dt_column_array('num','#','text-align-right','25px'),
-            dt_column_array('item','Items',false,'18%'),
-            dt_column_array('lastprice','Last Price','text-primary bold number','100px'),
-            dt_column_array('qty','Qty','number','80px'),
-            dt_column_array('unit','Unit','number','80px'),
+            dt_column_array('num', '#', 'text-align-right', '25px'),
+            dt_column_array('item', 'Items', false, '18%'),
+            dt_column_array('lastprice', 'Last Price', 'text-primary bold number', '100px'),
+            dt_column_array('qty', 'Qty', 'number', '80px'),
+            dt_column_array('unit', 'Unit', 'number', '80px'),
         );
 
         $itemlist = array();
@@ -1327,7 +1338,7 @@ class Model_purchasing extends CI_Model
         //GET FLOW STAGES
         $stages_qry = $this->db->select()
             ->from('prime_transaction_flow_main_stages')
-            ->where(array('flowid' => 3,'status' => 1))
+            ->where(array('flowid' => 3, 'status' => 1))
             ->get();
 
         $approval = false;
@@ -1335,19 +1346,19 @@ class Model_purchasing extends CI_Model
         if ($stages_qry->num_rows() > 0) {
             $stages = $stages_qry->result();
 
-            $stageids = array_column($stages,'sysid');
+            $stageids = array_column($stages, 'sysid');
             $isApproval = array();
 
             $current_qry = $this->db->select()
                 ->from('transaction_request_main_trails')
-                ->where(array('dataid' => $prfid,'status' => 1))
-                ->where_in('stageid',$stageids)
+                ->where(array('dataid' => $prfid, 'status' => 1))
+                ->where_in('stageid', $stageids)
                 ->order_by('datecreated DESC')
                 ->get()->row();
 
             $current = $current_qry->stageid;
 
-            foreach ($stages AS $stage) {
+            foreach ($stages as $stage) {
                 $isApproval[$stage->sysid] = (bool)strpos(strtolower($stage->desc), 'approval');
             }
 
@@ -1360,8 +1371,8 @@ class Model_purchasing extends CI_Model
 
         $suppliers_qry = $this->db->select('eqs.sysid, eqs.supplierid, s.descs AS name, s.codes, s.currency, eqs.exrate')
             ->from('eprs_suppliers_main as s')
-            ->join('eprs_quotation_suppliers as eqs','eqs.supplierid = s.sysid','left')
-            ->where(array('eqs.prfid' => $prfid,'eqs.status' => 1))
+            ->join('eprs_quotation_suppliers as eqs', 'eqs.supplierid = s.sysid', 'left')
+            ->where(array('eqs.prfid' => $prfid, 'eqs.status' => 1))
             ->get();
 
         $item_quotations = array();
@@ -1373,42 +1384,42 @@ class Model_purchasing extends CI_Model
                 $supplier_currrency = get_currency($supplier->currency);
                 $suppliers_curr[] = $supplier->currency;
                 $supplier_buttons = '';
-                if (in_array(24,$roles) || super_admin()) {
+                if (in_array(24, $roles) || super_admin()) {
                     $supplier_buttons .= '<div class="btn-group">';
                     $supplier_buttons .= ' <a href="frm_supplier_quotations" data-arr="' . $prfid . ',' . $supplier->sysid . '" data-toggle="ajax-modal" title="Edit Supplier Quotations" class="btn btn-primary inline"><i class="fa fa-edit"></i> </a>';
                     $supplier_buttons .= (!$approval) ? ' <button type="button" id="btn_delete_supplier_quote" data-id="' . $supplier->sysid . '" title="Delete Supplier Quotations" class="btn btn-danger inline"><i class="fa fa-trash"></i> </button>' : '';
                     $supplier_buttons .= '</div>';
                 }
                 if ($supplier->currency != 83) {
-                    $columns[] = dt_column_array(strtolower($supplier->codes.'_c'),$supplier->name.' ('.$supplier_currrency->name.')'.$supplier_buttons,'','100px');
-                    $columns[] = dt_column_array(strtolower($supplier->codes.'_p'),$supplier->name.' (Peso)','','100px');
-                    $data['suppliers'][] = dt_column_array(strtolower($supplier->codes.'_c'),$supplier->name.'('.$supplier_currrency->name.')'.$supplier_buttons,'','100px');
-                    $data['suppliers'][] = dt_column_array(strtolower($supplier->codes.'_p'),$supplier->name.'(Peso)'.$supplier_buttons,'','100px');
-                    $suppliers[] = strtolower($supplier->codes.'_c');
-                    $suppliers[] = strtolower($supplier->codes.'_p');
+                    $columns[] = dt_column_array(strtolower($supplier->codes . '_c'), $supplier->name . ' (' . $supplier_currrency->name . ')' . $supplier_buttons, '', '100px');
+                    $columns[] = dt_column_array(strtolower($supplier->codes . '_p'), $supplier->name . ' (Peso)', '', '100px');
+                    $data['suppliers'][] = dt_column_array(strtolower($supplier->codes . '_c'), $supplier->name . '(' . $supplier_currrency->name . ')' . $supplier_buttons, '', '100px');
+                    $data['suppliers'][] = dt_column_array(strtolower($supplier->codes . '_p'), $supplier->name . '(Peso)' . $supplier_buttons, '', '100px');
+                    $suppliers[] = strtolower($supplier->codes . '_c');
+                    $suppliers[] = strtolower($supplier->codes . '_p');
                 } else {
-                    $columns[] = dt_column_array(strtolower($supplier->codes),$supplier->name.$supplier_buttons,'','100px');
-                    $data['suppliers'][] = dt_column_array(strtolower($supplier->codes),$supplier->name.$supplier_buttons,'','100px');
+                    $columns[] = dt_column_array(strtolower($supplier->codes), $supplier->name . $supplier_buttons, '', '100px');
+                    $data['suppliers'][] = dt_column_array(strtolower($supplier->codes), $supplier->name . $supplier_buttons, '', '100px');
                     $suppliers[] = strtolower($supplier->codes);
                 }
 
                 //Query items quoted under this supplier
                 $item_quotation_qry = $this->db->select('')
                     ->from('eprs_quotation_details as eqd')
-                    ->where(array('eqd.quotationid' => $supplier->sysid,'eqd.status != ' => 0))
+                    ->where(array('eqd.quotationid' => $supplier->sysid, 'eqd.status != ' => 0))
                     ->get();
 
                 if ($item_quotation_qry->num_rows() > 0) {
                     foreach ($item_quotation_qry->result() as $quotation) {
                         if ($supplier->currency != 83) {
-                            $item_quotations[strtolower($supplier->codes).'_c'][$quotation->prfitemid] = array(
+                            $item_quotations[strtolower($supplier->codes) . '_c'][$quotation->prfitemid] = array(
                                 'id' => $quotation->sysid,
                                 'supplierid' => $supplier->sysid,
                                 'amount' => $quotation->amount,
                                 'status' => $quotation->status,
                                 'currency' => get_currency($supplier->currency)
                             );
-                            $item_quotations[strtolower($supplier->codes).'_p'][$quotation->prfitemid] = array(
+                            $item_quotations[strtolower($supplier->codes) . '_p'][$quotation->prfitemid] = array(
                                 'id' => $quotation->sysid,
                                 'supplierid' => $supplier->sysid,
                                 'amount' => $quotation->amount * ceil($supplier->exrate),
@@ -1426,10 +1437,9 @@ class Model_purchasing extends CI_Model
                         }
                     }
                 }
-
             }
         } else {
-            $columns[] = dt_column_array('suppliers','Suppliers\' Quotations','','');
+            $columns[] = dt_column_array('suppliers', 'Suppliers\' Quotations', '', '');
         }
         $total_cols = array();
         $cur_totals = array();
@@ -1437,35 +1447,35 @@ class Model_purchasing extends CI_Model
         if (count($suppliers_curr) > 0) {
             $non_peso = array();
             foreach ($suppliers_curr as $currency) {
-                if ($currency != 83 && !in_array($currency,$non_peso)) {
+                if ($currency != 83 && !in_array($currency, $non_peso)) {
                     $non_peso[] = $currency;
                 }
             }
 
             if (count($non_peso) > 0) {
-                foreach ($non_peso AS $cur) {
+                foreach ($non_peso as $cur) {
                     $curr_vals = get_currency($cur);
                     $code = strtolower($curr_vals->code);
-                    $total_cols[] = dt_column_array($code.'_total','Total ('.$curr_vals->code.')','totals number','100px');
-                    $cur_totals[] = $code.'_total';
-                    $cur_subtotals[] = $code.'_subtotal_amt';
+                    $total_cols[] = dt_column_array($code . '_total', 'Total (' . $curr_vals->code . ')', 'totals number', '100px');
+                    $cur_totals[] = $code . '_total';
+                    $cur_subtotals[] = $code . '_subtotal_amt';
                 }
-                $total_cols[] = dt_column_array('php_total','Total (Converted)','totals number','100px');
+                $total_cols[] = dt_column_array('php_total', 'Total (Converted)', 'totals number', '100px');
                 $cur_totals[] = 'php_total';
                 $cur_subtotals[] = 'php_subtotal_amt';
 
-                if (in_array(83,$suppliers_curr)) {
-                    $total_cols[] = dt_column_array('total','Total (PHP)','totals number','100px');
+                if (in_array(83, $suppliers_curr)) {
+                    $total_cols[] = dt_column_array('total', 'Total (PHP)', 'totals number', '100px');
                     $cur_totals[] = 'total';
                     $cur_subtotals[] = 'subtotal_amt';
                 }
             } else {
-                $total_cols[] = dt_column_array('total','Total','totals number','100px');
+                $total_cols[] = dt_column_array('total', 'Total', 'totals number', '100px');
                 $cur_totals[] = 'total';
                 $cur_subtotals[] = 'subtotal_amt';
             }
         } else {
-            $total_cols[] = dt_column_array('total','Total','totals number','100px');
+            $total_cols[] = dt_column_array('total', 'Total', 'totals number', '100px');
             $cur_totals[] = 'total';
             $cur_subtotals[] = 'subtotal_amt';
         }
@@ -1474,34 +1484,34 @@ class Model_purchasing extends CI_Model
         $data['subtotals'] = $cur_subtotals;
 
         $end_cols = array(
-            dt_column_array('remarks','Remarks','','20%'),
-            dt_column_array('control','Control','text-align-center','10%'),
+            dt_column_array('remarks', 'Remarks', '', '20%'),
+            dt_column_array('control', 'Control', 'text-align-center', '10%'),
         );
 
-        $columns = array_merge($columns,$total_cols,$end_cols);
+        $columns = array_merge($columns, $total_cols, $end_cols);
         /*if ($approval) {
             $columns[] = dt_column_array('control','Control','text-align-center','10%');
         }*/
 
         $prf_qry = $this->db->select('eti.itemid,eti.sysid,eti.prfid,imd.fulldescription,eti.qty,eti.remarks,u.unit_name,u.unit_code,eti.unitid,eqr.remarks AS rfqremarks,et.status')
             ->from('eprs_transaction_items AS eti')
-            ->join('eprs_transaction AS et','eti.prfid = et.sysid','left')
-            ->join('items_main_description AS imd','eti.itemid = imd.sysid','left')
-            ->join('eprs_quotation_remarks AS eqr','eqr.prfitemid = eti.sysid AND eqr.status = 1','left')
-            ->join('prime_unit AS u','eti.unitid = u.sysid','left')
-            ->where('eti.status',305)
-            ->where('eti.prfid',$prfid)
+            ->join('eprs_transaction AS et', 'eti.prfid = et.sysid', 'left')
+            ->join('items_main_description AS imd', 'eti.itemid = imd.sysid', 'left')
+            ->join('eprs_quotation_remarks AS eqr', 'eqr.prfitemid = eti.sysid AND eqr.status = 1', 'left')
+            ->join('prime_unit AS u', 'eti.unitid = u.sysid', 'left')
+            ->where('eti.status', 305)
+            ->where('eti.prfid', $prfid)
             ->get();
 
         //$data['item_qry'] = $this->db->last_query();
 
         if ($prf_qry->num_rows() > 0) {
             $n = 1;
-            foreach ($prf_qry->result() AS $item) {
+            foreach ($prf_qry->result() as $item) {
                 $unit = unit_query($item->unitid);
                 $control = '';
                 $control .= '<div class="btn-group">';
-                $control .= ((in_array(24,$roles) && !in_array($item->status,array(0,302,303))) || super_admin()) ? '<button type="button" class="btn btn-danger inline" id="btn_edit_rfq_qty" data-id="'.$item->sysid.'"><i class="fa fa-edit"></i></button>' : '';
+                $control .= ((in_array(24, $roles) && !in_array($item->status, array(0, 302, 303))) || super_admin()) ? '<button type="button" class="btn btn-danger inline" id="btn_edit_rfq_qty" data-id="' . $item->sysid . '"><i class="fa fa-edit"></i></button>' : '';
 
                 $comments = $this->db->select('COUNT(messages) AS cnt')
                     ->from('comments')
@@ -1512,16 +1522,16 @@ class Model_purchasing extends CI_Model
                         'stageid' => 104,
                         'status' => 1
                     ))->get()->row();
-                $control .= btn_comment($item->sysid,$comments->cnt);
+                $control .= btn_comment($item->sysid, $comments->cnt);
                 $control .= '</div>';
 
-                $unitn = ($unit) ? (($unit->name == $unit->code) ? $unit->name : $unit->name.' ('.$unit->code.')') : 'unit';
+                $unitn = ($unit) ? (($unit->name == $unit->code) ? $unit->name : $unit->name . ' (' . $unit->code . ')') : 'unit';
 
                 //QUERY LAST ITEM PRICE STATUS 301
                 $lastprice_qry = $this->db->select('qd.amount')
                     ->from('eprs_transaction_items AS ti')
-                    ->join('eprs_quotation_details AS qd','ti.sysid = qd.prfitemid','left')
-                    ->where(array('ti.itemid' => $item->itemid,'qd.status' => 301))
+                    ->join('eprs_quotation_details AS qd', 'ti.sysid = qd.prfitemid', 'left')
+                    ->where(array('ti.itemid' => $item->itemid, 'qd.status' => 301))
                     ->order_by('qd.datecreated DESC')->get()->row();
 
                 //$data['lastprice_qry'][] = $this->db->last_query();
@@ -1531,24 +1541,24 @@ class Model_purchasing extends CI_Model
 
                 $itemlist = array(
                     'num' => $n++,
-                    'item' => $item->fulldescription.(($itemremarks != '') ? ' ('.(strpos($itemremarks,'href') !== false ? $itemremarks : ellipsis($itemremarks,15)).')':''),
-                    'lastprice' => '<a href="#tbl_item_last_price" class="margin-left-10" data-toggle="ajax-modal" data-arr="'.$item->itemid.'" title="'.$item->fulldescription.' Last Price"><i class="fa fa-history pull-left"></i> '.number_format($lastprice,2).'</a>',
-                    'qty' => '<span id="prf_qty">'.$item->qty.'</span>',
-                    'unit' => '<span id="prf_unit_name" data-id="'.$item->unitid.'">'.$unitn.'</span>',
-                    'remarks' => ($approval || in_array($item->status,array(0,302,303))) ? $item->rfqremarks : '<textarea id="input_remarks" value="" name="item_remarks['.$item->sysid.']" rows="1" style="width: 100% !important;" class="form-control" maxlength="255">'.$item->rfqremarks.'</textarea>',
+                    'item' => $item->fulldescription . (($itemremarks != '') ? ' (' . (strpos($itemremarks, 'href') !== false ? $itemremarks : ellipsis($itemremarks, 15)) . ')' : ''),
+                    'lastprice' => '<a href="#tbl_item_last_price" class="margin-left-10" data-toggle="ajax-modal" data-arr="' . $item->itemid . '" title="' . $item->fulldescription . ' Last Price"><i class="fa fa-history pull-left"></i> ' . number_format($lastprice, 2) . '</a>',
+                    'qty' => '<span id="prf_qty">' . $item->qty . '</span>',
+                    'unit' => '<span id="prf_unit_name" data-id="' . $item->unitid . '">' . $unitn . '</span>',
+                    'remarks' => ($approval || in_array($item->status, array(0, 302, 303))) ? $item->rfqremarks : '<textarea id="input_remarks" value="" name="item_remarks[' . $item->sysid . ']" rows="1" style="width: 100% !important;" class="form-control" maxlength="255">' . $item->rfqremarks . '</textarea>',
                     'control' => $control,
                 );
 
                 if (count($cur_totals) > 0) {
-                    foreach ($cur_totals AS $total_val) {
-                        $itemlist[$total_val] = '<span class="est_total_amt" data-currency="'.$total_val.'">-</span>';
+                    foreach ($cur_totals as $total_val) {
+                        $itemlist[$total_val] = '<span class="est_total_amt" data-currency="' . $total_val . '">-</span>';
                     }
                 }
 
                 if (count($suppliers) > 0) {
                     $active_currencies = array_unique($suppliers_curr);
                     foreach ($suppliers as $supp) {
-                        if (key_exists($item->sysid,$item_quotations[$supp])) {
+                        if (key_exists($item->sysid, $item_quotations[$supp])) {
                             //if last price supplier = supp, generate total
                             //Add inline checkbox
                             //STATUS CHECKED IF STATUS 305
@@ -1559,22 +1569,22 @@ class Model_purchasing extends CI_Model
                             $qt_amt = $qt['amount'];
                             $qt_id = $qt['id'];
                             $qt_sid = $qt['supplierid'];
-                            $checked = ($qt['status'] == 305 && ($qt_currency->sysid == 83 || strpos($supp,'_c'))) ? 'checked' : '';
+                            $checked = ($qt['status'] == 305 && ($qt_currency->sysid == 83 || strpos($supp, '_c'))) ? 'checked' : '';
                             $highlight = ($qt['status'] == 305  && $qt_currency->sysid == 83) ? 'bold' : '';
-                            $currency_symbol = (strpos($supp,'_c') || strpos($supp,'_p')) ? $qt_currency->symbol : '';
-                            $qt_damount = ($qt_currency->sysid != 83) ? $currency_symbol.number_format($qt['amount'], 2) : $currency_symbol.number_format($qt_amt, 2);
-                            $qt_total = (strpos($supp,'_c') || strpos($supp,'_p')) ? strtolower($qt_currency->code) . '_total' : 'total';
+                            $currency_symbol = (strpos($supp, '_c') || strpos($supp, '_p')) ? $qt_currency->symbol : '';
+                            $qt_damount = ($qt_currency->sysid != 83) ? $currency_symbol . number_format($qt['amount'], 2) : $currency_symbol . number_format($qt_amt, 2);
+                            $qt_total = (strpos($supp, '_c') || strpos($supp, '_p')) ? strtolower($qt_currency->code) . '_total' : 'total';
 
                             $icon = ($checked == 'checked') ? '<i class="quoted fa fa-check text-primary"></i>' : '';
                             if ($approval) {
-                                $itemlist[$supp] = $icon.'<span id="rfq_item_price" data-price="'.$qt_amt.'" data-supplier="" data-value="'.$qt_id.'" data-item="'.$item->sysid.'" class="pull-right ' . $highlight . '">' . $qt_damount . '</span>';
+                                $itemlist[$supp] = $icon . '<span id="rfq_item_price" data-price="' . $qt_amt . '" data-supplier="" data-value="' . $qt_id . '" data-item="' . $item->sysid . '" class="pull-right ' . $highlight . '">' . $qt_damount . '</span>';
                             } else {
-                                $radio = (strpos($supp,'_c') || ($qt_currency->sysid == 83 && !strpos($supp,'_p'))) ? '<input type="radio" class="icheck" name="amount[' . $item->sysid . ']" id="icheck_input" data-currency="' . $qt_total . '" value="' . $qt_id . '" ' . $checked . ' required/>' : '';
-                                $itemlist[$supp] = (!in_array($item->status,array(0,302,303)) ? $radio : $icon).'<span id="rfq_item_price" data-price="'.$qt_amt.'" data-supplier="'.$qt_sid.'" class="pull-right ' . $highlight . '">' . $qt_damount . '</span>';
+                                $radio = (strpos($supp, '_c') || ($qt_currency->sysid == 83 && !strpos($supp, '_p'))) ? '<input type="radio" class="icheck" name="amount[' . $item->sysid . ']" id="icheck_input" data-currency="' . $qt_total . '" value="' . $qt_id . '" ' . $checked . ' required/>' : '';
+                                $itemlist[$supp] = (!in_array($item->status, array(0, 302, 303)) ? $radio : $icon) . '<span id="rfq_item_price" data-price="' . $qt_amt . '" data-supplier="' . $qt_sid . '" class="pull-right ' . $highlight . '">' . $qt_damount . '</span>';
                             }
                             if ($qt['status'] == 305) {
                                 if (count($cur_totals) > 0) {
-                                    foreach ($cur_totals AS $total_val) {
+                                    foreach ($cur_totals as $total_val) {
                                         if ($qt_total == $total_val) {
                                             $itemlist[$total_val] = '<span class="est_total_amt" data-currency="' . $total_val . '">' . number_format($item->qty * $qt_amt, 2) . '</span>';
                                         }
@@ -1591,7 +1601,6 @@ class Model_purchasing extends CI_Model
                 }
 
                 $data['itemlist'][] = $itemlist;
-
             }
         }
 
@@ -1600,7 +1609,8 @@ class Model_purchasing extends CI_Model
         return json_encode($data);
     }
 
-    function dt_quotation_items() {
+    function dt_quotation_items()
+    {
         $data = array();
 
         $dataid = $this->input->post('dataid');
@@ -1616,19 +1626,19 @@ class Model_purchasing extends CI_Model
             //CHECK IF SUPPLIERID IS THE QUOTATIONID OR SUPPLIER SYSID
             $supplier_qry = $this->db->select('esm.currency,eqs.exrate')
                 ->from('eprs_quotation_suppliers as eqs')
-                ->join('eprs_suppliers_main as esm','esm.sysid = eqs.supplierid')
-                ->where(array('eqs.sysid' => $supplier,'eqs.prfid' => $dataid))
+                ->join('eprs_suppliers_main as esm', 'esm.sysid = eqs.supplierid')
+                ->where(array('eqs.sysid' => $supplier, 'eqs.prfid' => $dataid))
                 ->get()->row();
 
             if (!$supplier_qry) {
                 $supplier_qry = $this->db->select('*')
                     ->from('eprs_suppliers_main')
-                    ->where('sysid',$supplier)->get()->row();
+                    ->where('sysid', $supplier)->get()->row();
             }
 
             if ($supplier_qry->currency != 83) {
                 $currency = get_currency($supplier_qry->currency);
-                $data['exchange_rate'] = '<span class="pull-left">Conversion: '.$currency->fullname.' to Peso</span> <span class="col-md-3"><input type="number" name="exrate" value="'.($supplier_qry->exrate ?? $currency->conversion).'" class="form-control input-small" step="any"></span>';
+                $data['exchange_rate'] = '<span class="pull-left">Conversion: ' . $currency->fullname . ' to Peso</span> <span class="col-md-3"><input type="number" name="exrate" value="' . ($supplier_qry->exrate ?? $currency->conversion) . '" class="form-control input-small" step="any"></span>';
             }
 
             $prf_qry = $this->db->select('eti.itemid,eti.remarks,eti.sysid,imd.fulldescription,u.unit_name,u.unit_code,eti.unitid')
@@ -1641,13 +1651,13 @@ class Model_purchasing extends CI_Model
 
             if ($prf_qry->num_rows() > 0) {
                 $n = 1;
-                foreach ($prf_qry->result() AS $item) {
+                foreach ($prf_qry->result() as $item) {
                     $current_amount = '';
                     //LOOKUP CURRENT ACTIVE PRICE
                     $current_quote = $this->db->select('eqd.amount')
                         ->from('eprs_quotation_details as eqd')
-                        ->where(array('eqd.prfitemid' => $item->sysid,'eqd.quotationid' => $supplier))
-                        ->where_in('eqd.status',array(1,305))
+                        ->where(array('eqd.prfitemid' => $item->sysid, 'eqd.quotationid' => $supplier))
+                        ->where_in('eqd.status', array(1, 305))
                         ->get()->row();
 
                     //$data['current_quote'][$item->itemid]['qry'] = $this->db->last_query();
@@ -1660,29 +1670,29 @@ class Model_purchasing extends CI_Model
                     $itemremarks = ($item->remarks && $item->remarks != '') ? preg_replace('@(https?://([-\w\.]+[-\w])+(:\d+)?(/([\w/_\.#-]*(\?\S+)?[^\.\s])?)?)@', '', $item->remarks) : '';
 
                     $itemlist = array(
-                        'num' => '<input type="checkbox" class="icheck" id="prf_item_id" name="prfitemid[]" value="'.$item->sysid.'" /> ',//.$n++, //.'<input type="hidden" id="prf_item_id" name="prfitemid[]" value="'.$item->sysid.'" disabled>',
-                        'item' => $item->fulldescription .(($itemremarks != '') ? ' ('.$itemremarks.')' : ''),
+                        'num' => '<input type="checkbox" class="icheck" id="prf_item_id" name="prfitemid[]" value="' . $item->sysid . '" /> ', //.$n++, //.'<input type="hidden" id="prf_item_id" name="prfitemid[]" value="'.$item->sysid.'" disabled>',
+                        'item' => $item->fulldescription . (($itemremarks != '') ? ' (' . $itemremarks . ')' : ''),
                         //'amount' => dt_inline_input('amount',false,false,false,false,false,true) //CREATE TEXTBOX FOR NEW QUOTATION
-                        'amount' => '<input type="number" id="input_amount" value="'.$current_amount.'" name="amount[]" step="any" class="form-control" style="width: 100px !important;" disabled>',
+                        'amount' => '<input type="number" id="input_amount" value="' . $current_amount . '" name="amount[]" step="any" class="form-control" style="width: 100px !important;" disabled>',
                         'remarks' => '<input id="input_remarks" value="" name="remarks[]" class="form-control" disabled>',
                     );
 
                     //QUERY LATEST QUOTATION FROM ITEMS QUOTE OF THE SAME SUPPLIER
                     $lastquote_qry = $this->db->select('eqd.amount')
                         ->from('eprs_quotation_details as eqd')
-                        ->join('eprs_quotation_suppliers as eqs','eqd.quotationid = eqs.sysid','left')
+                        ->join('eprs_quotation_suppliers as eqs', 'eqd.quotationid = eqs.sysid', 'left')
                         ->join('eprs_transaction_items AS eti', 'eqd.prfitemid = eti.sysid', 'left')
                         ->where(array(
                             'eti.itemid' => $item->itemid,
                             'eqs.supplierid' => $supplier,
                         ))
-                        ->where_not_in('eqd.status',array(0,303))
+                        ->where_not_in('eqd.status', array(0, 303))
                         ->order_by('eqd.sysid DESC')->get()->row();
 
                     if ($lastquote_qry) {
-                        $itemlist['lastquote'] = number_format($lastquote_qry->amount,2);
+                        $itemlist['lastquote'] = number_format($lastquote_qry->amount, 2);
 
-                        $itemlist['sameamount'] = '<input type="checkbox" class="icheck" name="amount[]" id="same_amount" value="'.$lastquote_qry->amount.'" disabled />';
+                        $itemlist['sameamount'] = '<input type="checkbox" class="icheck" name="amount[]" id="same_amount" value="' . $lastquote_qry->amount . '" disabled />';
                     } else {
                         $itemlist['lastquote'] = 'N/A';
 
@@ -1695,33 +1705,34 @@ class Model_purchasing extends CI_Model
         }
 
         $data['columns'] = array(
-            dt_column_array('num','<input type="checkbox" class="icheck" id="select_all" />','number','10px'),
-            dt_column_array('item','Items','','300px'),
-            dt_column_array('lastquote','Last Quote','number','50px'),
-            dt_column_array('amount','Amount','','80px'),
-            dt_column_array('sameamount','Same Amt','text-align-center','35px'),
-            dt_column_array('remarks','Remarks','text-align-center','50px'),
+            dt_column_array('num', '<input type="checkbox" class="icheck" id="select_all" />', 'number', '10px'),
+            dt_column_array('item', 'Items', '', '300px'),
+            dt_column_array('lastquote', 'Last Quote', 'number', '50px'),
+            dt_column_array('amount', 'Amount', '', '80px'),
+            dt_column_array('sameamount', 'Same Amt', 'text-align-center', '35px'),
+            dt_column_array('remarks', 'Remarks', 'text-align-center', '50px'),
         );
 
         return json_encode($data);
     }
 
-    function select2_quotation_supplier() {
+    function select2_quotation_supplier()
+    {
         $data = array();
         $prfid = $this->input->post('data');
 
         $existing_supplier = $this->db->select('supplierid')
             ->from('eprs_quotation_suppliers')
             ->where(array('prfid' => $prfid))
-            ->where_not_in('status',array(0,303))
+            ->where_not_in('status', array(0, 303))
             ->get();
 
         $ids = array();
         if ($existing_supplier->num_rows() > 0) {
-            foreach ($existing_supplier->result() AS $quotation) {
+            foreach ($existing_supplier->result() as $quotation) {
                 $ids[] = $quotation->supplierid;
             }
-            $this->db->where_not_in('esm.sysid',$ids);
+            $this->db->where_not_in('esm.sysid', $ids);
         }
 
         $supplier_qry = $this->db->select('esm.sysid,esm.descs')
@@ -1732,7 +1743,7 @@ class Model_purchasing extends CI_Model
             ->get();
 
         if ($supplier_qry->num_rows() > 0) {
-            foreach ($supplier_qry->result() AS $supplier) {
+            foreach ($supplier_qry->result() as $supplier) {
                 $data['list'][] = array(
                     'id' => $supplier->sysid,
                     'text' => $supplier->descs
@@ -1743,7 +1754,8 @@ class Model_purchasing extends CI_Model
         return json_encode($data);
     }
 
-    function add_supplier_quotation() {
+    function add_supplier_quotation()
+    {
         $data = array();
         $supplierid = $this->input->post('supplier');
         $rfop = $this->input->post('rfop');
@@ -1769,7 +1781,7 @@ class Model_purchasing extends CI_Model
         //CREATE OR FIND PRS/PO FOR PRF
         $prs_qry = $this->db->select()
             ->from('eprs_po')
-            ->where(array('prfid' => $appid,'status' => 1))
+            ->where(array('prfid' => $appid, 'status' => 1))
             ->get()->row();
 
         if ($prs_qry) {
@@ -1777,19 +1789,19 @@ class Model_purchasing extends CI_Model
             $poid = $prs_qry->sysid;
         } else {
             $ponum = date('mdY');
-            $new_po = insert_db($this->db,'eprs_po',array('prfid' => $appid,'ponumber' => $ponum));
+            $new_po = insert_db($this->db, 'eprs_po', array('prfid' => $appid, 'ponumber' => $ponum));
 
             if ($new_po->qry) {
                 $poid = $new_po->insert_id;
-                $data['ponum'] = 'PAE-'.str_pad($ponum,8,'0',STR_PAD_LEFT);;
+                $data['ponum'] = 'PAE-' . str_pad($ponum, 8, '0', STR_PAD_LEFT);;
             }
         }
 
         //LOOKUP EXISTING QUOTATION FOR SUPPLIER
         $quotation_qry = $this->db->select('sysid')
             ->from('eprs_quotation_suppliers')
-            ->where(array('prfid' => $appid,'supplierid' => $supplierid))
-            ->where_not_in('status',array(303,302,0))
+            ->where(array('prfid' => $appid, 'supplierid' => $supplierid))
+            ->where_not_in('status', array(303, 302, 0))
             ->get()->row();
 
         $quotationid = 0;
@@ -1804,9 +1816,9 @@ class Model_purchasing extends CI_Model
                 'exvat' => $exvat,
                 'exrate' => $exrate,
                 'paytype' => $paytype,
-                'quotationhash' => sha1($appid.'-'.$supplierid.'-'.date('Y-m-d H:i:s',time()))
+                'quotationhash' => sha1($appid . '-' . $supplierid . '-' . date('Y-m-d H:i:s', time()))
             );
-            $supplier_q = insert_db($this->db,'eprs_quotation_suppliers',$supp_arr);
+            $supplier_q = insert_db($this->db, 'eprs_quotation_suppliers', $supp_arr);
             if ($supplier_q->qry) {
                 $quotationid = $supplier_q->insert_id;
             }
@@ -1815,13 +1827,13 @@ class Model_purchasing extends CI_Model
         if ($quotationid > 0) {
             $trn['newquote'] = true;
             if (is_array($prfitemid) && count($prfitemid) > 0 && is_array($amount) && count($amount) > 0) {
-                foreach ($prfitemid AS $index => $itemid) {
+                foreach ($prfitemid as $index => $itemid) {
                     if ($amount[$index] != '' && $amount[$index] > 0) {
                         //LOOKUP EXISTING ITEM QUOTATION
                         $item_qry = $this->db->select()
                             ->from('eprs_quotation_details')
                             ->where(array('quotationid' => $quotationid, 'prfitemid' => $itemid))
-                            ->where_not_in('status',array(303,302,0))
+                            ->where_not_in('status', array(303, 302, 0))
                             ->get()->row();
 
                         $amount_q = 0;
@@ -1834,27 +1846,27 @@ class Model_purchasing extends CI_Model
                         }
 
                         if ($amount_q != floatval($amount[$index])) {
-                            update_db($this->db,'eprs_quotation_details',array('status' => 0),array('quotationid' => $quotationid, 'prfitemid' => $itemid));
+                            update_db($this->db, 'eprs_quotation_details', array('status' => 0), array('quotationid' => $quotationid, 'prfitemid' => $itemid));
                             $item_arr = array(
                                 'quotationid' => $quotationid,
                                 'prfitemid' => $itemid,
                                 'amount' => $amount[$index],
                                 'remarks' => $remarks[$index]
                             );
-                            $item_q = insert_db($this->db, 'eprs_quotation_details',$item_arr);
+                            $item_q = insert_db($this->db, 'eprs_quotation_details', $item_arr);
 
                             if ($item_q->qry) {
-                                $trn['itemquote_'.$index] = true;
+                                $trn['itemquote_' . $index] = true;
                             } else {
-                                $trn['itemquote_'.$index] = false;
+                                $trn['itemquote_' . $index] = false;
                             }
                         } else {
                             if (trim($remarks_q) != trim($remarks[$index])) {
-                                $item_q = update_db($this->db,'eprs_quotation_details',array('remarks' => $remarks[$index]),array('sysid' => $item_qid));
+                                $item_q = update_db($this->db, 'eprs_quotation_details', array('remarks' => $remarks[$index]), array('sysid' => $item_qid));
                                 if ($item_q->qry) {
-                                    $trn['itemquote_'.$index] = true;
+                                    $trn['itemquote_' . $index] = true;
                                 } else {
-                                    $trn['itemquote_'.$index] = false;
+                                    $trn['itemquote_' . $index] = false;
                                 }
                             }
                         }
@@ -1873,7 +1885,7 @@ class Model_purchasing extends CI_Model
                 'purpose' => $paypurpose,
                 'notes' => $ponotes
             );
-            $new_rfop = insert_db($this->db,'eprs_po_details',$rfop_arr);
+            $new_rfop = insert_db($this->db, 'eprs_po_details', $rfop_arr);
 
             if ($new_rfop->qry) {
                 $trn['rfop'] = true;
@@ -1887,12 +1899,12 @@ class Model_purchasing extends CI_Model
         if ($exrate && $exrate > 0) {
             $supplier_qry = $this->db->select('*')
                 ->from('eprs_suppliers_main')
-                ->where('sysid',$supplierid)->get()->row();
+                ->where('sysid', $supplierid)->get()->row();
 
             $currency = get_currency($supplier_qry->currency);
 
             if ($currency->conversion != $exrate) {
-                $currency_update = update_db($this->db,'currency',array('conversion' => $exrate),array('sysid' => $supplier_qry->currency));
+                $currency_update = update_db($this->db, 'currency', array('conversion' => $exrate), array('sysid' => $supplier_qry->currency));
                 if ($currency_update->qry) {
                     $trn['currency_update'] = true;
                 } else {
@@ -1901,7 +1913,7 @@ class Model_purchasing extends CI_Model
             }
         }
 
-        if (count($trn) > 0 && !in_array(false,$trn)) {
+        if (count($trn) > 0 && !in_array(false, $trn)) {
             $this->db->trans_commit();
             $msg = 'Item quotations saved!';
             $func = 'success';
@@ -1923,7 +1935,8 @@ class Model_purchasing extends CI_Model
         return json_encode($data);
     }
 
-    function save_prf_quotation() {
+    function save_prf_quotation()
+    {
         $data = array();
         $prfid = $this->input->post('prfid');
         $amount = $this->input->post('amount');
@@ -1937,31 +1950,31 @@ class Model_purchasing extends CI_Model
         $qry = false;
         $msg = '';
         $func = '';
-        $title ='';
-        $url ='';
+        $title = '';
+        $url = '';
 
         $trn = array();
 
         $this->db->trans_begin();
         $quotations = $this->save_quotation();
-        $trn = array_merge($trn,$quotations->trn);
+        $trn = array_merge($trn, $quotations->trn);
 
         //INSERT SHIPPING COST TO SUPPLIER
         if (is_array($shipping) && count($shipping) > 0) {
-            foreach ($shipping AS $quotationid => $shippingamount) {
+            foreach ($shipping as $quotationid => $shippingamount) {
                 if ($shippingamount > 0) {
                     update_db($this->db, 'eprs_quotation_suppliers', array('shipping' => $shippingamount), array('sysid' => $quotationid));
                 }
             }
         }
 
-        if(trim($rfqremarks) != ''){
+        if (trim($rfqremarks) != '') {
             $comments_arr = array(
                 'trnid' => $trnid,
                 'trailid' => $stageid,
                 'remarks' => $rfqremarks
             );
-            insert_db($this->db,'transaction_request_trails_comments',$comments_arr);
+            insert_db($this->db, 'transaction_request_trails_comments', $comments_arr);
         }
 
         $stage = get_stage_details($stageid);
@@ -1976,16 +1989,16 @@ class Model_purchasing extends CI_Model
             'remarks' => $rfqremarks
         );
 
-        insert_db($this->db,'eprs_transaction_logs',$logs_arr);
+        insert_db($this->db, 'eprs_transaction_logs', $logs_arr);
 
         $nextroute_qry = $this->db->select('sysid')
             ->from('prime_transaction_flow_main_stages')
-            ->where(array('flowid' => $flowid,'levels >' => $stage->levels,'status' => 1))
+            ->where(array('flowid' => $flowid, 'levels >' => $stage->levels, 'status' => 1))
             ->order_by('levels ASC')
             ->get()->row();
 
         if ($nextroute_qry) {
-            $trail_arr = array (
+            $trail_arr = array(
                 'trnid' => $trnid,
                 'stageid' => $nextroute_qry->sysid,
                 'dataid' => $prfid,
@@ -1993,8 +2006,8 @@ class Model_purchasing extends CI_Model
                 //'status' => $stats
             );
 
-            $forward = task_ins_process($trail_arr,null,null);
-            if ($forward->qry && !in_array(false,$trn)) {
+            $forward = task_ins_process($trail_arr, null, null);
+            if ($forward->qry && !in_array(false, $trn)) {
                 $this->db->trans_commit();
                 $qry = true;
                 $msg = 'You have forwarded quotations for approval.';
@@ -2019,7 +2032,8 @@ class Model_purchasing extends CI_Model
         return json_encode($data);
     }
 
-    function save_quotation() {
+    function save_quotation()
+    {
         $data = array();
         $prfid = $this->input->post('prfid');
         $amount = $this->input->post('amount');
@@ -2028,7 +2042,7 @@ class Model_purchasing extends CI_Model
         $trn = array();
 
         if (is_array($amount) && count($amount) > 0) {
-            foreach ($amount AS $itemid => $itemquote) {
+            foreach ($amount as $itemid => $itemquote) {
 
                 //LOOKUP PREVIOUSLY SUBMITTED QUOTATIONS OF THE SAME PRF AND ITEM
                 $find_previous = $this->db->select('sysid')
@@ -2040,7 +2054,7 @@ class Model_purchasing extends CI_Model
                     ))->get();
 
                 if ($find_previous->num_rows() > 0) {
-                    foreach ($find_previous->result() AS $rollback) {
+                    foreach ($find_previous->result() as $rollback) {
                         $set = array(
                             'status' => 1
                         );
@@ -2048,7 +2062,7 @@ class Model_purchasing extends CI_Model
                             'sysid' => $rollback->sysid
                         );
 
-                        update_db($this->db,'eprs_quotation_details',$set,$where);
+                        update_db($this->db, 'eprs_quotation_details', $set, $where);
                     }
                 }
 
@@ -2059,9 +2073,9 @@ class Model_purchasing extends CI_Model
                     'sysid' => $itemquote
                 );
 
-                $for_approval = update_db($this->db,'eprs_quotation_details',$set,$where);
+                $for_approval = update_db($this->db, 'eprs_quotation_details', $set, $where);
 
-                $trn['update_'.$itemquote] = $for_approval->qry;
+                $trn['update_' . $itemquote] = $for_approval->qry;
 
                 //INSERT REMARKS IF AVAILABLE
                 if ($remarks[$itemid] != '') {
@@ -2072,14 +2086,14 @@ class Model_purchasing extends CI_Model
                     );
 
                     //REMOVE PREVIOUS REMARKS
-                    update_db($this->db,'eprs_quotation_remarks',array('status' => 0),array('prfid' => $prfid,'prfitemid' => $itemid));
-                    $add_remarks = insert_db($this->db,'eprs_quotation_remarks',$values);
-                    $trn['remarks_'.$itemquote] = $add_remarks->qry;
+                    update_db($this->db, 'eprs_quotation_remarks', array('status' => 0), array('prfid' => $prfid, 'prfitemid' => $itemid));
+                    $add_remarks = insert_db($this->db, 'eprs_quotation_remarks', $values);
+                    $trn['remarks_' . $itemquote] = $add_remarks->qry;
                 }
             }
         }
         $data['trn'] = $trn;
-        if (in_array(false,$trn)) {
+        if (in_array(false, $trn)) {
             $data['qry'] = true;
         } else {
             $data['qry'] = false;
@@ -2088,7 +2102,8 @@ class Model_purchasing extends CI_Model
         return (object)$data;
     }
 
-    function get_supplier_summary_of_cost() {
+    function get_supplier_summary_of_cost()
+    {
         $data = array();
         $id = $this->input->post('id');
         $approval = $this->input->post('approval');
@@ -2100,13 +2115,13 @@ class Model_purchasing extends CI_Model
 
         $prf_qry = $this->db->select()
             ->from('eprs_transaction')
-            ->where('sysid',$id)
+            ->where('sysid', $id)
             ->get()->row();
 
         $suppliers_qry = $this->db->select('eqs.sysid, eqs.exvat, eqs.shipping, eqs.supplierid, eqs.paytype, s.descs AS name, s.codes,s.currency,s.type')
             ->from('eprs_suppliers_main as s')
-            ->join('eprs_quotation_suppliers as eqs','eqs.supplierid = s.sysid','left')
-            ->where(array('eqs.prfid' => $id,'eqs.status' => 1))
+            ->join('eprs_quotation_suppliers as eqs', 'eqs.supplierid = s.sysid', 'left')
+            ->where(array('eqs.prfid' => $id, 'eqs.status' => 1))
             ->get();
 
         if ($suppliers_qry->num_rows() > 0) {
@@ -2115,7 +2130,7 @@ class Model_purchasing extends CI_Model
             $active_currencies = array_column($suppliers_result, 'currency');
             $filtered_currencies = array_unique($active_currencies);
             $data['currencies'] = $filtered_currencies;
-            foreach ($suppliers_result AS $supplier) {
+            foreach ($suppliers_result as $supplier) {
                 $supp_total = 0;
                 $netvat = 0;
                 $vat = 0;
@@ -2128,12 +2143,12 @@ class Model_purchasing extends CI_Model
                 $s_currency[] = $supplier->currency;
                 $price_qry = $this->db->select('eti.qty,eqd.amount,eqd.status')
                     ->from('eprs_quotation_details AS eqd')
-                    ->join('eprs_transaction_items AS eti','eqd.prfitemid = eti.sysid','left')
-                    ->where(array('eqd.quotationid' => $supplier->sysid,'eqd.status != ' => 0))
+                    ->join('eprs_transaction_items AS eti', 'eqd.prfitemid = eti.sysid', 'left')
+                    ->where(array('eqd.quotationid' => $supplier->sysid, 'eqd.status != ' => 0))
                     ->get();
 
                 if ($price_qry->num_rows() > 0) {
-                    foreach ($price_qry->result() AS $item) {
+                    foreach ($price_qry->result() as $item) {
                         if ($item->status == 305) {
                             if ($supplier->currency != 83) {
                                 $convert = $currency->conversion;
@@ -2202,15 +2217,15 @@ class Model_purchasing extends CI_Model
 
                 //COMPUTE BASED OF EVERY CURRENCY
 
-                $icon = (count($filtered_currencies) > 1) ? '<span class="pull-left">'.$currency->symbol.'</span>' : '';
+                $icon = (count($filtered_currencies) > 1) ? '<span class="pull-left">' . $currency->symbol . '</span>' : '';
 
                 $supplist = array(
                     'supplier' => $supplier->name,
-                    'netvat' => $icon.'<span id="supplier_netvat" data-id="'.$supplier->sysid.'">'.number_format($netvat,2).'</span>',
-                    'vat' => '<span id="supplier_vat" data-id="'.$supplier->sysid.'">'.number_format($vat,2).'</span>',
-                    'gross' => '<span id="supplier_gross" data-id="'.$supplier->sysid.'">'.number_format($gross,2).'</span>',
-                    'ewt' => '<span id="supplier_ewt" data-id="'.$supplier->sysid.'">'.number_format($ewt,2).'</span>',
-                    'shipping' => (!$approval && !($prf_qry && in_array($prf_qry->status,array(0,302,303)))) ? '<input type="number" id="supplier_ship" value="'.$supplier->shipping.'" name="shipping['.$supplier->sysid.']" step=".01" class="form-control" data-id="'.$supplier->sysid.'" >' : '<span id="supplier_ship" data-id="'.$supplier->sysid.'">'.number_format($supplier->shipping,2).'</span>',
+                    'netvat' => $icon . '<span id="supplier_netvat" data-id="' . $supplier->sysid . '">' . number_format($netvat, 2) . '</span>',
+                    'vat' => '<span id="supplier_vat" data-id="' . $supplier->sysid . '">' . number_format($vat, 2) . '</span>',
+                    'gross' => '<span id="supplier_gross" data-id="' . $supplier->sysid . '">' . number_format($gross, 2) . '</span>',
+                    'ewt' => '<span id="supplier_ewt" data-id="' . $supplier->sysid . '">' . number_format($ewt, 2) . '</span>',
+                    'shipping' => (!$approval && !($prf_qry && in_array($prf_qry->status, array(0, 302, 303)))) ? '<input type="number" id="supplier_ship" value="' . $supplier->shipping . '" name="shipping[' . $supplier->sysid . ']" step=".01" class="form-control" data-id="' . $supplier->sysid . '" >' : '<span id="supplier_ship" data-id="' . $supplier->sysid . '">' . number_format($supplier->shipping, 2) . '</span>',
                     //'total' => '<span id="supplier_soc" data-id="'.$supplier->sysid.'">'.number_format($total,2).'</span>'
                 );
 
@@ -2218,16 +2233,16 @@ class Model_purchasing extends CI_Model
 
                 if (count($filtered_currencies) > 1) {
                     $currencies = $filtered_currencies;
-                    if ($key = array_search(83,$currencies)) {
+                    if ($key = array_search(83, $currencies)) {
                         $total_cols[83] = 'total';
                         unset($currencies[$key]);
                         $total_cols['c'] = 'php_total';
                     }
 
-                    foreach ($currencies AS $total_c) {
+                    foreach ($currencies as $total_c) {
                         $cr = get_currency($total_c);
                         $cr_c = strtolower($cr->code);
-                        $total_cols[$total_c] = $cr_c.'_total';
+                        $total_cols[$total_c] = $cr_c . '_total';
                     }
 
                     if (count($total_cols) > 0) {
@@ -2236,8 +2251,8 @@ class Model_purchasing extends CI_Model
                             //$data['total_cols'][$supplier->sysid][$col] = $total;
                             $cur = '';
                             if ($i != 83) {
-                                list($cur,$p) = explode('_',$col);
-                                $cur.='_';
+                                list($cur, $p) = explode('_', $col);
+                                $cur .= '_';
                             }
 
                             $gtotal[$col][] = $total;
@@ -2255,23 +2270,22 @@ class Model_purchasing extends CI_Model
 
                             if ($supplier->currency == 83) {
                                 $supplist['php_total'] = '<span id="php_supplier_soc" data-id="' . $supplier->sysid . '">0.00</span>';
-                                $supplist['total'] = '<span id="supplier_soc" data-id="' . $supplier->sysid . '">'.number_format($total,2).'</span>';
+                                $supplist['total'] = '<span id="supplier_soc" data-id="' . $supplier->sysid . '">' . number_format($total, 2) . '</span>';
                             } else {
                                 $gtotal['total'][] = $total_php;
                                 $total_c = $total * ceil($currency->conversion);
                                 $supplist['php_total'] = '<span id="php_supplier_soc" data-id="' . $supplier->sysid . '">' . number_format($total_c, 2) . '</span>';
                                 $total_php = $total_c + $supplier->shipping;
-                                $supplist['total'] = '<span id="supplier_soc" data-id="' . $supplier->sysid . '">'.number_format($total_php,2).'</span>';
+                                $supplist['total'] = '<span id="supplier_soc" data-id="' . $supplier->sysid . '">' . number_format($total_php, 2) . '</span>';
                             }
                         }
-
                     }
                 } else {
                     $currencies = $filtered_currencies[0];
                     if ($currencies != 83) {
                         $cr = get_currency($currencies);
                         $cr_c = strtolower($cr->code);
-                        $col = $cr_c.'_total';
+                        $col = $cr_c . '_total';
                         $supplist[$col] = '<span id="' . $cr_c . '_supplier_soc" data-id="' . $supplier->sysid . '">' . number_format($total, 2) . '</span>';
                         $total_c = $total * ceil($currency->conversion);
                         $total_php = $total_c + $supplier->shipping;
@@ -2286,12 +2300,12 @@ class Model_purchasing extends CI_Model
         }
 
         $columns = array(
-            dt_column_array('supplier','Supplier',false,false),
-            dt_column_array('netvat','Net of VAT','number',false),
-            dt_column_array('vat','12% VAT','number',false),
-            dt_column_array('gross','Gross','number',false),
-            dt_column_array('ewt','EWT','number',false),
-            dt_column_array('shipping','Shipping (Estimate)','number',false),
+            dt_column_array('supplier', 'Supplier', false, false),
+            dt_column_array('netvat', 'Net of VAT', 'number', false),
+            dt_column_array('vat', '12% VAT', 'number', false),
+            dt_column_array('gross', 'Gross', 'number', false),
+            dt_column_array('ewt', 'EWT', 'number', false),
+            dt_column_array('shipping', 'Shipping (Estimate)', 'number', false),
             //dt_column_array('total','Total','number',false)
         );
 
@@ -2327,16 +2341,15 @@ class Model_purchasing extends CI_Model
         $data['columns'] = $columns;
         //$data['subtotal'] = number_format($stotal,2);
         if (count($ctotal) > 0) {
-            foreach ($ctotal AS $c => $sub) {
+            foreach ($ctotal as $c => $sub) {
                 if ($c != 83) {
                     $cid = ($c == 'c') ? 83 : $c;
                     $cr = get_currency($cid);
                     $shortcr = strtolower($cr->code);
-                    $data['subtotals'][$shortcr.'_subtotal_amt'] = number_format($sub,2);
+                    $data['subtotals'][$shortcr . '_subtotal_amt'] = number_format($sub, 2);
                 } else {
-                    $data['subtotals']['subtotal_amt'] = number_format($sub,2);
+                    $data['subtotals']['subtotal_amt'] = number_format($sub, 2);
                 }
-
             }
         }
         //$data['buffer'] = number_format($gtotal*0.02,2);
@@ -2347,7 +2360,8 @@ class Model_purchasing extends CI_Model
         return json_encode($data);
     }
 
-    function compute_summary_of_cost() {
+    function compute_summary_of_cost()
+    {
         $data = array();
         $quote = $this->input->post('amount');
         $shipping = $this->input->post('shipping');
@@ -2363,12 +2377,12 @@ class Model_purchasing extends CI_Model
         $stotal = array();
 
         if (count($quote) > 0) {
-            foreach ($quote AS $itemid => $qt) {
+            foreach ($quote as $itemid => $qt) {
                 $amout_qry = $this->db->select('eti.qty,eqd.quotationid,eqd.amount,esm.currency')
                     ->from('eprs_quotation_details AS eqd')
-                    ->join('eprs_transaction_items AS eti','eqd.prfitemid = eti.sysid','left')
-                    ->join('eprs_quotation_suppliers AS eqs','eqd.quotationid = eqs.sysid','left')
-                    ->join('eprs_suppliers_main as esm','eqs.supplierid = esm.sysid','left')
+                    ->join('eprs_transaction_items AS eti', 'eqd.prfitemid = eti.sysid', 'left')
+                    ->join('eprs_quotation_suppliers AS eqs', 'eqd.quotationid = eqs.sysid', 'left')
+                    ->join('eprs_suppliers_main as esm', 'eqs.supplierid = esm.sysid', 'left')
                     ->where(array('eqd.sysid' => $qt, 'eti.sysid' => $itemid))
                     ->get()->row();
 
@@ -2391,7 +2405,7 @@ class Model_purchasing extends CI_Model
                     $amount = $amout_qry->amount;
 
                     $total = $amout_qry->amount * $amout_qry->qty;
-                    if(isset($cost[$amout_qry->quotationid])) {
+                    if (isset($cost[$amout_qry->quotationid])) {
                         $cost[$amout_qry->quotationid] += $total;
                     } else {
                         $cost[$amout_qry->quotationid] = $total;
@@ -2401,11 +2415,11 @@ class Model_purchasing extends CI_Model
         }
 
         //LOOKUP IF VAT-EX OR VAT-IN
-        foreach ($cost AS $quotationid => $totalamt) {
+        foreach ($cost as $quotationid => $totalamt) {
             $supplier = $this->db->select('eqs.exvat,eqs.exrate,s.currency,s.type')
                 ->from('eprs_quotation_suppliers AS eqs')
-                ->join('eprs_suppliers_main AS s','eqs.supplierid = s.sysid','left')
-                ->where('eqs.sysid',$quotationid)
+                ->join('eprs_suppliers_main AS s', 'eqs.supplierid = s.sysid', 'left')
+                ->where('eqs.sysid', $quotationid)
                 ->get()->row();
 
             if ($supplier->currency == 83) {
@@ -2431,11 +2445,9 @@ class Model_purchasing extends CI_Model
                 $c = get_currency($supplier->currency);
                 $netvat[$quotationid] = $totalamt;
 
-                
-                $ewtrate = 0;
-                if ($supplier->type == 4002) {
-                    $ewtrate = 0.02;
-                }
+
+
+                $ewtrate = 0.02;
 
                 $ewt[$quotationid] = ($supplier->exrate <= 1) ? round($netvat[$quotationid] * $ewtrate, 2) : 0;
                 $vat[$quotationid] = 0;
@@ -2446,7 +2458,6 @@ class Model_purchasing extends CI_Model
                 $suptotal[$quotationid]['php'] = $totalamt * ceil($supplier->exrate);
                 $suptotal[$quotationid]['p'] = $ship;
             }
-
         }
 
         /*if (count($ctotal) > 0) {
@@ -2462,10 +2473,10 @@ class Model_purchasing extends CI_Model
 
             }
         }*/
-        
+
         $supplier_qry = $this->db->select('s.currency')
             ->from('eprs_quotation_suppliers as eqs')
-            ->join('eprs_suppliers_main as s','s.sysid = eqs.supplierid','left')
+            ->join('eprs_suppliers_main as s', 's.sysid = eqs.supplierid', 'left')
             ->where(array('eqs.prfid' => $id))->get();
 
         if ($supplier_qry->num_rows() > 0) {
@@ -2505,8 +2516,8 @@ class Model_purchasing extends CI_Model
             }
         }
 
-        $data['subtotal'] = number_format(array_sum($cost),2);
-        $data['buffer'] = number_format(array_sum($suptotal)*0.02,2);
+        $data['subtotal'] = number_format(array_sum($cost), 2);
+        $data['buffer'] = number_format(array_sum($suptotal) * 0.02, 2);
 
         $data['soc'] = $cost;
         $data['netvat'] = $netvat;
@@ -2514,12 +2525,13 @@ class Model_purchasing extends CI_Model
         $data['gross'] = $gross;
         $data['ewt'] = $ewt;
         $data['suptotal'] = $suptotal;
-        $data['gtotal'] = number_format(array_sum($suptotal)+(array_sum($suptotal)*0.02),2);;
+        $data['gtotal'] = number_format(array_sum($suptotal) + (array_sum($suptotal) * 0.02), 2);;
 
         return json_encode($data);
     }
 
-    function dt_approver_remarks() {
+    function dt_approver_remarks()
+    {
         $data = array();
         $prsid = $this->input->post('id');
         $typesid = $this->input->post('typesid');
@@ -2536,13 +2548,13 @@ class Model_purchasing extends CI_Model
                 'prsid' => $prsid,
                 'typesid' => $typesid,
                 //'status' => 1
-            ))->where_not_in('moduleid',array(193))->get();
+            ))->where_not_in('moduleid', array(193))->get();
 
         if ($logs_qry->num_rows() > 0) {
-            foreach ($logs_qry->result() AS $log) {
+            foreach ($logs_qry->result() as $log) {
                 $data['list'][] = array(
                     'approver' => $approvers[$log->moduleid],
-                    'date' => date('Y-m-d H:i A',strtotime($log->datecreated)),
+                    'date' => date('Y-m-d H:i A', strtotime($log->datecreated)),
                     'status' => get_types_name($log->statusid)->names,
                     'remarks' => ($log->remarks != '') ? $log->remarks : 'N/A'
                 );
@@ -2550,15 +2562,16 @@ class Model_purchasing extends CI_Model
         }
 
         $data['columns'] = array(
-            dt_column_array('approver',false,'','20%'),
-            dt_column_array('date',false,'','15%'),
-            dt_column_array('status',false,'','10%'),
-            dt_column_array('remarks',false,'','50%'),
+            dt_column_array('approver', false, '', '20%'),
+            dt_column_array('date', false, '', '15%'),
+            dt_column_array('status', false, '', '10%'),
+            dt_column_array('remarks', false, '', '50%'),
         );
         return json_encode($data);
     }
 
-    function revise_item_qty() {
+    function revise_item_qty()
+    {
         $data = array();
         $itemid = $this->input->post('itemid');
         $itemqty = $this->input->post('itemqty');
@@ -2634,7 +2647,8 @@ class Model_purchasing extends CI_Model
         return json_encode($data);
     }
 
-    function delete_supplier_quotation() {
+    function delete_supplier_quotation()
+    {
         $data = array();
         $quotationid = $this->input->post('id');
         $qry = false;
@@ -2645,9 +2659,9 @@ class Model_purchasing extends CI_Model
         //get supplier details
         $supplier = $this->db->select('sm.descs')
             ->from('eprs_suppliers_main as sm')
-            ->join('eprs_quotation_suppliers as qs','sm.sysid = qs.supplierid','left')
+            ->join('eprs_quotation_suppliers as qs', 'sm.sysid = qs.supplierid', 'left')
             ->where(array('qs.sysid' => $quotationid))
-            ->where_not_in('qs.status',array(0,303))
+            ->where_not_in('qs.status', array(0, 303))
             ->get()->row();
 
         if ($supplier) {
@@ -2660,22 +2674,22 @@ class Model_purchasing extends CI_Model
                 if ($remove_quotations->qry) {
                     $this->db->trans_commit();
                     $qry = true;
-                    $msg = $supplier->descs.' quotations has been successfully removed.';
+                    $msg = $supplier->descs . ' quotations has been successfully removed.';
                     $func = 'success';
-                    $title = $supplier->descs.' Removed!';
+                    $title = $supplier->descs . ' Removed!';
                 } else {
                     $this->db->trans_rollback();
                     $qry = false;
-                    $msg = 'Failed to remove '.$supplier->descs.' quotations.';
+                    $msg = 'Failed to remove ' . $supplier->descs . ' quotations.';
                     $func = 'error';
-                    $title = $supplier->descs.' not Removed!';
+                    $title = $supplier->descs . ' not Removed!';
                 }
             } else {
                 $this->db->trans_rollback();
                 $qry = false;
-                $msg = 'Unable to remove '.$supplier->descs.' from quotations.';
+                $msg = 'Unable to remove ' . $supplier->descs . ' from quotations.';
                 $func = 'error';
-                $title = $supplier->descs.' not Removed!';
+                $title = $supplier->descs . ' not Removed!';
             }
         } else {
             $qry = false;
@@ -2692,7 +2706,8 @@ class Model_purchasing extends CI_Model
         return json_encode($data);
     }
 
-    function dt_po_suppliers() {
+    function dt_po_suppliers()
+    {
         $data = array();
         $prfid = $this->input->post('id');
         $view = $this->input->post('view');
@@ -2713,8 +2728,8 @@ class Model_purchasing extends CI_Model
                 qs.exvat
             ')
             ->from('eprs_quotation_suppliers AS qs')
-            ->join('eprs_suppliers_main AS sm','qs.supplierid = sm.sysid','left')
-            ->join('eprs_quotation_details AS qd','qs.sysid = qd.quotationid','left')
+            ->join('eprs_suppliers_main AS sm', 'qs.supplierid = sm.sysid', 'left')
+            ->join('eprs_quotation_details AS qd', 'qs.sysid = qd.quotationid', 'left')
             ->where(array(
                 'qd.status' => 301,
                 'qs.status' => 301,
@@ -2724,7 +2739,7 @@ class Model_purchasing extends CI_Model
 
         if ($suppliers_qry->num_rows() > 0) {
             $num = 1;
-            foreach ($suppliers_qry->result() AS $supplier) {
+            foreach ($suppliers_qry->result() as $supplier) {
                 //GET APPROVED QUOTATIONS WITH QUOTATIONID AND ITEM COUNT
                 $currency = get_currency($supplier->currency);
                 $currency_a[] = $currency;
@@ -2732,12 +2747,12 @@ class Model_purchasing extends CI_Model
                 $amount = 0;
                 $approved_qt = $this->db->select('eti.qty,eqd.amount,eqd.status')
                     ->from('eprs_quotation_details AS eqd')
-                    ->join('eprs_transaction_items AS eti','eqd.prfitemid = eti.sysid','left')
-                    ->where(array('eqd.quotationid' => $supplier->sysid,'eqd.status ' => 301))
+                    ->join('eprs_transaction_items AS eti', 'eqd.prfitemid = eti.sysid', 'left')
+                    ->where(array('eqd.quotationid' => $supplier->sysid, 'eqd.status ' => 301))
                     ->get();
 
                 if ($approved_qt->num_rows() > 0) {
-                    foreach ($approved_qt->result() AS $qt) {
+                    foreach ($approved_qt->result() as $qt) {
                         $amount += $qt->amount * $qt->qty;
                     }
                 }
@@ -2757,35 +2772,35 @@ class Model_purchasing extends CI_Model
                 }
 
                 $control = '';
-                $control .= ($view == 'false') ? '<a href="#frm_create_payment_request" title="Payment Request Details" data-toggle="ajax-modal" data-arr="'.$supplier->sysid.'" class="btn btn-success btn-sm inline"><i class="fa fa-list-ul"></i> Details</a>' : '';
-                $control .= '<a href="javasrcipt:;" title="PO Preview" id="btn_po_preview" data-id="'.$supplier->sysid.'" class="btn btn-primary btn-sm inline"><i class="fa fa-search"></i> Preview</a>';
+                $control .= ($view == 'false') ? '<a href="#frm_create_payment_request" title="Payment Request Details" data-toggle="ajax-modal" data-arr="' . $supplier->sysid . '" class="btn btn-success btn-sm inline"><i class="fa fa-list-ul"></i> Details</a>' : '';
+                $control .= '<a href="javasrcipt:;" title="PO Preview" id="btn_po_preview" data-id="' . $supplier->sysid . '" class="btn btn-primary btn-sm inline"><i class="fa fa-search"></i> Preview</a>';
                 $list_a = array(
                     'num' => $num++,
                     'name' => $supplier->name,
                     'items' => $supplier->items,
-                    'gross' => '<span class="pull-left">'.$icon.'</span>'.number_format($gross,2),
-                    'buffer' => ($buffer > 0 ? '<span class="pull-left">'.$icon.'</span>' : '').number_format($buffer,2),
-                    'ewt' => ($ewt > 0 ? '<span class="pull-left">'.$icon.'</span>' : '').number_format($ewt,2),
-                    'shipping' => (($supplier->currency != 83) ? '<span class="pull-left">'.$p_icon.'</span>' : '').number_format($supplier->shipping,2),
-                    'total' => ($supplier->currency != 83) ? number_format($supplier->shipping,2) : number_format($total,2),
+                    'gross' => '<span class="pull-left">' . $icon . '</span>' . number_format($gross, 2),
+                    'buffer' => ($buffer > 0 ? '<span class="pull-left">' . $icon . '</span>' : '') . number_format($buffer, 2),
+                    'ewt' => ($ewt > 0 ? '<span class="pull-left">' . $icon . '</span>' : '') . number_format($ewt, 2),
+                    'shipping' => (($supplier->currency != 83) ? '<span class="pull-left">' . $p_icon . '</span>' : '') . number_format($supplier->shipping, 2),
+                    'total' => ($supplier->currency != 83) ? number_format($supplier->shipping, 2) : number_format($total, 2),
                     'control' => $control
                 );
                 if ($supplier->currency != 83) {
                     $code = strtolower($currency->code);
-                    $list_a[$code.'_total'] = number_format($total,2);
+                    $list_a[$code . '_total'] = number_format($total, 2);
                 }
                 $list[] = $list_a;
             }
         }
 
         $columns = array(
-            dt_column_array('num','#','number','1%'),
-            dt_column_array('name','Name','','15%'),
-            dt_column_array('items','Items','number','5%'),
-            dt_column_array('gross','Gross','number','10%'),
-            dt_column_array('buffer','Buffer 2%','number','8%'),
-            dt_column_array('ewt','EWT','number','8%'),
-            dt_column_array('shipping','Shipping (Est.)','number','8%'),
+            dt_column_array('num', '#', 'number', '1%'),
+            dt_column_array('name', 'Name', '', '15%'),
+            dt_column_array('items', 'Items', 'number', '5%'),
+            dt_column_array('gross', 'Gross', 'number', '10%'),
+            dt_column_array('buffer', 'Buffer 2%', 'number', '8%'),
+            dt_column_array('ewt', 'EWT', 'number', '8%'),
+            dt_column_array('shipping', 'Shipping (Est.)', 'number', '8%'),
             //dt_column_array('total','Total','number','10%'),
             //dt_column_array('control','Control','text-align-center','10%'),
         );
@@ -2793,39 +2808,39 @@ class Model_purchasing extends CI_Model
         $a_currency = array_column($currency_a, 'sysid');
         $u_currency = array_unique($a_currency);
         if (count($u_currency) > 1) {
-            if (in_array(83,$u_currency)) {
+            if (in_array(83, $u_currency)) {
                 //$key = array_search(83, array_map("unserialize", array_unique(array_map("serialize", $currency_a))));
-                foreach ($currency_a AS $k => $v) {
-                    if (in_array(83,(array)$v)) {
+                foreach ($currency_a as $k => $v) {
+                    if (in_array(83, (array)$v)) {
                         unset($currency_a[$k]);
                     }
                 }
             }
-            foreach ($currency_a AS $c) {
+            foreach ($currency_a as $c) {
                 $code = strtolower($c->code);
-                $columns[] = dt_column_array($code.'_total','Total ('.$c->code.')','number','10%');
+                $columns[] = dt_column_array($code . '_total', 'Total (' . $c->code . ')', 'number', '10%');
             }
-            $columns[] = dt_column_array('total','Total (PHP)','number','10%');
+            $columns[] = dt_column_array('total', 'Total (PHP)', 'number', '10%');
         } else {
             if ($u_currency[0] != 83) {
                 $c = $currency_a[0];
                 $code = strtolower($c->code);
-                $columns[] = dt_column_array($code.'_total','Total ('.$c->code.')','number','10%');
-                $columns[] = dt_column_array('total','Total (PHP)','number','10%');
+                $columns[] = dt_column_array($code . '_total', 'Total (' . $c->code . ')', 'number', '10%');
+                $columns[] = dt_column_array('total', 'Total (PHP)', 'number', '10%');
             } else {
-                $columns[] = dt_column_array('total','Total','number','10%');
+                $columns[] = dt_column_array('total', 'Total', 'number', '10%');
             }
         }
 
-        $columns[] = dt_column_array('control','Control','text-align-center','10%');
+        $columns[] = dt_column_array('control', 'Control', 'text-align-center', '10%');
 
         $data['columns'] = $columns;
 
         if (count($list) > 0) {
-            foreach ($list AS $n => $v) {
-                $cols = array_column($columns,'data');
-                foreach ($cols AS $col) {
-                    if (!array_key_exists($col,$list[$n])) {
+            foreach ($list as $n => $v) {
+                $cols = array_column($columns, 'data');
+                foreach ($cols as $col) {
+                    if (!array_key_exists($col, $list[$n])) {
                         $list[$n][$col] = '0.00';
                     }
                 }
@@ -2837,7 +2852,8 @@ class Model_purchasing extends CI_Model
         return json_encode($data);
     }
 
-    function save_payment_request() {
+    function save_payment_request()
+    {
         $data = array();
         $quotedsupplier = $this->input->post('quotedsupplier');
         $paymenttype = $this->input->post('paymenttype');
@@ -2873,7 +2889,7 @@ class Model_purchasing extends CI_Model
                     'accountnum' => $accountnumber
                 );
 
-                $add_online_details = insert_db($this->db,'eprs_suppliers_online_details',$online_array);
+                $add_online_details = insert_db($this->db, 'eprs_suppliers_online_details', $online_array);
                 if ($add_online_details->qry) {
                     $trn['add_online_details'] = true;
                     $msg .= 'Online Details has been updated."\n"';
@@ -2881,7 +2897,6 @@ class Model_purchasing extends CI_Model
                     $trn['add_online_details'] = false;
                     $msg .= 'Unable to update online details."\n"';
                 }
-
             }
         }
 
@@ -2925,12 +2940,12 @@ class Model_purchasing extends CI_Model
             }
         }
 
-        if (count($existing) > 0 && !in_array(false,$existing)) {
+        if (count($existing) > 0 && !in_array(false, $existing)) {
             $msg .= 'Submitted details already exists. Make some changes and try again.';
         } else {
-            update_db($this->db,'eprs_po_details',array('status' => 0),array('quotationid' => $quotedsupplier));
+            update_db($this->db, 'eprs_po_details', array('status' => 0), array('quotationid' => $quotedsupplier));
 
-            $add_po_dets = insert_db($this->db,'eprs_po_details',$po_details);
+            $add_po_dets = insert_db($this->db, 'eprs_po_details', $po_details);
 
             if ($add_po_dets->qry) {
                 $trn['add_po_dets'] = true;
@@ -2939,7 +2954,7 @@ class Model_purchasing extends CI_Model
             }
         }
 
-        if (!in_array(false,$trn)) {
+        if (!in_array(false, $trn)) {
             $this->db->trans_commit();
             $msg = 'PO Details has been updated!';
             $qry = true;
@@ -2947,7 +2962,7 @@ class Model_purchasing extends CI_Model
             $title = 'Success!';
         } else {
             $data['trn'] = $trn;
-            if (in_array(true,$trn)) {
+            if (in_array(true, $trn)) {
                 $this->db->trans_commit();
                 $func = 'warning';
                 $title = 'Updated with Errors';
@@ -2957,7 +2972,6 @@ class Model_purchasing extends CI_Model
                 $func = 'error';
                 $title = 'Fail!';
             }
-
         }
 
         $data['qry'] = $qry;
@@ -2968,7 +2982,8 @@ class Model_purchasing extends CI_Model
         return json_encode($data);
     }
 
-    function generate_po() {
+    function generate_po()
+    {
         $data = array();
         $requestid = $this->input->post('id');
         $forpogen = array();
@@ -2983,7 +2998,7 @@ class Model_purchasing extends CI_Model
                 sm.descs AS `name`
             ')
             ->from('eprs_quotation_suppliers AS qs')
-            ->join('eprs_suppliers_main AS sm','qs.supplierid = sm.sysid','left')
+            ->join('eprs_suppliers_main AS sm', 'qs.supplierid = sm.sysid', 'left')
             ->where(array(
                 'qs.status' => 301,
                 'qs.prfid' => $requestid
@@ -3010,25 +3025,25 @@ class Model_purchasing extends CI_Model
             $suppliers = '';
             $last = end($nodets);
             if ($nodets_cnt > 1) {
-                unset($nodets[$nodets_cnt-1]);
-                $suppliers .= implode(', ',$nodets).' and '.$last;
+                unset($nodets[$nodets_cnt - 1]);
+                $suppliers .= implode(', ', $nodets) . ' and ' . $last;
             } else {
                 $suppliers .= $last;
             }
-            $msg = $suppliers.' has no saved PO details. Kindly provide details for the following supplier(s) and try again.';
+            $msg = $suppliers . ' has no saved PO details. Kindly provide details for the following supplier(s) and try again.';
             $func = 'error';
         } else {
             //CREATE PO NUMBER AND UPDATE PO DETAILS
             $ponum = date('mdY');
-            $new_po = insert_db($this->db,'eprs_po',array('prfid' => $requestid,'ponumber' => $ponum));
+            $new_po = insert_db($this->db, 'eprs_po', array('prfid' => $requestid, 'ponumber' => $ponum));
             if ($new_po->qry) {
                 $poid = $new_po->insert_id;
                 $update_details = array();
                 foreach ($forpogen as $details) {
-                    $update_details[] = update_db($this->db,'eprs_po_details',array('poid' => $poid),array('sysid' => $details))->qry;
+                    $update_details[] = update_db($this->db, 'eprs_po_details', array('poid' => $poid), array('sysid' => $details))->qry;
                 }
 
-                if (!in_array(false,$update_details)) {
+                if (!in_array(false, $update_details)) {
                     $qry = true;
                     $msg = 'POs has been created for all suppliers!';
                     $func = 'success';
@@ -3044,7 +3059,8 @@ class Model_purchasing extends CI_Model
         return json_encode($data);
     }
 
-    function my_prs_list() {
+    function my_prs_list()
+    {
         $data = array();
 
         $route = $this->input->post('route');
@@ -3055,13 +3071,13 @@ class Model_purchasing extends CI_Model
         $where_stages = ($app_flow_ids_arr) ? " AND flowid IN ($app_flow_ids) " : "";
         $data['traillast'] = $where_trails_last;
 
-        if($route && ((is_array($route) && count($route) > 0) || $route > 0)) {
+        if ($route && ((is_array($route) && count($route) > 0) || $route > 0)) {
 
             $levels = '';
             if (is_array($route)) {
-                $levels = 'levels IN ('.implode(',',$route).')';
+                $levels = 'levels IN (' . implode(',', $route) . ')';
             } else {
-                $levels = ($route > 0) ? 'levels = '.$route : 'levels = ""';
+                $levels = ($route > 0) ? 'levels = ' . $route : 'levels = ""';
             }
 
             $sql_stages = $this->db->query("
@@ -3070,7 +3086,7 @@ class Model_purchasing extends CI_Model
                 WHERE $levels AND `status` = 1 $where_stages
                 ");
 
-            if($sql_stages->num_rows()>0) {
+            if ($sql_stages->num_rows() > 0) {
                 foreach ($sql_stages->result() as $srow) {
                     $stages_ids[] = $srow->sysid;
                 }
@@ -3084,7 +3100,7 @@ class Model_purchasing extends CI_Model
                 WHERE `status` = 1 $where_stages
                 ");
 
-            if($sql_stages->num_rows()>0) {
+            if ($sql_stages->num_rows() > 0) {
                 foreach ($sql_stages->result() as $srow) {
                     $stages_ids[] = $srow->sysid;
                 }
@@ -3094,7 +3110,7 @@ class Model_purchasing extends CI_Model
         }
 
         $roles = json_decode(get_user_role(user_id()));
-        if (user_id() != 1 || ($roles && !array_search(24,array_column((array)$roles,'id')))) {
+        if (user_id() != 1 || ($roles && !array_search(24, array_column((array)$roles, 'id')))) {
             $where .= ' AND et.createdby = ' . user_id();
         }
 
@@ -3131,7 +3147,7 @@ class Model_purchasing extends CI_Model
         $data['sql'] = $this->db->last_query();
 
         if ($qry_details->num_rows() > 0) {
-            foreach ($qry_details->result() AS $row) {
+            foreach ($qry_details->result() as $row) {
                 $prsid = $row->sysid;
                 $trnid = $row->trnid;
                 $stageid = $row->stageid;
@@ -3145,7 +3161,7 @@ class Model_purchasing extends CI_Model
                 $requestor = '';
 
                 if ($creator) {
-                    $requestor = ucfirst($creator->firstname.' '.$creator->lastname);
+                    $requestor = ucfirst($creator->firstname . ' ' . $creator->lastname);
                 }
 
                 $comment_cnt = '';
@@ -3154,7 +3170,7 @@ class Model_purchasing extends CI_Model
                     ->from('transaction_request_trails_comments AS tc')
                     ->where(array('tc.trnid' => $trnid, 'status' => 1))
                     ->get()->row();
-                if($qry_comments_cnt && $qry_comments_cnt->cnt>0) {
+                if ($qry_comments_cnt && $qry_comments_cnt->cnt > 0) {
 
                     $qry_comments_msg = $this->db->select('remarks')
                         ->from('transaction_request_trails_comments AS tc')
@@ -3164,12 +3180,11 @@ class Model_purchasing extends CI_Model
                     $comment_msg = ($qry_comments_msg) ? $qry_comments_msg->remarks : '';
                     $max_length = 45;
 
-                    if (strlen($comment_msg) > $max_length)
-                    {
+                    if (strlen($comment_msg) > $max_length) {
                         $offset = ($max_length - 3) - strlen($comment_msg);
                         $comment_msg = substr($comment_msg, 0, strrpos($comment_msg, ' ', $offset)) . ' ...';
                     }
-                    $comment_cnt = '<span class="badge badge-danger pull-right" style="margin-left: 5px;">'.$qry_comments_cnt->cnt.'</span>';
+                    $comment_cnt = '<span class="badge badge-danger pull-right" style="margin-left: 5px;">' . $qry_comments_cnt->cnt . '</span>';
                 }
 
                 $creation_date = '';
@@ -3185,8 +3200,8 @@ class Model_purchasing extends CI_Model
 
                 $data['traillast_qry'] = $this->db->last_query();
                 $show = true;
-                if($route && $route > 0) {
-                    if($qry_trails_last && $qry_trails_last->stageid != $stageid) {
+                if ($route && $route > 0) {
+                    if ($qry_trails_last && $qry_trails_last->stageid != $stageid) {
                         $show = false;
                     }
                 }
@@ -3197,7 +3212,7 @@ class Model_purchasing extends CI_Model
                 $from_created_by = 'None';
 
 
-                if($qry_trails_last) {
+                if ($qry_trails_last) {
                     $creation_date = $row->datecreated;
                     $updated_date = $qry_trails_last->datecreated;
 
@@ -3207,32 +3222,31 @@ class Model_purchasing extends CI_Model
 
                     $trn_name = '<a href="javascript:;" title="Current" class="label label-info">C</a> ' . get_trail_name($qry_trails_last->stageid);
                     $button .= '<div class="btn-group btn-xs">';
-                    $button .= '<a target="_blank" title="View PRF." data-content="body" href="' . base_url('module/bc33ea4e26e5e1af1408321416956113a4658763/view/' . $prsid). '" class="btn btn-primary btn-xs inline tooltips"><i class="fa fa-search fa-fw"></i></a>';
+                    $button .= '<a target="_blank" title="View PRF." data-content="body" href="' . base_url('module/bc33ea4e26e5e1af1408321416956113a4658763/view/' . $prsid) . '" class="btn btn-primary btn-xs inline tooltips"><i class="fa fa-search fa-fw"></i></a>';
                     $button .= '</div>';
-
                 }
 
                 $trn_elapse = time_elapsed_diff($creation_date, $updated_date, true);
                 $ovr_elapse = time_elapsed_diff($creation_date, date('Y-m-d h:m:s'));
 
-                $time = $datesubmitted . '<br><small class="text-info">' . timeago($row->datecreated, sql_time()->DATETIME).'</small>';
-                $time_updated = $updated_date . '<br><small class="text-info">' . timeago($updated_date, sql_time()->DATETIME).'</small>';
+                $time = $datesubmitted . '<br><small class="text-info">' . timeago($row->datecreated, sql_time()->DATETIME) . '</small>';
+                $time_updated = $updated_date . '<br><small class="text-info">' . timeago($updated_date, sql_time()->DATETIME) . '</small>';
 
-                if($row->status==1) {
+                if ($row->status == 1) {
                     $status = 'Pending';
-                }else{
+                } else {
                     $status = get_types_label_format($row->status);
                 }
 
-                if($show) {
-                    $prfno = 'PRF'.date('ym',strtotime($created)).str_pad($prsid,5,'0',STR_PAD_LEFT);
+                if ($show) {
+                    $prfno = 'PRF' . date('ym', strtotime($created)) . str_pad($prsid, 5, '0', STR_PAD_LEFT);
                     $po = $this->db->select('ponumber as number')
                         ->from('eprs_po')
-                        ->where(array('prfid' => $prsid,'status' => 1))
+                        ->where(array('prfid' => $prsid, 'status' => 1))
                         ->get()->row();
 
                     if ($po) {
-                        $ponum = 'PAE-'.str_pad($po->number,8,'0',STR_PAD_LEFT);
+                        $ponum = 'PAE-' . str_pad($po->number, 8, '0', STR_PAD_LEFT);
                         $hide = 'hidden';
                     } else {
                         $ponum = 'N/A';
@@ -3241,7 +3255,7 @@ class Model_purchasing extends CI_Model
 
                     $data['list'][] = array(
                         'expand' => btn_expand($prsid),
-                        'prfno' => '<h4 class="text-danger bold" style="margin: 0px 0px;">' .$prfno. ' </h4> ',
+                        'prfno' => '<h4 class="text-danger bold" style="margin: 0px 0px;">' . $prfno . ' </h4> ',
                         'pono' => $ponum,
                         'submitted' => $time,
                         'from' => $from_created_by,
@@ -3261,47 +3275,48 @@ class Model_purchasing extends CI_Model
         }
 
         $data['columns'] = array(
-            dt_column_array('expand',false,'text-align-center','1%'),
-            dt_column_array('prfno',false,'text-primary bold','10%'),
-            dt_column_array('pono',false,'text-primary bold','10%'),
-            dt_column_array('submitted',false,false,'10%'),
-            dt_column_array('updated',false,false,'10%'),
-            dt_column_array('items',false,'number'),
-            dt_column_array('justification',false,false,'300px'),
-            dt_column_array('trn',false,'text-danger','150px'),
-            dt_column_array('remarks',false,'text-info','150px'),
-            dt_column_array('status',false,'text-info'),
-            dt_column_array('control',false,'controls','5%'),
+            dt_column_array('expand', false, 'text-align-center', '1%'),
+            dt_column_array('prfno', false, 'text-primary bold', '10%'),
+            dt_column_array('pono', false, 'text-primary bold', '10%'),
+            dt_column_array('submitted', false, false, '10%'),
+            dt_column_array('updated', false, false, '10%'),
+            dt_column_array('items', false, 'number'),
+            dt_column_array('justification', false, false, '300px'),
+            dt_column_array('trn', false, 'text-danger', '150px'),
+            dt_column_array('remarks', false, 'text-info', '150px'),
+            dt_column_array('status', false, 'text-info'),
+            dt_column_array('control', false, 'controls', '5%'),
         );
 
         return json_encode($data);
     }
 
-    function my_prs_draft() {
+    function my_prs_draft()
+    {
         $data = array();
 
         $drafts_lookup = $this->db->select('et.*,COUNT(eti.sysid) AS items')
             ->from('eprs_transaction as et')
-            ->join('eprs_transaction_items as eti','et.sysid = eti.prfid AND eti.status = 307','left')
-            ->where(array('et.createdby' => user_id(),'et.status' => 307))
+            ->join('eprs_transaction_items as eti', 'et.sysid = eti.prfid AND eti.status = 307', 'left')
+            ->where(array('et.createdby' => user_id(), 'et.status' => 307))
             ->group_by('et.sysid')
             ->get();
 
         if ($drafts_lookup->num_rows() > 0) {
             $num = 1;
-            foreach ($drafts_lookup->result() AS $draft) {
-                $prfno = 'PRF'.date('ym',strtotime($draft->datecreated)).str_pad($draft->sysid,5,'0',STR_PAD_LEFT);
-                $time = $draft->datecreated . '<br><small class="text-info">' . timeago($draft->datecreated, sql_time()->DATETIME).'</small>';
-                $time_updated = $draft->dateupdated . '<br><small class="text-info">' . timeago($draft->dateupdated, sql_time()->DATETIME).'</small>';
+            foreach ($drafts_lookup->result() as $draft) {
+                $prfno = 'PRF' . date('ym', strtotime($draft->datecreated)) . str_pad($draft->sysid, 5, '0', STR_PAD_LEFT);
+                $time = $draft->datecreated . '<br><small class="text-info">' . timeago($draft->datecreated, sql_time()->DATETIME) . '</small>';
+                $time_updated = $draft->dateupdated . '<br><small class="text-info">' . timeago($draft->dateupdated, sql_time()->DATETIME) . '</small>';
 
                 $button = '';
                 $button .= '<div class="btn-group btn-xs">';
-                $button .= '<a target="_blank" title="View PRF Draft." data-content="body" href="' . base_url('module/bc33ea4e26e5e1af1408321416956113a4658763/view/' . $draft->sysid). '" class="btn btn-primary btn-xs inline tooltips"><i class="fa fa-search fa-fw"></i></a>';
+                $button .= '<a target="_blank" title="View PRF Draft." data-content="body" href="' . base_url('module/bc33ea4e26e5e1af1408321416956113a4658763/view/' . $draft->sysid) . '" class="btn btn-primary btn-xs inline tooltips"><i class="fa fa-search fa-fw"></i></a>';
                 $button .= '</div>';
 
                 $data['list'][] = array(
                     'num' => $num++,
-                    'prfno' => '<h4 class="text-danger bold" style="margin: 0px 0px;">' .$prfno. ' </h4> ',
+                    'prfno' => '<h4 class="text-danger bold" style="margin: 0px 0px;">' . $prfno . ' </h4> ',
                     'created' => $time,
                     'updated' => $time_updated,
                     'items' => $draft->items,
@@ -3312,19 +3327,20 @@ class Model_purchasing extends CI_Model
         }
 
         $data['columns'] = array(
-            dt_column_array('num',false,'text-align-center','1%'),
-            dt_column_array('prfno',false,'text-primary bold','10%'),
-            dt_column_array('created',false,false,'10%'),
-            dt_column_array('updated',false,false,'10%'),
-            dt_column_array('items',false,'number'),
-            dt_column_array('justification',false,false,'300px'),
-            dt_column_array('control',false,'controls text-align-center','5%'),
+            dt_column_array('num', false, 'text-align-center', '1%'),
+            dt_column_array('prfno', false, 'text-primary bold', '10%'),
+            dt_column_array('created', false, false, '10%'),
+            dt_column_array('updated', false, false, '10%'),
+            dt_column_array('items', false, 'number'),
+            dt_column_array('justification', false, false, '300px'),
+            dt_column_array('control', false, 'controls text-align-center', '5%'),
         );
 
         return json_encode($data);
     }
 
-    function edit_justification() {
+    function edit_justification()
+    {
         $data = array();
         $prfid = $this->input->post('prfid');
         $justification = $this->input->post('justification');
@@ -3334,7 +3350,7 @@ class Model_purchasing extends CI_Model
         $func = '';
 
         $this->db->trans_begin();
-        $update = update_db($this->db,'eprs_transaction',array('justification' => $justification),array('sysid' => $prfid));
+        $update = update_db($this->db, 'eprs_transaction', array('justification' => $justification), array('sysid' => $prfid));
 
         if ($update->qry) {
             $this->db->trans_commit();
@@ -3354,7 +3370,8 @@ class Model_purchasing extends CI_Model
         return json_encode($data);
     }
 
-    function new_supplier_validation() {
+    function new_supplier_validation()
+    {
         $data = array();
         $value = $this->input->post('value');
         $field = $this->input->post('field');
@@ -3365,14 +3382,14 @@ class Model_purchasing extends CI_Model
         $qry = false;
         $func = '';
         $icon = '';
-        if ($value && $value !='') {
+        if ($value && $value != '') {
             if ($location == 'main') {
                 if ($field == 'codes') {
                     $value = strtoupper($value);
                 }
                 $lookup_qry = $this->db->select($field)
                     ->from('eprs_suppliers_main')
-                    ->where($field,$value)
+                    ->where($field, $value)
                     ->get()->row();
 
                 if ($lookup_qry) {
@@ -3416,7 +3433,8 @@ class Model_purchasing extends CI_Model
         return json_encode($data);
     }
 
-    function save_new_supplier() {
+    function save_new_supplier()
+    {
         $data = array();
         $suppliercode = strtoupper($this->input->post('suppliercode'));
         $suppliername = $this->input->post('suppliername');
@@ -3439,14 +3457,14 @@ class Model_purchasing extends CI_Model
 
         //CHECK IF TIN EXIST
         if ($suppliertin && $suppliertin != '') {
-            $this->db->or_where('tin',$suppliertin);
+            $this->db->or_where('tin', $suppliertin);
         }
         $check_qry = $this->db->select('')
             ->from('eprs_suppliers_main')
-            ->or_where('codes',$suppliercode)
-            ->or_where('name',$suppliername)
-            ->or_where('descs',$supplierdesc)
-            ->where('status',1)
+            ->or_where('codes', $suppliercode)
+            ->or_where('name', $suppliername)
+            ->or_where('descs', $supplierdesc)
+            ->where('status', 1)
             ->get()->row();
 
         if ($check_qry) {
@@ -3454,17 +3472,17 @@ class Model_purchasing extends CI_Model
             $func = 'error';
         } else {
             if ($supplierphone && $supplierphone != '') {
-                $this->db->or_where('contact',$supplierphone);
+                $this->db->or_where('contact', $supplierphone);
             }
             if ($suppliermobile && $suppliermobile != '') {
-                $this->db->or_where('contact',$suppliermobile);
+                $this->db->or_where('contact', $suppliermobile);
             }
             if ($supplieremail && $supplieremail != '') {
-                $this->db->or_where('contact',$supplieremail);
+                $this->db->or_where('contact', $supplieremail);
             }
             $contact_qry = $this->db->select('')
                 ->from('eprs_suppliers_contact as sm')
-                ->where('status',1)
+                ->where('status', 1)
                 ->get()->row();
 
             if ($contact_qry) {
@@ -3474,9 +3492,9 @@ class Model_purchasing extends CI_Model
                 if ($accountname != '' && $accountbank != '' && $accountnumber != '') {
                     $account_qry = $this->db->select('')
                         ->from('eprs_suppliers_online_details as sm')
-                        ->or_where('name',$accountname)
-                        ->or_where('accountnum',$accountnumber)
-                        ->where('status',1)
+                        ->or_where('name', $accountname)
+                        ->or_where('accountnum', $accountnumber)
+                        ->where('status', 1)
                         ->get()->row();
 
                     if ($account_qry) {
@@ -3505,7 +3523,7 @@ class Model_purchasing extends CI_Model
                 $insert_info['tin'] = $suppliertin;
             }
 
-            $supplier = insert_db($this->db,'eprs_suppliers_main',$insert_info);
+            $supplier = insert_db($this->db, 'eprs_suppliers_main', $insert_info);
 
             if ($supplier->qry) {
                 $result['supplier'] = true;
@@ -3516,7 +3534,7 @@ class Model_purchasing extends CI_Model
                     'supplierid' => $supplier_id,
                     'address' => $supplieraddress
                 );
-                $address = insert_db($this->db,'eprs_suppliers_address',$address_arr);
+                $address = insert_db($this->db, 'eprs_suppliers_address', $address_arr);
                 $result['address'] = $address->qry;
 
                 //INSERT CONTACT
@@ -3527,7 +3545,7 @@ class Model_purchasing extends CI_Model
                         'typesid' => 1050
                     );
 
-                    $phone = insert_db($this->db,'eprs_suppliers_contact',$phone_arr);
+                    $phone = insert_db($this->db, 'eprs_suppliers_contact', $phone_arr);
                     $result['phone'] = $phone->qry;
                 }
 
@@ -3538,7 +3556,7 @@ class Model_purchasing extends CI_Model
                         'typesid' => 1051
                     );
 
-                    $mobile = insert_db($this->db,'eprs_suppliers_contact',$mobile_arr);
+                    $mobile = insert_db($this->db, 'eprs_suppliers_contact', $mobile_arr);
                     $result['mobile'] = $mobile->qry;
                 }
 
@@ -3549,7 +3567,7 @@ class Model_purchasing extends CI_Model
                         'typesid' => 1053
                     );
 
-                    $email = insert_db($this->db,'eprs_suppliers_contact',$email_arr);
+                    $email = insert_db($this->db, 'eprs_suppliers_contact', $email_arr);
                     $result['email'] = $email->qry;
                 }
 
@@ -3562,13 +3580,13 @@ class Model_purchasing extends CI_Model
                         'accountnum' => $accountnumber
                     );
 
-                    $account = insert_db($this->db,'eprs_suppliers_online_details',$account_arr);
+                    $account = insert_db($this->db, 'eprs_suppliers_online_details', $account_arr);
                     $result['account'] = $account->qry;
                 }
             } else {
                 $result['supplier'] = false;
             }
-            if (!in_array(false,$result)) {
+            if (!in_array(false, $result)) {
                 $this->db->trans_commit();
                 $msg = 'Supplier details has been saved!';
                 $qry = true;
@@ -3589,24 +3607,25 @@ class Model_purchasing extends CI_Model
         return json_encode($data);
     }
 
-    function prs_list() {
+    function prs_list()
+    {
         $data = array();
 
         //LOOKUP ALL NON-DELETED PRS
         $prs_qry = $this->db->select('t.sysid,t.datecreated,t.justification,COUNT(i.sysid) AS items,t.status ')
             ->from('eprs_transaction AS t')
-            ->join('eprs_transaction_items AS i','t.sysid = i.prfid AND i.status != 0','left')
+            ->join('eprs_transaction_items AS i', 't.sysid = i.prfid AND i.status != 0', 'left')
             ->where(array('t.status !=' => 0))
             ->group_by('t.sysid,t.justification,t.status')
             ->get();
 
         if ($prs_qry->num_rows() > 0) {
             $n = 1;
-            foreach ($prs_qry->result() AS $prs) {
-                $control = '<button id="btn_load_items" class="btn btn-primary inline" data-id="'.$prs->sysid.'"><i class="fa fa-download"></i></button>';
+            foreach ($prs_qry->result() as $prs) {
+                $control = '<button id="btn_load_items" class="btn btn-primary inline" data-id="' . $prs->sysid . '"><i class="fa fa-download"></i></button>';
                 $data['list'][] = array(
-                    'num' => btn_expand($prs->sysid).' '.$n++,
-                    'prs' => '<span class="text-danger bold">PRF'.date('ym',strtotime($prs->datecreated)).str_pad($prs->sysid,5,'0',STR_PAD_LEFT).'</span>',
+                    'num' => btn_expand($prs->sysid) . ' ' . $n++,
+                    'prs' => '<span class="text-danger bold">PRF' . date('ym', strtotime($prs->datecreated)) . str_pad($prs->sysid, 5, '0', STR_PAD_LEFT) . '</span>',
                     'items' => $prs->items,
                     'justification' => $prs->justification,
                     'status' => get_types_label_format($prs->status),
@@ -3616,18 +3635,19 @@ class Model_purchasing extends CI_Model
         }
 
         $data['columns'] = array(
-            dt_column_array('num','#','number','10px'),
-            dt_column_array('prs','PRF#','text-primary bold','25px'),
-            dt_column_array('items','Items','number','15px'),
-            dt_column_array('justification','Justification','','300px'),
-            dt_column_array('status','Status','text-align-center','25px'),
-            dt_column_array('control','<i class="fa fa-wrench"></i>','text-align-center','15%'),
+            dt_column_array('num', '#', 'number', '10px'),
+            dt_column_array('prs', 'PRF#', 'text-primary bold', '25px'),
+            dt_column_array('items', 'Items', 'number', '15px'),
+            dt_column_array('justification', 'Justification', '', '300px'),
+            dt_column_array('status', 'Status', 'text-align-center', '25px'),
+            dt_column_array('control', '<i class="fa fa-wrench"></i>', 'text-align-center', '15%'),
         );
 
         return json_encode($data);
     }
 
-    function prf_sub_details() {
+    function prf_sub_details()
+    {
         $data = array();
         $prfid = $this->input->post('id');
 
@@ -3637,10 +3657,10 @@ class Model_purchasing extends CI_Model
         //LOOKUP ALL PRF ITEMS
         $items_qry = $this->db->select('eti.itemid,eti.sysid,eti.prfid,imd.fulldescription,eti.qty,eti.remarks,u.unit_name,u.unit_code,eti.unitid')
             ->from('eprs_transaction_items AS eti')
-            ->join('items_main_description AS imd','eti.itemid = imd.sysid','left')
-            ->join('prime_unit AS u','eti.unitid = u.sysid','left')
-            ->where('eti.status !=',0)
-            ->where('eti.prfid',$prfid)
+            ->join('items_main_description AS imd', 'eti.itemid = imd.sysid', 'left')
+            ->join('prime_unit AS u', 'eti.unitid = u.sysid', 'left')
+            ->where('eti.status !=', 0)
+            ->where('eti.prfid', $prfid)
             ->get();
 
         //$data['query'] = $this->db->last_query();
@@ -3649,13 +3669,13 @@ class Model_purchasing extends CI_Model
             $n = 1;
             foreach ($items_qry->result() as $item) {
                 $unit = unit_query($item->unitid);
-                $unitn = ($unit) ? (($unit->name == $unit->code) ? $unit->name : $unit->name.' ('.$unit->code.')') : 'unit';
+                $unitn = ($unit) ? (($unit->name == $unit->code) ? $unit->name : $unit->name . ' (' . $unit->code . ')') : 'unit';
                 $row .= '<tr>';
-                $row .= '<td class="number">'.$n++.'</td>';
-                $row .= '<td class="">'.$item->fulldescription.'</td>';
-                $row .= '<td class="number">'.$item->qty.'</td>';
-                $row .= '<td class="">'.$unitn.'</td>';
-                $row .= '<td class="">'.$item->remarks.'</td>';
+                $row .= '<td class="number">' . $n++ . '</td>';
+                $row .= '<td class="">' . $item->fulldescription . '</td>';
+                $row .= '<td class="number">' . $item->qty . '</td>';
+                $row .= '<td class="">' . $unitn . '</td>';
+                $row .= '<td class="">' . $item->remarks . '</td>';
                 $row .= '</tr>';
             }
         }
@@ -3678,7 +3698,8 @@ class Model_purchasing extends CI_Model
         return json_encode($data);
     }
 
-    function load_prf_items() {
+    function load_prf_items()
+    {
         $data = array();
         $id = $this->input->post('id');
 
@@ -3693,18 +3714,18 @@ class Model_purchasing extends CI_Model
         $this->db->trans_begin();
         $prf_item_qry = $this->db->select('itemid,qty,unitid,remarks')
             ->from('eprs_transaction_items')
-            ->where(array('prfid' => $id,'status !=' => 0))
+            ->where(array('prfid' => $id, 'status !=' => 0))
             ->get();
 
         if ($prf_item_qry->num_rows() > 0) {
-            foreach ($prf_item_qry->result() AS $item) {
-                $additem = insert_db($this->db,'eprs_transaction_items',(array)$item);
+            foreach ($prf_item_qry->result() as $item) {
+                $additem = insert_db($this->db, 'eprs_transaction_items', (array)$item);
 
                 $result[] = $additem->qry;
             }
         }
 
-        if (in_array(false,$result)) {
+        if (in_array(false, $result)) {
             $this->db->trans_rollback();
             $msg = 'Error adding items from selected PRF.';
             $qry = false;
@@ -3726,7 +3747,8 @@ class Model_purchasing extends CI_Model
         return json_encode($data);
     }
 
-    function prs_viewer_list() {
+    function prs_viewer_list()
+    {
         $data = array();
 
         $route = $this->input->post('route');
@@ -3740,13 +3762,13 @@ class Model_purchasing extends CI_Model
         $where_stages = ($app_flow_ids_arr) ? " AND flowid IN ($app_flow_ids) " : "";
         $data['traillast'] = $where_trails_last;
 
-        if($route && ((is_array($route) && count($route) > 0) || $route > 0)) {
+        if ($route && ((is_array($route) && count($route) > 0) || $route > 0)) {
 
             $levels = '';
             if (is_array($route)) {
-                $levels = 'levels IN ('.implode(',',$route).')';
+                $levels = 'levels IN (' . implode(',', $route) . ')';
             } else {
-                $levels = ($route > 0) ? 'levels = '.$route : 'levels = ""';
+                $levels = ($route > 0) ? 'levels = ' . $route : 'levels = ""';
             }
 
             $sql_stages = $this->db->query("
@@ -3755,7 +3777,7 @@ class Model_purchasing extends CI_Model
                 WHERE $levels AND `status` = 1 $where_stages
                 ");
 
-            if($sql_stages->num_rows()>0) {
+            if ($sql_stages->num_rows() > 0) {
                 foreach ($sql_stages->result() as $srow) {
                     $stages_ids[] = $srow->sysid;
                 }
@@ -3769,7 +3791,7 @@ class Model_purchasing extends CI_Model
                 WHERE `status` = 1 $where_stages
                 ");
 
-            if($sql_stages->num_rows()>0) {
+            if ($sql_stages->num_rows() > 0) {
                 foreach ($sql_stages->result() as $srow) {
                     $stages_ids[] = $srow->sysid;
                 }
@@ -3781,9 +3803,9 @@ class Model_purchasing extends CI_Model
         $status_ = '';
         if ($status) {
             if (is_array($status)) {
-                $status_ = ' et.`status` IN ('.implode(',',$status).') ';
+                $status_ = ' et.`status` IN (' . implode(',', $status) . ') ';
             } else {
-                $status_ = ' et.`status` = '.$status.' ';
+                $status_ = ' et.`status` = ' . $status . ' ';
             }
         } else {
             $status_ = ' et.`status` > 0 ';
@@ -3830,12 +3852,12 @@ class Model_purchasing extends CI_Model
         //$data['sql'] = $this->db->last_query();
 
         if ($qry_details->num_rows() > 0) {
-            foreach ($qry_details->result() AS $row) {
+            foreach ($qry_details->result() as $row) {
                 $prsid = $row->sysid;
                 $trnid = $row->trnid;
                 $stageid = $row->stageid;
                 $datesubmitted = $row->submitted;
-                $justification = ellipsis($row->justification,50);
+                $justification = ellipsis($row->justification, 50);
                 $createdby = $row->createdby;
                 $created = $row->datecreated;
                 $items = $row->items;
@@ -3849,7 +3871,7 @@ class Model_purchasing extends CI_Model
                 $requestor = '';
 
                 if ($creator) {
-                    $requestor = ucfirst($creator->firstname.' '.$creator->lastname);
+                    $requestor = ucfirst($creator->firstname . ' ' . $creator->lastname);
                 }
 
                 $comment_cnt = '';
@@ -3858,7 +3880,7 @@ class Model_purchasing extends CI_Model
                     ->from('transaction_request_trails_comments AS tc')
                     ->where(array('tc.trnid' => $trnid, 'status' => 1))
                     ->get()->row();
-                if($qry_comments_cnt && $qry_comments_cnt->cnt>0) {
+                if ($qry_comments_cnt && $qry_comments_cnt->cnt > 0) {
 
                     $qry_comments_msg = $this->db->select('remarks')
                         ->from('transaction_request_trails_comments AS tc')
@@ -3868,12 +3890,11 @@ class Model_purchasing extends CI_Model
                     $comment_msg = ($qry_comments_msg) ? $qry_comments_msg->remarks : '';
                     $max_length = 45;
 
-                    if (strlen($comment_msg) > $max_length)
-                    {
+                    if (strlen($comment_msg) > $max_length) {
                         $offset = ($max_length - 3) - strlen($comment_msg);
                         $comment_msg = substr($comment_msg, 0, strrpos($comment_msg, ' ', $offset)) . ' ...';
                     }
-                    $comment_cnt = '<span class="badge badge-danger pull-right" style="margin-left: 5px;">'.$qry_comments_cnt->cnt.'</span>';
+                    $comment_cnt = '<span class="badge badge-danger pull-right" style="margin-left: 5px;">' . $qry_comments_cnt->cnt . '</span>';
                 }
 
                 $creation_date = '';
@@ -3889,8 +3910,8 @@ class Model_purchasing extends CI_Model
 
                 //$data['traillast_qry'] = $this->db->last_query();
                 $show = true;
-                if($route && $route > 0) {
-                    if($qry_trails_last && $qry_trails_last->stageid != $stageid) {
+                if ($route && $route > 0) {
+                    if ($qry_trails_last && $qry_trails_last->stageid != $stageid) {
                         $show = false;
                     }
                 }
@@ -3901,7 +3922,7 @@ class Model_purchasing extends CI_Model
                 $from_created_by = 'None';
 
 
-                if($qry_trails_last) {
+                if ($qry_trails_last) {
 
                     $creation_date = $row->datecreated;
                     $updated_date = $qry_trails_last->datecreated;
@@ -3922,33 +3943,32 @@ class Model_purchasing extends CI_Model
                         $button .= '<a target="_blank" title="View PRF." data-content="body" href="' . base_url('module/49e3d046636e06b2d82ee046db8e6eb9a2e11e16/view/' . $prsid) . '" class="btn btn-primary btn-xs inline tooltips"><i class="fa fa-search fa-fw"></i></a>';
                         $button .= '</div>';
                     }
-
                 }
 
                 $trn_elapse = time_elapsed_diff($creation_date, $updated_date, true);
                 $ovr_elapse = time_elapsed_diff($creation_date, date('Y-m-d h:m:s'));
 
-                $time = $datesubmitted . '<br><small class="text-info">' . timeago($row->datecreated, sql_time()->DATETIME).'</small>';
-                $time_updated = $updated_date . '<br><small class="text-info">' . timeago($updated_date, sql_time()->DATETIME).'</small>';
+                $time = $datesubmitted . '<br><small class="text-info">' . timeago($row->datecreated, sql_time()->DATETIME) . '</small>';
+                $time_updated = $updated_date . '<br><small class="text-info">' . timeago($updated_date, sql_time()->DATETIME) . '</small>';
 
-                if($row->status==1) {
+                if ($row->status == 1) {
                     $status = 'Pending';
-                }else{
+                } else {
                     $status = get_types_label_format($row->status);
-                    if ((in_array($row->status,array(0,302,303)))) {
-                        $time_updated = $row->dateupdated . '<br><small class="text-info">' . timeago($row->dateupdated, sql_time()->DATETIME).'</small>';
+                    if ((in_array($row->status, array(0, 302, 303)))) {
+                        $time_updated = $row->dateupdated . '<br><small class="text-info">' . timeago($row->dateupdated, sql_time()->DATETIME) . '</small>';
                     }
                 }
 
-                if($show) {
-                    $prfno = 'PRF'.date('ym',strtotime($created)).str_pad($prsid,5,'0',STR_PAD_LEFT);
+                if ($show) {
+                    $prfno = 'PRF' . date('ym', strtotime($created)) . str_pad($prsid, 5, '0', STR_PAD_LEFT);
                     $po = $this->db->select('ponumber as number')
                         ->from('eprs_po')
-                        ->where(array('prfid' => $prsid,'status' => 1))
+                        ->where(array('prfid' => $prsid, 'status' => 1))
                         ->get()->row();
 
                     if ($po) {
-                        $ponum = 'PAE-'.str_pad($po->number,8,'0',STR_PAD_LEFT);
+                        $ponum = 'PAE-' . str_pad($po->number, 8, '0', STR_PAD_LEFT);
                         $hide = 'hidden';
                     } else {
                         $ponum = 'N/A';
@@ -3957,7 +3977,7 @@ class Model_purchasing extends CI_Model
 
                     $data['list'][] = array(
                         'expand' => btn_expand($prsid),
-                        'prfno' => '<h4 class="text-danger bold" style="margin: 0px 0px;">' .$prfno. ' </h4> ',
+                        'prfno' => '<h4 class="text-danger bold" style="margin: 0px 0px;">' . $prfno . ' </h4> ',
                         'pono' => $ponum,
                         'submitted' => $time,
                         'from' => $from_created_by,
@@ -3977,23 +3997,24 @@ class Model_purchasing extends CI_Model
         }
 
         $data['columns'] = array(
-            dt_column_array('expand',false,'text-align-center','1%'),
-            dt_column_array('prfno',false,'text-primary bold','10%'),
-            dt_column_array('pono',false,'text-primary bold','10%'),
-            dt_column_array('submitted',false,false,'10%'),
-            dt_column_array('updated',false,false,'10%'),
-            dt_column_array('items',false,'number'),
-            dt_column_array('justification',false,false,'300px'),
-            dt_column_array('trn',false,'text-danger','150px'),
-            dt_column_array('remarks',false,'text-info','150px'),
-            dt_column_array('status',false,'text-info'),
-            dt_column_array('control',false,'controls','5%'),
+            dt_column_array('expand', false, 'text-align-center', '1%'),
+            dt_column_array('prfno', false, 'text-primary bold', '10%'),
+            dt_column_array('pono', false, 'text-primary bold', '10%'),
+            dt_column_array('submitted', false, false, '10%'),
+            dt_column_array('updated', false, false, '10%'),
+            dt_column_array('items', false, 'number'),
+            dt_column_array('justification', false, false, '300px'),
+            dt_column_array('trn', false, 'text-danger', '150px'),
+            dt_column_array('remarks', false, 'text-info', '150px'),
+            dt_column_array('status', false, 'text-info'),
+            dt_column_array('control', false, 'controls', '5%'),
         );
 
         return json_encode($data);
     }
 
-    function update_supplier_quotation() {
+    function update_supplier_quotation()
+    {
         /*
          * LOOKUP EACH SUBMITTED CHANGES IF ITEM HAS EXISTING ACTIVE QUOTATION.
          * IF EXIST, UPDATE TO STATUS 0.
@@ -4015,7 +4036,7 @@ class Model_purchasing extends CI_Model
         //GET INITIAL SUPPLIER DETAILS
         $supplier_details = $this->db->select()
             ->from('eprs_quotation_suppliers')
-            ->where('sysid',$supplierid)
+            ->where('sysid', $supplierid)
             ->get()->row();
 
         //LOOP ALL PRF ITEMS SUBMITTED
@@ -4041,7 +4062,7 @@ class Model_purchasing extends CI_Model
             //check exchange rate
             $supplier_qry = $this->db->select('esm.currency')
                 ->from('eprs_quotation_suppliers as eqs')
-                ->join('eprs_suppliers_main as esm','eqs.supplierid = esm.sysid','left')
+                ->join('eprs_suppliers_main as esm', 'eqs.supplierid = esm.sysid', 'left')
                 ->where(array('eqs.sysid' => $supplierid))
                 ->get()->row();
 
@@ -4049,11 +4070,11 @@ class Model_purchasing extends CI_Model
                 $current_exrate = get_currency($supplier_qry->currency)->conversion;
                 if ($current_exrate != $exrate) {
                     //UPDATE ON-DATE EXCHANGE RATE
-                    $update_exrate = update_db($this->db,'eprs_quotation_suppliers',array('exrate' => $exrate),array('sysid' => $supplierid));
+                    $update_exrate = update_db($this->db, 'eprs_quotation_suppliers', array('exrate' => $exrate), array('sysid' => $supplierid));
 
                     if ($update_exrate->qry) {
                         //UPDATE TO-DATE EXCHANGE RATE
-                        $update_currency = update_db($this->db,'currency',array('conversion' => $exrate),array('sysid' => $supplier_qry->currency));
+                        $update_currency = update_db($this->db, 'currency', array('conversion' => $exrate), array('sysid' => $supplier_qry->currency));
                         if (!$update_currency->qry) {
                             $transproc['updateExchangeRate'] = $update_currency->error;
                         }
@@ -4065,7 +4086,7 @@ class Model_purchasing extends CI_Model
         }
 
         if (is_array($prfitemid) && count($prfitemid) > 0) {
-            foreach ($prfitemid AS $index => $items) {
+            foreach ($prfitemid as $index => $items) {
                 $new_quotation = array(
                     'quotationid' => $supplierid,
                     'prfitemid' => $items,
@@ -4076,19 +4097,19 @@ class Model_purchasing extends CI_Model
                 //LOOKUP EXISTING QUOTATIONS FROM SUPPLIER
                 $past_quotation = $this->db->select('sysid,status')
                     ->from('eprs_quotation_details')
-                    ->where(array('quotationid' => $supplierid,'prfitemid' => $items,'status !=' => 0))
+                    ->where(array('quotationid' => $supplierid, 'prfitemid' => $items, 'status !=' => 0))
                     ->get()->row();
 
                 //REMOVE OLD QUOTATION AND ADD NEW ONE
                 if ($past_quotation) {
                     $new_quotation['status'] = $past_quotation->status;
-                    $x_quote = update_db($this->db,'eprs_quotation_details',array('status' => 0),array('sysid' => $past_quotation->sysid,));
+                    $x_quote = update_db($this->db, 'eprs_quotation_details', array('status' => 0), array('sysid' => $past_quotation->sysid,));
                     if (!$x_quote->qry) {
                         $transproc['removeQuote'][$items] = $x_quote->error;
                     }
                 }
 
-                $add_quote = insert_db($this->db,'eprs_quotation_details',$new_quotation);
+                $add_quote = insert_db($this->db, 'eprs_quotation_details', $new_quotation);
 
                 if (!$add_quote->qry) {
                     $transproc['addQuote'][$items] = $add_quote->error;
@@ -4116,7 +4137,8 @@ class Model_purchasing extends CI_Model
         return json_encode($data);
     }
 
-    function update_supplier_details() {
+    function update_supplier_details()
+    {
         $data = array();
 
         $supplierid = $this->input->post('supplierid');
@@ -4145,9 +4167,9 @@ class Model_purchasing extends CI_Model
         //LOOKUP DETAILS
         $supplier_qry = $this->db->select('esm.codes, esm.name, esm.descs, esm.currency, esm.tin, esod.name AS accountname, esod.bank, esod.accountnum, esa.address')
             ->from('eprs_suppliers_main AS esm')
-            ->join('eprs_suppliers_online_details AS esod','esm.sysid = esod.supplierid AND esod.status = 1','left')
-            ->join('eprs_suppliers_address AS esa','esm.sysid = esa.supplierid AND esa.status = 1','left')
-            ->where(array('esm.sysid' => $supplierid,'esm.status' => 1))->get()->row();
+            ->join('eprs_suppliers_online_details AS esod', 'esm.sysid = esod.supplierid AND esod.status = 1', 'left')
+            ->join('eprs_suppliers_address AS esa', 'esm.sysid = esa.supplierid AND esa.status = 1', 'left')
+            ->where(array('esm.sysid' => $supplierid, 'esm.status' => 1))->get()->row();
 
         if ($supplier_qry) {
             $supplier = $supplier_qry;
@@ -4186,7 +4208,7 @@ class Model_purchasing extends CI_Model
 
         $contact_qry = $this->db->select('typesid AS type,contact AS info')
             ->from('eprs_suppliers_contact')
-            ->where(array('supplierid' => $supplierid,'status' => 1))
+            ->where(array('supplierid' => $supplierid, 'status' => 1))
             ->get();
 
         //QUERY EACH CONTACT
@@ -4196,10 +4218,10 @@ class Model_purchasing extends CI_Model
             1053 => $supplieremail
         );
 
-        foreach ($contact_types AS $type => $value) {
+        foreach ($contact_types as $type => $value) {
             $contact_qry = $this->db->select('contact AS info')
                 ->from('eprs_suppliers_contact')
-                ->where(array('supplierid' => $supplierid,'typesid' => $type,'status' => 1))
+                ->where(array('supplierid' => $supplierid, 'typesid' => $type, 'status' => 1))
                 ->get()->row();
 
             if ($contact_qry) {
@@ -4300,7 +4322,8 @@ class Model_purchasing extends CI_Model
         return json_encode($data);
     }
 
-    function export_quotation_sheet() {
+    function export_quotation_sheet()
+    {
         $dataid = $this->input->post('dataid');
         $supplier = $this->input->post('supplier');
         $items = $this->input->post('items');
@@ -4313,7 +4336,7 @@ class Model_purchasing extends CI_Model
         //GET SUPPLIER DETAILS
         $supplier_qry = $this->db->select('esm.name,esm.descs')
             ->from('eprs_suppliers_main as esm')
-            ->where('esm.sysid',$supplier)->get()->row();
+            ->where('esm.sysid', $supplier)->get()->row();
 
         if ($supplier_qry) {
             $supplier_name = $supplier_qry->name;
@@ -4326,14 +4349,14 @@ class Model_purchasing extends CI_Model
             ->join('prime_unit AS u', 'eti.unitid = u.sysid', 'left')
             ->where('eti.status', 305)
             ->where('eti.prfid', $dataid)
-            ->where_in('eti.sysid',$items)
+            ->where_in('eti.sysid', $items)
             ->get();
 
         //$data['items_qry'] = $this->db->last_query();
         //$data['items'] = $items_qry->result();
 
         if ($items_qry->num_rows() > 0) {
-            foreach ($items_qry->result() AS $item) {
+            foreach ($items_qry->result() as $item) {
                 $item_details[] = $item;
             }
         }
@@ -4341,7 +4364,7 @@ class Model_purchasing extends CI_Model
 
         $this->load->library('excel');
 
-        $file = FCPATH.'assets/templates/quotations.xlsx';
+        $file = FCPATH . 'assets/templates/quotations.xlsx';
 
         $xls = PHPExcel_IOFactory::load($file);
 
@@ -4351,7 +4374,7 @@ class Model_purchasing extends CI_Model
         $sheet = $xls->getActiveSheet();
         $sheet->setTitle($supplier_qry->descs);
         $sheet->getStyle('B2')->getAlignment();
-        $sheet->setCellValue('B2',$supplier_name);
+        $sheet->setCellValue('B2', $supplier_name);
         $row = 4;
 
         $styleB = $sheet->getStyle('B4');
@@ -4361,16 +4384,16 @@ class Model_purchasing extends CI_Model
         $styleF = $sheet->getStyle('F4');
         $styleG = $sheet->getStyle('G4');
 
-        foreach($sheet->getRowDimensions() as $rd) {
+        foreach ($sheet->getRowDimensions() as $rd) {
             $rd->setRowHeight(-1);
         }
 
         if ($item_cnt > 0) {
             foreach ($item_details as $detail) {
-                $sheet->SetCellValue('B'.$row, $detail->fulldescription.($detail->remarks ? '('.$detail->remarks.')':''));
-                $sheet->SetCellValue('C'.$row, $detail->qty);
-                $sheet->SetCellValue('D'.$row, $detail->unit_code);
-                $sheet->SetCellValue('F'.$row, '=C'.$row.'*E'.$row);
+                $sheet->SetCellValue('B' . $row, $detail->fulldescription . ($detail->remarks ? '(' . $detail->remarks . ')' : ''));
+                $sheet->SetCellValue('C' . $row, $detail->qty);
+                $sheet->SetCellValue('D' . $row, $detail->unit_code);
+                $sheet->SetCellValue('F' . $row, '=C' . $row . '*E' . $row);
                 $row++;
                 $sheet->insertNewRowBefore($row);
             }
@@ -4380,16 +4403,16 @@ class Model_purchasing extends CI_Model
             //$sheet->duplicateStyle($styleE,'E5:E'.$row);
             //$sheet->duplicateStyle($styleF,'F5:F'.$row);
             //$sheet->duplicateStyle($styleG,'G5:G'.$row);
-            $sheet->getStyle('C4:C'.$row)->getNumberFormat()->setFormatCode('#,##0');
-            $sheet->getStyle('E4:E'.$row)->getNumberFormat()->setFormatCode('_(* #,##0.00_);_(* \(#,##0.00\);_(* "-"??_);_(@_)');
-            $sheet->getStyle('F4:F'.$row)->getNumberFormat()->setFormatCode('_(* #,##0.00_);_(* \(#,##0.00\);_(* "-"??_);_(@_)');
-            $sheet->SetCellValue('B'.$row, 'Total')->getStyle()->getFont()->setBold(true);
-            $sheet->SetCellValue('F'.$row, '=SUM(F4:F'.($row-1).')');
+            $sheet->getStyle('C4:C' . $row)->getNumberFormat()->setFormatCode('#,##0');
+            $sheet->getStyle('E4:E' . $row)->getNumberFormat()->setFormatCode('_(* #,##0.00_);_(* \(#,##0.00\);_(* "-"??_);_(@_)');
+            $sheet->getStyle('F4:F' . $row)->getNumberFormat()->setFormatCode('_(* #,##0.00_);_(* \(#,##0.00\);_(* "-"??_);_(@_)');
+            $sheet->SetCellValue('B' . $row, 'Total')->getStyle()->getFont()->setBold(true);
+            $sheet->SetCellValue('F' . $row, '=SUM(F4:F' . ($row - 1) . ')');
         }
 
         //$data['supplier'] = $supplier_name;
         $xlsSave = PHPExcel_IOFactory::createWriter($xls, 'Excel2007');
-        $fileName = $supplier_name.' - '.date('m.d.Y').'.xlsx';
+        $fileName = $supplier_name . ' - ' . date('m.d.Y') . '.xlsx';
 
         ob_start();
         $xlsSave->save('php://output');
@@ -4398,13 +4421,14 @@ class Model_purchasing extends CI_Model
 
         $data['xls'] = array(
             'filename' => $fileName,
-            'file' => 'data:application/vnd.ms-excel;base64,'.base64_encode($xlsData)
+            'file' => 'data:application/vnd.ms-excel;base64,' . base64_encode($xlsData)
         );
 
         return json_encode($data);
     }
 
-    function upload_past_purchases() {
+    function upload_past_purchases()
+    {
         $data = array();
         $qry = false;
         $msg = '';
@@ -4413,7 +4437,7 @@ class Model_purchasing extends CI_Model
         $this->load->helper('directory');
         $this->load->library('upload');
 
-        if(isset($_FILES["appfiledrop"])) {
+        if (isset($_FILES["appfiledrop"])) {
             $dataid = $this->input->post('dataid');
             $stageid = $this->input->post('stageid');
 
@@ -4424,21 +4448,21 @@ class Model_purchasing extends CI_Model
             $file_directory = FCPATH . 'uploads/attachments/eprs/pastpurchases/' . str_pad($dataid, 6, "0", STR_PAD_LEFT) . '/';
 
             $file_name = $fileinfo['filename'];
-            $extract = explode('_',$file_name);
+            $extract = explode('_', $file_name);
 
             $filetype = (is_array($extract) && count($extract) > 0) ? $extract[0] : $file_name;
-            $count = (is_array($extract) && count($extract) > 0) ? ((isset($extract[1]) && ($extract[1] != '')) ? '_'.$extract[1] : '') : '';
+            $count = (is_array($extract) && count($extract) > 0) ? ((isset($extract[1]) && ($extract[1] != '')) ? '_' . $extract[1] : '') : '';
 
             $data['filetype'] = $filetype;
 
-            $upload = sys_upload_files('appfiledrop',$file_directory,$filename);
+            $upload = sys_upload_files('appfiledrop', $file_directory, $filename);
             $data['upload'] = $upload;
 
             if ($upload) {
                 $msg = 'Files Uploaded!';
                 $qry = true;
             }
-        }else{
+        } else {
             $msg = 'Drop the file again!';
         }
         $data['msg'] = $msg;
@@ -4448,32 +4472,33 @@ class Model_purchasing extends CI_Model
         return json_encode($data);
     }
 
-    function item_last_price() {
+    function item_last_price()
+    {
         $data = array();
         $itemid = $this->input->post('itemid');
 
         $lastprice_qry = $this->db->select('ti.prfid,po.ponumber,s.descs AS supplier,qd.amount,qs.sysid as quoteid,ti.remarks,po.sysid AS poid,prf.datecreated as prfdate,s.currency')
             ->from('eprs_transaction_items AS ti')
-            ->join('eprs_transaction AS prf','prf.sysid = ti.prfid','left')
-            ->join('eprs_quotation_details AS qd','ti.sysid = qd.prfitemid','left')
-            ->join('eprs_quotation_suppliers AS qs','qd.quotationid = qs.sysid','left')
-            ->join('eprs_suppliers_main AS s','qs.supplierid = s.sysid','left')
-            ->join('eprs_po_details As pd','pd.quotationid = qs.sysid','left')
-            ->join('eprs_po As po','pd.poid = po.sysid','inner')
-            ->where(array('ti.itemid' => $itemid,'qd.status' => 301))
+            ->join('eprs_transaction AS prf', 'prf.sysid = ti.prfid', 'left')
+            ->join('eprs_quotation_details AS qd', 'ti.sysid = qd.prfitemid', 'left')
+            ->join('eprs_quotation_suppliers AS qs', 'qd.quotationid = qs.sysid', 'left')
+            ->join('eprs_suppliers_main AS s', 'qs.supplierid = s.sysid', 'left')
+            ->join('eprs_po_details As pd', 'pd.quotationid = qs.sysid', 'left')
+            ->join('eprs_po As po', 'pd.poid = po.sysid', 'inner')
+            ->where(array('ti.itemid' => $itemid, 'qd.status' => 301))
             ->order_by('qd.datecreated DESC')->get();
 
         if ($lastprice_qry->num_rows() > 0) {
             $n = 1;
-            foreach ($lastprice_qry->result() AS $lp) {
-                $currency = ($lp->currency != 83) ? '<span class="pull-left">'.get_currency($lp->currency)->symbol.'</span> ' : '';
-                $view = '<a href="javasrcipt:;" title="PO Preview" id="btn_view_po" data-id="'.$lp->quoteid.'" class="btn btn-primary btn-sm inline"><i class="fa fa-search"></i> </a>';
+            foreach ($lastprice_qry->result() as $lp) {
+                $currency = ($lp->currency != 83) ? '<span class="pull-left">' . get_currency($lp->currency)->symbol . '</span> ' : '';
+                $view = '<a href="javasrcipt:;" title="PO Preview" id="btn_view_po" data-id="' . $lp->quoteid . '" class="btn btn-primary btn-sm inline"><i class="fa fa-search"></i> </a>';
                 $data['lastprice'][] = array(
                     'num' => $n++,
-                    'prf' => 'PRF'.date('ym',strtotime($lp->prfdate)).str_pad($lp->prfid,5,'0',STR_PAD_LEFT),
-                    'po' => 'PAE-'.str_pad($lp->ponumber,8,'0',STR_PAD_LEFT),
+                    'prf' => 'PRF' . date('ym', strtotime($lp->prfdate)) . str_pad($lp->prfid, 5, '0', STR_PAD_LEFT),
+                    'po' => 'PAE-' . str_pad($lp->ponumber, 8, '0', STR_PAD_LEFT),
                     'supplier' => $lp->supplier,
-                    'amount' => $currency.number_format($lp->amount,2),
+                    'amount' => $currency . number_format($lp->amount, 2),
                     'remarks' => ($lp->remarks) ?: 'N/A',
                     'view' => $view
                 );
@@ -4481,13 +4506,13 @@ class Model_purchasing extends CI_Model
         }
 
         $columns = array(
-            dt_column_array('num','#','text-align-center','1%'),
-            dt_column_array('prf','PRF #','text-primary bold',''),
-            dt_column_array('po','PO #','text-primary bold',''),
-            dt_column_array('supplier','Supplier','','30%'),
-            dt_column_array('amount','Quoted Amount','number','10%'),
-            dt_column_array('remarks','Spec/Remarks','','25%'),
-            dt_column_array('view','View PO','text-align-center','5%'),
+            dt_column_array('num', '#', 'text-align-center', '1%'),
+            dt_column_array('prf', 'PRF #', 'text-primary bold', ''),
+            dt_column_array('po', 'PO #', 'text-primary bold', ''),
+            dt_column_array('supplier', 'Supplier', '', '30%'),
+            dt_column_array('amount', 'Quoted Amount', 'number', '10%'),
+            dt_column_array('remarks', 'Spec/Remarks', '', '25%'),
+            dt_column_array('view', 'View PO', 'text-align-center', '5%'),
         );
 
         $data['columns'] = $columns;
@@ -4495,7 +4520,8 @@ class Model_purchasing extends CI_Model
         return json_encode($data);
     }
 
-    function cancel_purchase_request() {
+    function cancel_purchase_request()
+    {
         $data = array();
         $prfid = $this->input->post('prfid');
         $remarks = $this->input->post('remarks');
@@ -4510,19 +4536,19 @@ class Model_purchasing extends CI_Model
         $qry = false;
 
         //CHANGE STATUS OF QUOTATIONS TO 302
-        if (in_array($type,array(1206,1207))) {
+        if (in_array($type, array(1206, 1207))) {
             $this->db->trans_begin();
-            $disapprove = update_db($this->db,'eprs_transaction',array('status' => 303),array('sysid' => $prfid));
+            $disapprove = update_db($this->db, 'eprs_transaction', array('status' => 303), array('sysid' => $prfid));
 
             if ($disapprove->qry) {
-                update_db($this->db,'transaction_request_main_trails',array('status' => 0),array('dataid' => $prfid,'trnid' => $trnid,'status' => 1));
-                if(trim($remarks) != ''){
+                update_db($this->db, 'transaction_request_main_trails', array('status' => 0), array('dataid' => $prfid, 'trnid' => $trnid, 'status' => 1));
+                if (trim($remarks) != '') {
                     $comments_arr = array(
                         'trnid' => $trnid,
                         'trailid' => $stageid,
                         'remarks' => $remarks
                     );
-                    insert_db($this->db,'transaction_request_trails_comments',$comments_arr);
+                    insert_db($this->db, 'transaction_request_trails_comments', $comments_arr);
                 }
                 $this->db->trans_commit();
                 $msg = 'This purchase request has been discontinued!';
@@ -4545,7 +4571,8 @@ class Model_purchasing extends CI_Model
         return json_encode($data);
     }
 
-    function get_supplier_payment_details() {
+    function get_supplier_payment_details()
+    {
         $data = array();
         $supplierid = $this->input->post('supplierid');
         $prfid = $this->input->post('prfid');
@@ -4553,21 +4580,21 @@ class Model_purchasing extends CI_Model
         //CHECK IF SUPPLIERID IS THE QUOTATIONID OR SUPPLIER SYSID
         $supplier_qry = $this->db->select('esm.currency,eqs.exrate,esm.sysid AS id')
             ->from('eprs_quotation_suppliers as eqs')
-            ->join('eprs_suppliers_main as esm','esm.sysid = eqs.supplierid')
-            ->where(array('eqs.sysid' => $supplierid,'eqs.prfid' => $prfid))
+            ->join('eprs_suppliers_main as esm', 'esm.sysid = eqs.supplierid')
+            ->where(array('eqs.sysid' => $supplierid, 'eqs.prfid' => $prfid))
             ->get()->row();
 
         if (!$supplier_qry) {
             $supplier_qry = $this->db->select('sysid AS id')
                 ->from('eprs_suppliers_main')
-                ->where('sysid',$supplierid)->get()->row();
+                ->where('sysid', $supplierid)->get()->row();
         }
 
         $supplier_details = $this->db->select('s.name, s.tin, sa.address, sod.name AS accountname, sod.bank, sod.accountnum')
             ->from('eprs_suppliers_main AS s')
-            ->join('eprs_suppliers_address AS sa','s.sysid = sa.supplierid','left')
-            ->join('eprs_suppliers_online_details AS sod','s.sysid = sod.supplierid AND sod.status = 1','left')
-            ->where(array('s.sysid' => $supplier_qry->id,'s.status' => 1))
+            ->join('eprs_suppliers_address AS sa', 's.sysid = sa.supplierid', 'left')
+            ->join('eprs_suppliers_online_details AS sod', 's.sysid = sod.supplierid AND sod.status = 1', 'left')
+            ->where(array('s.sysid' => $supplier_qry->id, 's.status' => 1))
             ->get()->row();
 
         if ($supplier_details) {
@@ -4583,8 +4610,8 @@ class Model_purchasing extends CI_Model
         if ($prfid > 0) {
             $po_details = $this->db->select('po.paytype,po.payterm,po.purpose,po.notes')
                 ->from('eprs_po_details As po')
-                ->join('eprs_quotation_suppliers AS s','s.sysid = po.quotationid','left')
-                ->where(array('s.prfid' => $prfid,'s.supplierid' => $supplier_qry->id,'po.status' => 1))
+                ->join('eprs_quotation_suppliers AS s', 's.sysid = po.quotationid', 'left')
+                ->where(array('s.prfid' => $prfid, 's.supplierid' => $supplier_qry->id, 'po.status' => 1))
                 ->get()->row();
 
             if ($po_details) {
