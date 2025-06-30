@@ -181,7 +181,7 @@ if ($app->duid > 0 && $app->durate > 0) {
             }
 
             footer {
-                position: relative;
+                position: fixed;
                 bottom: 0px;
                 height: 50px;
                 background-color: transparent;
