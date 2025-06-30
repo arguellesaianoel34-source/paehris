@@ -218,9 +218,15 @@ if ($app->duid > 0 && $app->durate > 0) {
         </style>
     </head>
     <body>
+
     <header>
         <img src="<?php echo $pae_letter_head; ?>" width="100%"/>
     </header>
+
+    
+    <footer>
+        <img src="<?php echo $pae_letter_foot; ?>" width="100%"/>';
+    </footer>
 
     <main>
         <?php
@@ -443,9 +449,6 @@ if ($app->duid > 0 && $app->durate > 0) {
     </main>
 
     
-    <footer>
-        <img src="<?php echo $pae_letter_foot; ?>" width="100%"/>';
-    </footer>
     </body>
     </html>
 <?php } else { ?>

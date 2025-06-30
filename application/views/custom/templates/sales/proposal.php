@@ -246,6 +246,10 @@ if ($app->duid > 0 && $app->durate > 0) {
         <img src="<?php echo $pae_letter_head; ?>" width="100%"/>
     </header>
 
+    <footer>
+        <img src="<?php echo $pae_letter_foot; ?>" width="100%"/>';
+    </footer>
+
     <main>
         <?php
         $ratesum = $outright + $twoyrs + $threeyrs + $fiveyrs + $tenyrs;
@@ -617,10 +621,6 @@ if ($app->duid > 0 && $app->durate > 0) {
             echo '<h1>PLEASE SET PROPOSED SYSTEM RATES AND REFRESH THE PREVIEW!</h1>';
         } ?>
     </main>
-
-    <footer>
-        <img src="<?php echo $pae_letter_foot; ?>" width="100%"/>';
-    </footer>
     </body>
     </html>
 <?php } else { ?>
