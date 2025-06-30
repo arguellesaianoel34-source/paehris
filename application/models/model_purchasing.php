@@ -1359,7 +1359,7 @@ class Model_purchasing extends CI_Model
             $current = $current_qry->stageid;
 
             foreach ($stages as $stage) {
-                $isApproval[$stage->sysid] = (bool)strpos(strtolower($stage->desc), 'approval');
+                $isApproval[$stage->sysid] = (bool) strpos(strtolower($stage->desc), 'approval');
             }
 
             $approval = $isApproval[$current];
@@ -1570,7 +1570,7 @@ class Model_purchasing extends CI_Model
                             $qt_id = $qt['id'];
                             $qt_sid = $qt['supplierid'];
                             $checked = ($qt['status'] == 305 && ($qt_currency->sysid == 83 || strpos($supp, '_c'))) ? 'checked' : '';
-                            $highlight = ($qt['status'] == 305  && $qt_currency->sysid == 83) ? 'bold' : '';
+                            $highlight = ($qt['status'] == 305 && $qt_currency->sysid == 83) ? 'bold' : '';
                             $currency_symbol = (strpos($supp, '_c') || strpos($supp, '_p')) ? $qt_currency->symbol : '';
                             $qt_damount = ($qt_currency->sysid != 83) ? $currency_symbol . number_format($qt['amount'], 2) : $currency_symbol . number_format($qt_amt, 2);
                             $qt_total = (strpos($supp, '_c') || strpos($supp, '_p')) ? strtolower($qt_currency->code) . '_total' : 'total';
@@ -1620,7 +1620,7 @@ class Model_purchasing extends CI_Model
          * LOOKUP IF QUOTATION FOR SUPPLIER EXISTS DISPLAY PRICE AS VALUE.
          * DO NOT DISPLAY STATUS ZERO (0) QUOTATIONS IN LAST PRICE
          * LOOKUP LAST PRICE NOT EQUAL TO CURRENT QOTATION
-        */
+         */
 
         if ($supplier && $supplier > 0) {
             //CHECK IF SUPPLIERID IS THE QUOTATIONID OR SUPPLIER SYSID
@@ -1793,7 +1793,8 @@ class Model_purchasing extends CI_Model
 
             if ($new_po->qry) {
                 $poid = $new_po->insert_id;
-                $data['ponum'] = 'PAE-' . str_pad($ponum, 8, '0', STR_PAD_LEFT);;
+                $data['ponum'] = 'PAE-' . str_pad($ponum, 8, '0', STR_PAD_LEFT);
+                ;
             }
         }
 
@@ -1982,7 +1983,7 @@ class Model_purchasing extends CI_Model
         //Insert trn to logs
 
         $logs_arr = array(
-            'prsid' =>  $prfid,
+            'prsid' => $prfid,
             'moduleid' => $stage->moduleid,
             'typesid' => 1207,
             'statusid' => 305,
@@ -2099,7 +2100,7 @@ class Model_purchasing extends CI_Model
             $data['qry'] = false;
         }
 
-        return (object)$data;
+        return (object) $data;
     }
 
     function get_supplier_summary_of_cost()
@@ -2191,11 +2192,17 @@ class Model_purchasing extends CI_Model
                             $netvat = $supp_total - $vat;
                             $gross = $supp_total;
                         }
-                        $ewtrate = 0.01;
-                        if ($supplier->type == 4002) {
-                            $ewtrate = 0.02;
+
+                        if ($supplier->type < 0) {
+                            $ewt = 0;
+                        } else {
+                            $ewtrate = 0.01;
+                            if ($supplier->type == 4002) {
+                                $ewtrate = 0.02;
+                            }
+
+                            $ewt = round($netvat * $ewtrate, 2);
                         }
-                        $ewt = round($netvat * $ewtrate, 2);
                         $total = $gross - $ewt + $supplier->shipping;
                     } else {
                         $netvat = $supp_total;
@@ -2433,7 +2440,7 @@ class Model_purchasing extends CI_Model
                     $gross[$quotationid] = $totalamt;
                 }
                 $ewtrate = 0.01;
-                
+
                 if ($supplier->type == 4002) {
                     $ewtrate = 0.02;
                 }
@@ -2523,7 +2530,8 @@ class Model_purchasing extends CI_Model
         $data['gross'] = $gross;
         $data['ewt'] = $ewt;
         $data['suptotal'] = $suptotal;
-        $data['gtotal'] = number_format(array_sum($suptotal) + (array_sum($suptotal) * 0.02), 2);;
+        $data['gtotal'] = number_format(array_sum($suptotal) + (array_sum($suptotal) * 0.02), 2);
+        ;
 
         return json_encode($data);
     }
@@ -2809,7 +2817,7 @@ class Model_purchasing extends CI_Model
             if (in_array(83, $u_currency)) {
                 //$key = array_search(83, array_map("unserialize", array_unique(array_map("serialize", $currency_a))));
                 foreach ($currency_a as $k => $v) {
-                    if (in_array(83, (array)$v)) {
+                    if (in_array(83, (array) $v)) {
                         unset($currency_a[$k]);
                     }
                 }
@@ -3108,7 +3116,7 @@ class Model_purchasing extends CI_Model
         }
 
         $roles = json_decode(get_user_role(user_id()));
-        if (user_id() != 1 || ($roles && !array_search(24, array_column((array)$roles, 'id')))) {
+        if (user_id() != 1 || ($roles && !array_search(24, array_column((array) $roles, 'id')))) {
             $where .= ' AND et.createdby = ' . user_id();
         }
 
@@ -3717,7 +3725,7 @@ class Model_purchasing extends CI_Model
 
         if ($prf_item_qry->num_rows() > 0) {
             foreach ($prf_item_qry->result() as $item) {
-                $additem = insert_db($this->db, 'eprs_transaction_items', (array)$item);
+                $additem = insert_db($this->db, 'eprs_transaction_items', (array) $item);
 
                 $result[] = $additem->qry;
             }
@@ -4101,7 +4109,7 @@ class Model_purchasing extends CI_Model
                 //REMOVE OLD QUOTATION AND ADD NEW ONE
                 if ($past_quotation) {
                     $new_quotation['status'] = $past_quotation->status;
-                    $x_quote = update_db($this->db, 'eprs_quotation_details', array('status' => 0), array('sysid' => $past_quotation->sysid,));
+                    $x_quote = update_db($this->db, 'eprs_quotation_details', array('status' => 0), array('sysid' => $past_quotation->sysid, ));
                     if (!$x_quote->qry) {
                         $transproc['removeQuote'][$items] = $x_quote->error;
                     }
