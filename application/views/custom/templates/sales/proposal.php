@@ -247,7 +247,6 @@ if ($app->duid > 0 && $app->durate > 0) {
     </header>
 
     <main>
-        <hr>
         <?php
         $ratesum = $outright + $twoyrs + $threeyrs + $fiveyrs + $tenyrs;
         if (
