@@ -181,7 +181,7 @@ if ($app->duid > 0 && $app->durate > 0) {
             }
 
             footer {
-                position: fixed;
+                position: relative;
                 bottom: 0px;
                 height: 50px;
                 background-color: transparent;
@@ -221,9 +221,6 @@ if ($app->duid > 0 && $app->durate > 0) {
     <header>
         <img src="<?php echo $pae_letter_head; ?>" width="100%"/>
     </header>
-    <footer>
-        <img src="<?php echo $pae_letter_foot; ?>" width="100%"/>';
-    </footer>
 
     <main>
         <hr>
@@ -445,6 +442,11 @@ if ($app->duid > 0 && $app->durate > 0) {
             echo '<h1>PLEASE SET PROPOSED SYSTEM RATES AND REFRESH THE PREVIEW!</h1>';
         } ?>
     </main>
+
+    
+    <footer>
+        <img src="<?php echo $pae_letter_foot; ?>" width="100%"/>';
+    </footer>
     </body>
     </html>
 <?php } else { ?>
