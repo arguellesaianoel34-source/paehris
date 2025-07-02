@@ -2528,8 +2528,8 @@ class Model_purchasing extends CI_Model
                     } else {
                         $crc = get_currency($ac[0]);
                         $crc_code = strtolower($crc->code);
-                        $data['subtotals'][$crc_code . '_subtotal_amt'] = number_format($ctotal[$ac[0]], 2);
-                        $data['subtotals']['php_subtotal_amt'] = number_format($ctotal['c'], 2);
+                        $data['subtotals'][$crc_code . '_subtotal_amt'] = isset($ctotal[$ac[0]]) ? number_format(array_sum($ctotal[$ac[0]]), 2) : '0.00';
+                        $data['subtotals']['php_subtotal_amt'] = isset($ctotal['c']) ? number_format(array_sum($ctotal['c']), 2) : '0.00';
                     }
                 }
             }
