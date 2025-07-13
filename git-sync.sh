@@ -112,26 +112,66 @@ fi
 write_success "Remote origin found: $REMOTE_URL"
 
 
-# Branch selection with arrow keys (requires fzf, falls back to select)
+
+# Enhanced branch selection: show local/remote, allow new branch, show last commit, confirm
+function get_branch_list() {
+    git for-each-ref --format='%(refname:short)|%(objectname:short)|%(authorname)|%(committerdate:relative)|%(upstream:short)' refs/heads refs/remotes | \
+    awk -F'|' '{
+        label = ($1 ~ /^origin\//) ? "[remote]" : "[local]";
+        printf "%s %s (last: %s, %s)\n", label, $1, $3, $4;
+    }'
+}
+
+BRANCHES=("Create new branch...")
+while IFS= read -r line; do
+    BRANCHES+=("$line")
+done < <(get_branch_list)
+
 if command -v fzf >/dev/null 2>&1; then
-    write_info "Select a branch to push/pull (use arrow keys, type to search):"
-    CURRENT_BRANCH=$(git branch --all --format='%(refname:short)' | grep -v 'HEAD' | sort | uniq | fzf --height 10 --prompt="Branch > ")
-    if [ -z "$CURRENT_BRANCH" ]; then
-        write_warning "No branch selected. Operation cancelled."
-        exit 0
-    fi
+    write_info "Select a branch to push/pull (arrow keys, type to search, or choose 'Create new branch...'):"
+    SELECTED=$(printf "%s\n" "${BRANCHES[@]}" | fzf --height 15 --prompt="Branch > ")
 else
     write_info "fzf not found. Using basic selection."
-    mapfile -t BRANCHES < <(git branch --all --format='%(refname:short)' | grep -v 'HEAD' | sort | uniq)
     echo "Select a branch to push/pull:"
-    select CURRENT_BRANCH in "${BRANCHES[@]}"; do
-        if [ -n "$CURRENT_BRANCH" ]; then
+    select SELECTED in "${BRANCHES[@]}"; do
+        if [ -n "$SELECTED" ]; then
             break
         fi
     done
-    if [ -z "$CURRENT_BRANCH" ]; then
-        write_warning "No branch selected. Operation cancelled."
+fi
+
+if [ -z "$SELECTED" ]; then
+    write_warning "No branch selected. Operation cancelled."
+    exit 0
+fi
+
+if [[ "$SELECTED" == "Create new branch..." ]]; then
+    read -p "Enter new branch name: " NEW_BRANCH
+    if [ -z "$NEW_BRANCH" ]; then
+        write_warning "No branch name entered. Operation cancelled."
         exit 0
+    fi
+    git checkout -b "$NEW_BRANCH"
+    CURRENT_BRANCH="$NEW_BRANCH"
+    write_success "Created and switched to new branch: $CURRENT_BRANCH"
+else
+    CURRENT_BRANCH=$(echo "$SELECTED" | awk '{print $2}')
+    # Confirm before switching
+    read -p "You selected '$CURRENT_BRANCH'. Continue? (y/n): " CONFIRM
+    if [[ ! "$CONFIRM" =~ ^[Yy]$ ]]; then
+        write_warning "Operation cancelled by user."
+        exit 0
+    fi
+    # If not on branch, switch
+    CURRENT_ON=$(git branch --show-current)
+    if [ "$CURRENT_ON" != "$CURRENT_BRANCH" ]; then
+        git checkout "$CURRENT_BRANCH"
+        if [ $? -eq 0 ]; then
+            write_success "Switched to branch: $CURRENT_BRANCH"
+        else
+            write_error "Failed to switch branch."
+            exit 1
+        fi
     fi
 fi
 write_info "Selected branch: $CURRENT_BRANCH"
