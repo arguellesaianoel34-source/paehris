@@ -2206,7 +2206,7 @@ class Model_purchasing extends CI_Model
                         $total = $gross - $ewt + $supplier->shipping;
                     } else {
                         $netvat = $supp_total;
-                        $vat = 0;
+                        $vat = 0.12;
                         $gross = 0;
                         $ewt = 0;
                         $total = $netvat + $supplier->shipping;
@@ -2215,7 +2215,7 @@ class Model_purchasing extends CI_Model
                     $grosstotal += $gross;
                 } else {
                     $netvat = $supp_total;
-                    $vat = 0.12;
+                    $vat = 0;
                     $gross = 0;
                     $ewt = 0;
                     $total = $netvat;
@@ -2258,7 +2258,7 @@ class Model_purchasing extends CI_Model
                             //$data['total_cols'][$supplier->sysid][$col] = $total;
                             $cur = '';
                             if ($i != 83) {
-                                list($cur, $p) = explode('_', $col);
+                                [$cur, $p] = explode('_', $col);
                                 $cur .= '_';
                             }
 
