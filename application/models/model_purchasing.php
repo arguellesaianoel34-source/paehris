@@ -2206,7 +2206,7 @@ class Model_purchasing extends CI_Model
                         $total = $gross - $ewt + $supplier->shipping;
                     } else {
                         $netvat = $supp_total;
-                        $vat = 0.12;
+                        $vat = $supplier->paytype;
                         $gross = 0;
                         $ewt = 0;
                         $total = $netvat + $supplier->shipping;
