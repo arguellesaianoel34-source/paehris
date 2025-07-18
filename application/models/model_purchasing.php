@@ -2182,7 +2182,7 @@ class Model_purchasing extends CI_Model
 
                 //SUMMARY OF COST COMPUTATION
                 if ($supplier->currency == 83) {
-                    if ($supplier->paytype && $supplier->paytype != 1) {
+                    if ($supplier->paytype && ($supplier->paytype != 1 || $supplier->paytype < 1)) {
                         if ($supplier->exvat == 1) {
                             $netvat = $supp_total;
                             $vat = round($supp_total * 0.12, 2);
