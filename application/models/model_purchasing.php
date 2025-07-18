@@ -2215,7 +2215,7 @@ class Model_purchasing extends CI_Model
                     $grosstotal += $gross;
                 } else {
                     $netvat = $supp_total;
-                    $vat = 12;
+                    $vat = 0.12;
                     $gross = 0;
                     $ewt = 0;
                     $total = $netvat;
