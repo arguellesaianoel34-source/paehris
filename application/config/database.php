@@ -18,12 +18,12 @@ if( $connect == 'dev' ) {
     $db_config['host_server']            = 'localhost';
     $db_config['host_user']              = 'dev_erp';
     $db_config['host_db']                = 'pae_erp';
-    $db_config['host_pass']              = 'G3HhN[.Ez6G2YRZA';
+    $db_config['host_pass']              = 'av*MwsF5baeYKvBU';
 
     $db_config['audit_server']           = 'localhost';
     $db_config['audit_user']             = 'dev_erp';
     $db_config['audit_db']               = 'pae_erp_audit';
-    $db_config['audit_pass']             = 'G3HhN[.Ez6G2YRZA';
+    $db_config['audit_pass']             = 'av*MwsF5baeYKvBU';
 
 } else if( $connect == 'online' ) {
     // Turbify
