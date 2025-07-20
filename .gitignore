@@ -50,6 +50,6 @@ Thumbs.db
 *.mov
 *.wmv
 
-/application/config/database.php
+# /application/config/database.php
 /uploads/
 /.stfolder/
