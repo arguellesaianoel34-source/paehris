@@ -1,6 +1,6 @@
 # PowerShell script to run CodeIgniter 3 project with local PHP
-$phpPath = Join-Path $PSScriptRoot 'server\php\php.exe'
-$phpDir = Join-Path $PSScriptRoot 'server\php'
+$phpPath = Join-Path $PSScriptRoot 'php\php.exe'
+$phpDir = Join-Path $PSScriptRoot 'php'
 $extDir = Join-Path $phpDir 'ext'
 $webRoot = $PSScriptRoot
 $port = 8080
