@@ -8,6 +8,8 @@ node_modules/
 dist/
 /.vscode/
 /.idea/
+/server/
+
 
 # Compiled Java class files
 *.class

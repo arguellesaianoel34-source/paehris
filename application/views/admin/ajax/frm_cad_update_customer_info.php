@@ -9,51 +9,58 @@
     }
 </style>
 <?php
-list($dataid,$level) = explode(',',$this->input->post('ids'));
-$info           = get_application_details($dataid)->info;
-$personid       = $info ? $info->personid : '';
-$firstname      = $info ? $info->firstname : '';
-$lastname       = $info ? $info->lastname : '';
-$middlename     = $info ? $info->middlename : '';
-$suffix         = $info ? $info->suffix : '';
-$marital        = $info ? $info->marital : '';
-$address        = ($info) ? $info->addrspec : '';
-$country        = ($info && $info->country != 0) ? $info->country : 175;
-$region         = ($info) ? $info->region : '';
-$citymun        = ($info) ? $info->city : '';
-$province       = ($info) ? $info->province : '';
-$datecreated    = ($info) ? $info->datecreated : '';
-$tinno          = ($info) ? $info->tinno : '';
-$mapupdated     = ($info) ? $info->mapupdated : '';
-$mapupdatedby   = ($info) ? $info->mapupdatedby : '';
-$maplink        = ($info->geolink) ? $info->geolink : '';
-$distid         = ($info) ? $info->distid : 0;
-$essrno         = ($info) ? $info->essrno : false;
-$moduleid       = ($info) ? $info->moduleid : 0;
-$apptype        = ($info) ? $info->apptype : 0;
-$phone          = (($info && $info->contactphone != '') || ($info->contactphone > 0)) ? $info->contactphone : '';
-$mobile         = (($info && $info->contactmobile != '') || ($info->contactmobile > 0)) ? $info->contactmobile : '';
-$email          = (($info && $info->contactemail != '') || ($info->contactemail > 0)) ? $info->contactemail : '';
+
+[$dataid, $level] = explode(',',$this->input->post('ids'));
+
+$info           = get_application_details($dataid)->info ?? null;
+$personid       = $info->personid   ?? '';
+$firstname      = $info->firstname  ?? '';
+$lastname       = $info->lastname   ?? '';
+$middlename     = $info->middlename ?? '';
+$suffix         = $info->suffix     ?? '';
+$marital        = $info->marital    ?? '';
+$address        = $info->addrspec   ?? '';
+$country        = (isset($info->country) && $info->country != 0) ? $info->country : 175;
+$region         = $info->region     ?? '';
+$citymun        = $info->city       ?? '';
+$province       = $info->province   ?? '';
+$datecreated    = $info->datecreated?? '';
+$tinno          = $info->tinno      ?? '';
+$mapupdated     = $info->mapupdated ?? '';
+$mapupdatedby   = $info->mapupdatedby ?? '';
+$maplink        = $info->geolink    ?? '';
+$distid         = $info->distid     ?? 0;
+$essrno         = $info->essrno     ?? false;
+$moduleid       = $info->moduleid   ?? 0;
+$apptype        = $info->apptype    ?? 0;
+$phone          = (!empty($info->contactphone)) ? $info->contactphone : '';
+$mobile         = (!empty($info->contactmobile)) ? $info->contactmobile : '';
+$email          = (!empty($info->contactemail)) ? $info->contactemail : '';
 
 //GET CORP INFO IF APPTYPE > 1
-$corpname = 'Unknown';
-$corpbranch = '';
-$rf_contacts = array();
+$corpname       = 'Unknown';
+$corpbranch     = '';
+$rf_contacts    = [];
 
 $qry_corp_app = $this->db->select()
     ->from('application_customers_corporation')
-    ->where(array('appid' => $dataid, 'types' => $apptype))
+    ->where(['appid' => $dataid, 'types' => $apptype])
     ->get()->row();
 
 if($qry_corp_app) {
-    $info = array();
-    if($apptype == 2) {
-        $corpinfo = get_corporation_info($qry_corp_app->corpid);
-        $pic_dir = 'corporation';
-    } else {
-        $corpinfo = get_government_info($qry_corp_app->corpid);
-        $pic_dir = 'government';
+    $info = [];
+
+    switch ($apptype) {
+        case 2:
+            $corpinfo = get_corporation_info($qry_corp_app->corpid);
+            $pic_dir = 'corporation';
+            break;
+        default:
+            $corpinfo = get_government_info($qry_corp_app->corpid);
+            $pic_dir = 'government';
+            break;
     }
+    
     $corpid = $qry_corp_app->corpid;
     if ($corpinfo->qry) {
         $corpname = $corpinfo->info->descs;
@@ -61,14 +68,14 @@ if($qry_corp_app) {
         if($apptype == 2) {
             $qry_branch = $this->db->select()
                 ->from('corporation_branches')
-                ->where(array('corpid' => $qry_corp_app->corpid, 'sysid' => $qry_corp_app->branchid))
+                ->where(['corpid' => $qry_corp_app->corpid, 'sysid' => $qry_corp_app->branchid])
                 ->get()->row();
             if ($qry_branch) {
                 $branchid = $qry_branch->sysid;
                 $corpbranch = $qry_branch->names;
             }
         }else{
-            $corpbranch = ($corpinfo) ? $corpinfo->info->names : '';
+            $corpbranch = $corpinfo ? $corpinfo->info->names : '';
         }
     }
 }
@@ -77,13 +84,13 @@ $referral = $this->db->select('p.sysid AS personid,p.firstname,p.lastname,p.midd
     ->from('application_customers_referrals AS r')
     ->join('person AS p','r.personid = p.sysid','left')
     ->join('person_title AS pt','p.sysid = pt.personid','left')
-    ->where(array('r.appid' => $dataid, 'r.status' => 1))->get()->row();
+    ->where(['r.appid' => $dataid, 'r.status' => 1])->get()->row();
 
 if ($referral) {
     $referral_contacts = $this->db->select('MAX(CASE WHEN (types = 1051) THEN contactstring ELSE NULL END) AS mobile,MAX(CASE WHEN (types = 1049) THEN contactstring ELSE NULL END) AS phone')
         ->from('person_contact_matrix')
-        ->where(array('personid' => $referral->personid,'status' => 1))
-        ->where_in('types',array(1049,1051))->group_by('personid')->get()->row();
+        ->where(['personid' => $referral->personid, 'status' => 1])
+        ->where_in('types', [1049, 1051])->group_by('personid')->get()->row();
 
     if ($referral_contacts) {
         $rf_contacts = $referral_contacts;
@@ -167,7 +174,7 @@ if ($referral) {
                                         <td>
                                             <div id="non_residential" style="display: block;">
                                                 <input type="hidden" name="corpid" value="<?php echo $corpid; ?>">
-                                                <input type="hidden" name="branchid" value="<?php echo $branchid; ?>">
+                                                <input type="hidden" name="branchid" value="<?php echo $branchid ?? ''; ?>">
                                                 <div class="form-group margin-top-10" id="non_res_details">
                                                     <label class="col-md-2 control-label"><span class="required"></span> Establishment</label>
                                                     <div class="col-md-7"><input name="corpname" type="text" class="form-control data-entry input-lg" id="corpname" placeholder="Establishment name..." data-toggle="autocomplete" col-name="corpname" value="<?php echo $corpname;?>">

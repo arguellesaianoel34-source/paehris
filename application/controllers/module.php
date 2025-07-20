@@ -3,14 +3,16 @@
 if (!defined('BASEPATH'))
     exit('No direct script access allowed');
 
-class Module extends CI_Controller {
+class Module extends CI_Controller
+{
 
     private $message = '';
     private $page = NULL;
     private $params = NULL;
     private $user_login;
 
-    public function __construct() {
+    public function __construct()
+    {
         parent::__construct();
         $this->page = $this->uri->segment(2);
         $this->reroute();
@@ -24,15 +26,15 @@ class Module extends CI_Controller {
 
         // IMPORTANT ADD THIS TO ALL CONTROLLERS
 
-        if(check_user_lock()) {
+        if (check_user_lock()) {
             redirect(base_url(), 'refresh');
         }
 
-        if(!user_id()) {
+        if (!user_id()) {
             if ($this->uri->total_segments() > 0) {
-                $currentURL = explode('?',current_url());
+                $currentURL = explode('?', current_url());
 
-                redirect(base_url().'?redirect='.$currentURL[1], 'refresh');
+                redirect(base_url() . '?redirect=' . $currentURL[1], 'refresh');
             } else {
                 redirect(base_url(), 'refresh');
             }
@@ -40,7 +42,8 @@ class Module extends CI_Controller {
 
     }
 
-    public function _remap($page, $params = array()) {
+    public function _remap($page, $params = array())
+    {
         if (count($params) > 0) {
             if (strlen($params[0]) > 0) {
                 $this->params = $params;
@@ -60,23 +63,27 @@ class Module extends CI_Controller {
         }
     }
 
-    public function session() {
+    public function session()
+    {
         echo "Session!";
         var_dump($this->params);
     }
 
-    public function get_uri_end() {
+    public function get_uri_end()
+    {
         $segs = $this->uri->segment_array();
         $count = count($segs);
         return $segs[$count];
     }
 
-    public function index() {
+    public function index()
+    {
+
+
         $data = array();
         if (
             $this->does_page_dashboard($this->page) == true || $this->does_page_exist() == true
-            )
-        {
+        ) {
 
             $pageqry = $this->model_admin->get_navigation_specific_details($this->page);
             $segment_cnt = count($this->uri->segment_array());
@@ -86,27 +93,36 @@ class Module extends CI_Controller {
             $data['profiledata'] = $this->model_admin->get_user_login_info(user_id());
             $data['usersmodule'] = $this->model_admin->select_modules();
             //$data['usersmodule'] = $this->db->select('*')->from('prime_module_navigations_main')->where(array('status' => 1, 'type' => 1))->get();
-            $data['pagename'] = $this->model_admin->get_navigation_specific_details($this->page);
+            $data['pagename'] = $pageqry->pname;
             $data['pagetitle'] = $pageqry->pname;
             $data['pagedesc'] = $pageqry->desc;
             $data['pageicon'] = $pageqry->icon;
             $data['pageclass'] = $pageqry->htmlclass;
             $data['navid'] = $pageqry->sysid;
-
+            $data['hashcode'] = $pageqry->hashcode;
             if (user_id() > 0) {
-                if($pageqry) {
+                if ($pageqry) {
                     $logs = log_user_page($pageqry->sysid);
-                    if($logs) {
+                            
+                            
+                    // echo "<pre>" . htmlspecialchars(print_r($data, true)) . "</pre>";
+                    // exit;
+
+                    if ($logs) {
                         $pagefilename = $pageqry->pagefile;
                         if ($pageqry && file_exists(FCPATH . 'application/views/admin/pages/modules/' . $pagefilename . '.php') && $pagefilename != "" && $this->page != "") {
-                            if($check_page_main && !$this->uri->segment(3)) {
+
+                            
+                            if ($check_page_main && !$this->uri->segment(3)) {
                                 $data['pagetitle'] = $pageqry->pname;
+
                                 init_header($data);
                                 init_page_wrapper_top($data);
                                 $this->load->view('admin/common/mainpage', $data);
                                 init_page_wrapper_bottom($data);
                                 init_footer($data, '');
-                            }else {
+                            } else {
+
                                 if ($this->uri->segment(3)) {
                                     // GET SUB PAGE NAME
                                     $page_sub = $this->model_admin->get_navigation_details($pageqry->sysid);
@@ -250,7 +266,7 @@ class Module extends CI_Controller {
                             if (file_exists(FCPATH . 'application/views/admin/pages/' . $pagefilename . '.php')) {
                                 return $this->error_page('<strong class="text-danger">PAGE FOUND: (' . $pagefilename . ')!</strong>');
                             } else {
-                                if($check_page_main) {
+                                if ($check_page_main) {
                                     $data['pagetitle'] = $pageqry->pname;
                                     init_header($data);
                                     init_page_wrapper_top($data);
@@ -262,8 +278,8 @@ class Module extends CI_Controller {
                                 }
                             }
                         }
-                    }else{
-                        if($check_page_main) {
+                    } else {
+                        if ($check_page_main) {
                             $data['pagetitle'] = $pageqry->pname;
                             init_header($data);
                             init_page_wrapper_top($data);
@@ -274,8 +290,8 @@ class Module extends CI_Controller {
                             return $this->error_page();
                         }
                     }
-                }else{
-                    if($check_page_main) {
+                } else {
+                    if ($check_page_main) {
                         $data['pagetitle'] = $pageqry->pname;
                         init_header($data);
                         init_page_wrapper_top($data);
@@ -288,8 +304,7 @@ class Module extends CI_Controller {
 
                 }
             } else {
-
-                if($check_page_main) {
+                if ($check_page_main) {
                     $data['pagetitle'] = $pageqry->pname;
                     init_header($data);
                     init_page_wrapper_top($data);
@@ -312,7 +327,8 @@ class Module extends CI_Controller {
         }
     }
 
-    public function error_page($msg = NULL) {
+    public function error_page($msg = NULL)
+    {
         if ($msg == NULL) {
             if (user_id()) {
                 $data['userdata'] = $this->model_admin->get_user_login_info(user_id());
@@ -336,7 +352,8 @@ class Module extends CI_Controller {
         }
     }
 
-    public function noroute($page = NULL) {
+    public function noroute($page = NULL)
+    {
         if ($page) {
             echo "<h1>404 No Route Found to " . $page . "</h1>";
         } else {
@@ -344,7 +361,8 @@ class Module extends CI_Controller {
         }
     }
 
-    private function reroute() {
+    private function reroute()
+    {
 
         if ($this->page == $this->router->class) {
             if ($this->uri->total_segments() > 1) {
@@ -358,13 +376,15 @@ class Module extends CI_Controller {
         }
     }
 
-    private function does_page_dashboard($hash) {
+    private function does_page_dashboard($hash)
+    {
         return $this->model_admin->get_user_dashboard_access($hash);
     }
 
-    private function does_page_exist() {
+    private function does_page_exist()
+    {
         $return = false;
-        if ( user_id()) {
+        if (user_id()) {
             $a = $this->model_admin->array_module_navigations();
 
             if ($a) {
@@ -379,7 +399,7 @@ class Module extends CI_Controller {
             if ($this->model_admin->in_array_r($this->page, $array_of_pages) || super_admin()) {
                 $return = true;
             } else {
-                $return =  false;
+                $return = false;
             }
         }
         return $return;
