@@ -16,14 +16,14 @@ $db_config = array();
 if( $connect == 'dev' ) {
     // LOCALHOST
     $db_config['host_server']            = 'localhost';
-    $db_config['host_user']              = 'root';
+    $db_config['host_user']              = 'dev_erp';
     $db_config['host_db']                = 'pae_erp';
-    $db_config['host_pass']              = 'iF4D3R0N88!';
+    $db_config['host_pass']              = 'G3HhN[.Ez6G2YRZA';
 
     $db_config['audit_server']           = 'localhost';
-    $db_config['audit_user']             = 'root';
+    $db_config['audit_user']             = 'dev_erp';
     $db_config['audit_db']               = 'pae_erp_audit';
-    $db_config['audit_pass']             = 'iF4D3R0N88!';
+    $db_config['audit_pass']             = 'G3HhN[.Ez6G2YRZA';
 
 } else if( $connect == 'online' ) {
     // Turbify

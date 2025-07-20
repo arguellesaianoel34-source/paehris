@@ -163,7 +163,6 @@
         }
     }
     .container-fluid {
-        min-height: calc(100% - 40px);
         display: flex;
         flex-direction: column;
     }
@@ -173,10 +172,28 @@
         flex-direction: column;
         min-height: 0;
     }
+    /* Grid layout for top-aligned cards */
     #clientGrid {
-        flex: 1 1 auto;
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 24px;
+        width: 100%;
+        padding-bottom: 20px;
         min-height: 0;
-        overflow-y: auto;
+    }
+    @media (max-width: 1200px) {
+        #clientGrid {
+            grid-template-columns: repeat(2, 1fr);
+        }
+    }
+    @media (max-width: 767px) {
+        #clientGrid {
+            grid-template-columns: 1fr;
+        }
+    }
+    .client-card-col {
+        width: 100%;
+        margin-bottom: 0;
     }
     .pagination-footer {
         display: flex;
@@ -223,7 +240,7 @@
         </div>
     </div>
     <div class="client-grid-container">
-        <div id="clientGrid" class="row">
+        <div id="clientGrid">
             <!-- Client cards will be rendered here by JS -->
         </div>
         <div class="pagination-footer">
@@ -265,15 +282,15 @@
         var endIdx = startIdx + clientsPerPage;
         var pageClients = list.slice(startIdx, endIdx);
         pageClients.forEach(function (client, idx) {
-            var card = document.createElement('div');
-            card.className = 'col-xs-12 col-sm-6 col-md-4 col-lg-4';
+            var cardCol = document.createElement('div');
+            cardCol.className = 'client-card-col';
             var name = client.app_name || client.name || '';
             var id = client.app_id || client.id || '';
             var status = client.status_id || '';
             var address = client.address || '';
             var system = client.system || '';
             var category = client.category || (client.is_corporate === 'YES' ? 'corporation' : 'residential');
-            card.innerHTML =
+            cardCol.innerHTML =
                 '<div class="client-card">' +
                 '<div class="avatar-section" style="background-image: url(https://ui-avatars.com/api/?name=' + encodeURIComponent(name) + '&background=0A2342&color=fff&size=128)">' +
                 '</div>' +
@@ -289,9 +306,9 @@
                 '</div>';
             // Add animation class with staggered delay
             setTimeout(function() {
-                card.firstChild.classList.add('card-animate-in');
+                cardCol.firstChild.classList.add('card-animate-in');
             }, 60 * idx);
-            grid.appendChild(card);
+            grid.appendChild(cardCol);
         });
         renderPagination(list.length);
     }
