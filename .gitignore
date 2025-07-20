@@ -55,3 +55,4 @@ Thumbs.db
 # /application/config/database.php
 /uploads/
 /.stfolder/
+run.ps1
