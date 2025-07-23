@@ -1503,6 +1503,8 @@ class Model_purchasing extends CI_Model
             ->where('eti.prfid', $prfid)
             ->get();
 
+        $data['prf_qry'] = $prf_qry->result();
+
         //$data['item_qry'] = $this->db->last_query();
 
         if ($prf_qry->num_rows() > 0) {
