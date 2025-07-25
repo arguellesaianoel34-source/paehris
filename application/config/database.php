@@ -47,9 +47,6 @@ if( $connect == 'dev' ) {
 
 $query_builder = TRUE;
 
-$db[$active_group]['sysmode'] = $active_group;
-$db[$active_group]['sysaudit'] = $active_group_audit;
-
 // Default settings for all databases
 $default_db_config = array(
     'dbdriver' => 'mysqli',
@@ -105,3 +102,7 @@ $db['tvi'] = array_merge($default_db_config, array(
     'password' => '959@M+U1GOat',
     'database' => 'uub4rmw23inpzxn9_tvi_erp',
 ));
+
+
+$db[$active_group]['sysmode'] = $active_group;
+$db[$active_group]['sysaudit'] = $active_group_audit;
