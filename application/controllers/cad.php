@@ -1266,11 +1266,14 @@ class Cad extends CI_Controller
     function getdocumentpreview()
     {
 
-        // Prevent any output before streaming PDF
-        ob_clean();
-        ob_start();
+
 
         $layout = $this->cad->get_document_layout();
+
+        print_r($layout);
+
+        exit;
+
         $papersize = $layout->papersize;
         $html = $layout->html;
         $title = $layout->title;
@@ -1290,7 +1293,6 @@ class Cad extends CI_Controller
         $dompdf->add_info('Keywords', $title);
 
         // Clean (discard) any output so far, then stream
-        ob_end_clean();
         $dompdf->stream($filename, array('Attachment' => false));
     }
 
