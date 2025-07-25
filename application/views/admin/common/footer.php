@@ -1,7 +1,7 @@
 
 <?php
 
-$sysmode = isset($this->db->sysmode) ? $this->db->sysmode : 'dev';sss
+$sysmode = isset($this->db->sysmode) ? $this->db->sysmode : 'dev';
 if($sysmode=='dev') {
     $sysmode_msg = '<a href="javascript:;" class="font-red-thunderbird tooltips" title="System is in Development Database"><i class="fa fa-gears"></i> Development DB</a>';
 }else{
