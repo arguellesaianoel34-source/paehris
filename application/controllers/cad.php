@@ -1266,14 +1266,7 @@ class Cad extends CI_Controller
     function getdocumentpreview()
     {
 
-
-
         $layout = $this->cad->get_document_layout();
-
-        echo $layout->html;
-        exit;
-
-        
 
         $papersize = $layout->papersize;
         $html = $layout->html;
@@ -1285,8 +1278,9 @@ class Cad extends CI_Controller
         $dompdf->loadHtml($html);
         $customPaper = ($papersize && $papersize != '') ? $papersize : 'letter';
 
-        $dompdf->setPaper($customPaper, 'portrate');
+        $dompdf->setPaper($customPaper, 'portrait');
         $dompdf->render();
+        
         // Add PDF Document Information
         $dompdf->add_info('Subject', $title);
         $dompdf->add_info('Author', user_info()->username ?? '');
