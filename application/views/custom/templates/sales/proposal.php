@@ -694,7 +694,8 @@ if ($app->duid > 0 && $app->durate > 0) {
                             However, over the course of the panel's 25-year warranty, savings are guaranteed.
                         </p>
                     <?php } ?>
-                    <p style="font-weight: bold; font-family: Arial, Verdana, sans-serif; font-size: 14px; line-height: 10px; color: #FF6700; margin-bottom: 0.5em;"> Benefits of Going Solar:</p>
+                    <div style="page-break-inside: avoid; display: table; width: 100%;">
+                        <p style="font-weight: bold; font-family: Arial, Verdana, sans-serif; font-size: 14px; line-height: 10px; color: #FF6700; margin-bottom: 0.5em;"> Benefits of Going Solar:</p>
                         <ul class="list" style="margin-top: 0;">
                             <li> Drastically reduces your electric bills.</li>
                             <li> Protects your business against rising energy costs.</li>
@@ -706,6 +707,7 @@ if ($app->duid > 0 && $app->durate > 0) {
                             <li> Reduces your carbon footprint.</li>
                             <li> Environmentally friendly.</li>
                         </ul>
+                    </div>
                 </div>
                 <!-- <div class="page_break">
                 <p style="font-family: Arial, Verdana, sans-serif; font-size: 21px; line-height: 15px; text-align: center; font-weight: bold; color: #FF6700">SOLAR PANEL ROOF LAYOUT</p>
