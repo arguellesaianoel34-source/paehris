@@ -1503,6 +1503,8 @@ class Model_purchasing extends CI_Model
             ->where('eti.prfid', $prfid)
             ->get();
 
+        $data['prf_qry'] = $prf_qry->result();
+
         //$data['item_qry'] = $this->db->last_query();
 
         if ($prf_qry->num_rows() > 0) {
@@ -2182,7 +2184,7 @@ class Model_purchasing extends CI_Model
 
                 //SUMMARY OF COST COMPUTATION
                 if ($supplier->currency == 83) {
-                    if ($supplier->paytype && $supplier->paytype != 1) {
+                    if ($supplier->paytype && ($supplier->paytype != 1 || $supplier->type < 1)) {
                         if ($supplier->exvat == 1) {
                             $netvat = $supp_total;
                             $vat = round($supp_total * 0.12, 2);
@@ -2258,7 +2260,7 @@ class Model_purchasing extends CI_Model
                             //$data['total_cols'][$supplier->sysid][$col] = $total;
                             $cur = '';
                             if ($i != 83) {
-                                list($cur, $p) = explode('_', $col);
+                                [$cur, $p] = explode('_', $col);
                                 $cur .= '_';
                             }
 
@@ -2441,8 +2443,12 @@ class Model_purchasing extends CI_Model
                 }
                 $ewtrate = 0.01;
 
-                if ($supplier->type == 4002) {
-                    $ewtrate = 0.02;
+                if ($supplier->type < 0) {
+                    $ewtrate = 0;
+                } else{
+                    if ($supplier->type == 4002) {
+                        $ewtrate = 0.02;
+                    }
                 }
 
                 $ewt[$quotationid] = ($supplier->exrate <= 1) ? round($netvat[$quotationid] * $ewtrate, 2) : 0;
@@ -2453,6 +2459,16 @@ class Model_purchasing extends CI_Model
             } else {
                 $c = get_currency($supplier->currency);
                 $netvat[$quotationid] = $totalamt;
+
+                $ewtrate = 0.01;
+
+                if ($supplier->type < 0) {
+                    $ewtrate = 0;
+                } else{
+                    if ($supplier->type == 4002) {
+                        $ewtrate = 0.02;
+                    }
+                }
 
                 $ewt[$quotationid] = ($supplier->exrate <= 1) ? round($netvat[$quotationid] * $ewtrate, 2) : 0;
                 $vat[$quotationid] = 0;
@@ -2514,8 +2530,8 @@ class Model_purchasing extends CI_Model
                     } else {
                         $crc = get_currency($ac[0]);
                         $crc_code = strtolower($crc->code);
-                        $data['subtotals'][$crc_code . '_subtotal_amt'] = number_format($ctotal[$ac[0]], 2);
-                        $data['subtotals']['php_subtotal_amt'] = number_format($ctotal['c'], 2);
+                        $data['subtotals'][$crc_code . '_subtotal_amt'] = isset($ctotal[$ac[0]]) ? number_format(array_sum($ctotal[$ac[0]]), 2) : '0.00';
+                        $data['subtotals']['php_subtotal_amt'] = isset($ctotal['c']) ? number_format(array_sum($ctotal['c']), 2) : '0.00';
                     }
                 }
             }
