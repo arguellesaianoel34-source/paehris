@@ -497,23 +497,23 @@ if ($app->duid > 0 && $app->durate > 0) {
                             <tbody>
                                 <tr>
                                     <th
-                                        style="font-family: Arial, Verdana, sans-serif; font-size: 8px; border: 1px solid #000; background: #92CDDC; text-align: center; line-height: 20px">
+                                        style="font-family: Arial, Verdana, sans-serif; font-size: 8px; border: 1px solid #000; background: #92CDDC; text-align: center; line-height: 15px">
                                         Cost of Utility Purchased Power
                                     </th>
                                     <th
-                                        style="font-family: Arial, Verdana, sans-serif; font-size: 8px; border: 1px solid #000; background: #C3E4FB; text-align: center; line-height: 20px">
+                                        style="font-family: Arial, Verdana, sans-serif; font-size: 8px; border: 1px solid #000; background: #C3E4FB; text-align: center; line-height: 15px">
                                         *Utility Comparative Rate
                                     </th>
                                     <th
-                                        style="font-family: Arial, Verdana, sans-serif; font-size: 8px; border: 1px solid #000; background: #FFC299; text-align: center; line-height: 20px">
+                                        style="font-family: Arial, Verdana, sans-serif; font-size: 8px; border: 1px solid #000; background: #FFC299; text-align: center; line-height: 15px">
                                         Fixed Monthly Payment
                                     </th>
                                     <th
-                                        style="font-family: Arial, Verdana, sans-serif; font-size: 8px; border: 1px solid #000; background: #B8CCE4; text-align: center; line-height: 20px">
+                                        style="font-family: Arial, Verdana, sans-serif; font-size: 8px; border: 1px solid #000; background: #B8CCE4; text-align: center; line-height: 15px">
                                         PA Energy Comparative Rate
                                     </th>
                                     <th
-                                        style="font-family: Arial, Verdana, sans-serif; font-size: 10px; border: 1px solid #000; background: #FEA022; text-align: center; line-height: 20px">
+                                        style="font-family: Arial, Verdana, sans-serif; font-size: 10px; border: 1px solid #000; background: #FEA022; text-align: center; line-height: 15px">
                                         Actual Savings
                                     </th>
                                 </tr>
@@ -545,23 +545,23 @@ if ($app->duid > 0 && $app->durate > 0) {
                             <tbody>
                                 <tr>
                                     <th
-                                        style="font-family: Arial, Verdana, sans-serif; font-size: 8px; border: 1px solid #000; background: #92CDDC; text-align: center; line-height: 20px">
+                                        style="font-family: Arial, Verdana, sans-serif; font-size: 8px; border: 1px solid #000; background: #92CDDC; text-align: center; line-height: 15px">
                                         Cost of Utility Purchased Power
                                     </th>
                                     <th
-                                        style="font-family: Arial, Verdana, sans-serif; font-size: 8px; border: 1px solid #000; background: #C3E4FB; text-align: center; line-height: 20px">
+                                        style="font-family: Arial, Verdana, sans-serif; font-size: 8px; border: 1px solid #000; background: #C3E4FB; text-align: center; line-height: 15px">
                                         *Utility Comparative Rate
                                     </th>
                                     <th
-                                        style="font-family: Arial, Verdana, sans-serif; font-size: 8px; border: 1px solid #000; background: #FFC299; text-align: center; line-height: 20px">
+                                        style="font-family: Arial, Verdana, sans-serif; font-size: 8px; border: 1px solid #000; background: #FFC299; text-align: center; line-height: 15px">
                                         Fixed Monthly Payment
                                     </th>
                                     <th
-                                        style="font-family: Arial, Verdana, sans-serif; font-size: 8px; border: 1px solid #000; background: #B8CCE4; text-align: center; line-height: 20px">
+                                        style="font-family: Arial, Verdana, sans-serif; font-size: 8px; border: 1px solid #000; background: #B8CCE4; text-align: center; line-height: 15px">
                                         PA Energy Comparative Rate
                                     </th>
                                     <th
-                                        style="font-family: Arial, Verdana, sans-serif; font-size: 10px; border: 1px solid #000; background: #FEA022; text-align: center; line-height: 20px">
+                                        style="font-family: Arial, Verdana, sans-serif; font-size: 10px; border: 1px solid #000; background: #FEA022; text-align: center; line-height: 15px">
                                         Actual Savings
                                     </th>
                                 </tr>
@@ -642,21 +642,21 @@ if ($app->duid > 0 && $app->durate > 0) {
                             <tbody>
                                 <tr>
                                     <th
-                                        style="font-family: Arial, Verdana, sans-serif; font-size: 13px; border: 1px solid #000; background: #92CDDC; text-align: center; line-height: 20px">
+                                        style="font-family: Arial, Verdana, sans-serif; font-size: 13px; border: 1px solid #000; background: #92CDDC; text-align: center; line-height: 15px">
                                         Current Utility Bill
                                     </th>
                                     <th
-                                        style="font-family: Arial, Verdana, sans-serif; font-size: 13px; border: 1px solid #000; background: #C3E4FB; text-align: center; line-height: 20px">
+                                        style="font-family: Arial, Verdana, sans-serif; font-size: 13px; border: 1px solid #000; background: #C3E4FB; text-align: center; line-height: 15px">
                                         Solar Savings
                                     </th>
                                     <th
-                                        style="font-family: Arial, Verdana, sans-serif; font-size: 13px; border: 1px solid #000; background: #FFC299; text-align: center; line-height: 20px">
+                                        style="font-family: Arial, Verdana, sans-serif; font-size: 13px; border: 1px solid #000; background: #FFC299; text-align: center; line-height: 15px">
                                         New Power Bill
                                     </th>
-                                    <!--<th style="font-family: Arial, Verdana, sans-serif; font-size: 13px; border: 1px solid #000; background: #B8CCE4; text-align: center; line-height: 20px">
+                                    <!--<th style="font-family: Arial, Verdana, sans-serif; font-size: 13px; border: 1px solid #000; background: #B8CCE4; text-align: center; line-height: 15px">
                                 10-Year Plan Monthly Payment
                             </th>
-                            <th style="font-family: Arial, Verdana, sans-serif; font-size: 13px; border: 1px solid #000; background: #FEA022; text-align: center; line-height: 20px">
+                            <th style="font-family: Arial, Verdana, sans-serif; font-size: 13px; border: 1px solid #000; background: #FEA022; text-align: center; line-height: 15px">
                                 Projected Savings Per Month
                             </th>-->
                                 </tr>
