@@ -11,43 +11,47 @@ $active_group               = 'pae';
 $active_group_audit         = 'audit';
 $connect                    = 'dev';
 
-$db_config = array();
+$db_config = [];
 
-if( $connect == 'dev' ) {
-    // LOCALHOST
-    $db_config['host_server']            = 'localhost';
-    $db_config['host_user']              = 'dev_erp';
-    $db_config['host_db']                = 'pae_erp';
-    $db_config['host_pass']              = 'av*MwsF5baeYKvBU';
+switch ($connect) {
+    case 'dev':
+        // LOCALHOST
+        $db_config['host_server']            = 'localhost';
+        $db_config['host_user']              = 'dev_erp';
+        $db_config['host_db']                = 'pae_erp';
+        $db_config['host_pass']              = 'av*MwsF5baeYKvBU';
 
-    $db_config['audit_server']           = 'localhost';
-    $db_config['audit_user']             = 'dev_erp';
-    $db_config['audit_db']               = 'pae_erp_audit';
-    $db_config['audit_pass']             = 'av*MwsF5baeYKvBU';
+        $db_config['audit_server']           = 'localhost';
+        $db_config['audit_user']             = 'dev_erp';
+        $db_config['audit_db']               = 'pae_erp_audit';
+        $db_config['audit_pass']             = 'av*MwsF5baeYKvBU';
+        break;
 
-} else if( $connect == 'online' ) {
-    // Turbify
-    $db_config['host_server']            = 'localhost';
-    $db_config['host_user']              = 'uub4rmw23inpzxn9_pae_root';
-    $db_config['host_db']                = 'uub4rmw23inpzxn9_erp';
-    $db_config['host_pass']              = '959@M+U1GOat';
+    case 'online':
+        // Turbify
+        $db_config['host_server']            = 'localhost';
+        $db_config['host_user']              = 'uub4rmw23inpzxn9_pae_root';
+        $db_config['host_db']                = 'uub4rmw23inpzxn9_erp';
+        $db_config['host_pass']              = '959@M+U1GOat';
 
-    $db_config['audit_server']           = 'localhost';
-    $db_config['audit_user']             = 'uub4rmw23inpzxn9_pae_root';
-    $db_config['audit_db']               = 'uub4rmw23inpzxn9_erp_audit';
-    $db_config['audit_pass']             = '959@M+U1GOat';
+        $db_config['audit_server']           = 'localhost';
+        $db_config['audit_user']             = 'uub4rmw23inpzxn9_pae_root';
+        $db_config['audit_db']               = 'uub4rmw23inpzxn9_erp_audit';
+        $db_config['audit_pass']             = '959@M+U1GOat';
+        break;
 
-} else {
-    // PAE SERVER
-    $db_config['host_server']            = '172.20.224.5';
-    $db_config['host_user']              = 'lucky';
-    $db_config['host_db']                = 'pae';
-    $db_config['host_pass']              = 'F4D3R0N88';
+    default:
+        // PAE SERVER
+        $db_config['host_server']            = '172.20.224.5';
+        $db_config['host_user']              = 'lucky';
+        $db_config['host_db']                = 'pae';
+        $db_config['host_pass']              = 'F4D3R0N88';
 
-    $db_config['audit_server']           = '172.20.224.5';
-    $db_config['audit_user']             = 'lucky';
-    $db_config['audit_db']               = 'pae_audit';
-    $db_config['audit_pass']             = 'F4D3R0N88';
+        $db_config['audit_server']           = '172.20.224.5';
+        $db_config['audit_user']             = 'lucky';
+        $db_config['audit_db']               = 'pae_audit';
+        $db_config['audit_pass']             = 'F4D3R0N88';
+        break;
 }
 
 $query_builder = TRUE;
