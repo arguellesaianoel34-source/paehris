@@ -1269,6 +1269,7 @@ class Cad extends CI_Controller
 
         $papersize = $layout->papersize;
         $html = $layout->html;
+        
         $title = $layout->title;
         $filename = $layout->filename;
 

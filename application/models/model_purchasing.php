@@ -1795,8 +1795,7 @@ class Model_purchasing extends CI_Model
 
             if ($new_po->qry) {
                 $poid = $new_po->insert_id;
-                $data['ponum'] = 'PAE-' . str_pad($ponum, 8, '0', STR_PAD_LEFT);
-                ;
+                $data['ponum'] = 'PAE-' . str_pad($ponum, 8, '0', STR_PAD_LEFT);;
             }
         }
 
@@ -2185,14 +2184,20 @@ class Model_purchasing extends CI_Model
                 //SUMMARY OF COST COMPUTATION
                 if ($supplier->currency == 83) {
                     if ($supplier->paytype && ($supplier->paytype != 1 || $supplier->type < 1)) {
-                        if ($supplier->exvat == 1) {
+                        if ($supplier->tax_exempt == 1) {
                             $netvat = $supp_total;
-                            $vat = round($supp_total * 0.12, 2);
-                            $gross = $supp_total + $vat;
-                        } else {
-                            $vat = round($supp_total * 12 / 112, 2);
-                            $netvat = $supp_total - $vat;
+                            $vat = 0;
                             $gross = $supp_total;
+                        } else {
+                            if ($supplier->exvat == 1) {
+                                $netvat = $supp_total;
+                                $vat = round($supp_total * 0.12, 2);
+                                $gross = $supp_total + $vat;
+                            } else {
+                                $vat = round($supp_total * 12 / 112, 2);
+                                $netvat = $supp_total - $vat;
+                                $gross = $supp_total;
+                            }
                         }
 
                         if ($supplier->type < 0) {
@@ -2445,7 +2450,7 @@ class Model_purchasing extends CI_Model
 
                 if ($supplier->type < 0) {
                     $ewtrate = 0;
-                } else{
+                } else {
                     if ($supplier->type == 4002) {
                         $ewtrate = 0.02;
                     }
@@ -2464,7 +2469,7 @@ class Model_purchasing extends CI_Model
 
                 if ($supplier->type < 0) {
                     $ewtrate = 0;
-                } else{
+                } else {
                     if ($supplier->type == 4002) {
                         $ewtrate = 0.02;
                     }
@@ -2546,8 +2551,7 @@ class Model_purchasing extends CI_Model
         $data['gross'] = $gross;
         $data['ewt'] = $ewt;
         $data['suptotal'] = $suptotal;
-        $data['gtotal'] = number_format(array_sum($suptotal) + (array_sum($suptotal) * 0.02), 2);
-        ;
+        $data['gtotal'] = number_format(array_sum($suptotal) + (array_sum($suptotal) * 0.02), 2);;
 
         return json_encode($data);
     }
@@ -4125,7 +4129,7 @@ class Model_purchasing extends CI_Model
                 //REMOVE OLD QUOTATION AND ADD NEW ONE
                 if ($past_quotation) {
                     $new_quotation['status'] = $past_quotation->status;
-                    $x_quote = update_db($this->db, 'eprs_quotation_details', array('status' => 0), array('sysid' => $past_quotation->sysid, ));
+                    $x_quote = update_db($this->db, 'eprs_quotation_details', array('status' => 0), array('sysid' => $past_quotation->sysid,));
                     if (!$x_quote->qry) {
                         $transproc['removeQuote'][$items] = $x_quote->error;
                     }
