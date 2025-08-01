@@ -2120,7 +2120,7 @@ class Model_purchasing extends CI_Model
             ->where('sysid', $id)
             ->get()->row();
 
-        $suppliers_qry = $this->db->select('eqs.sysid, eqs.exvat, eqs.shipping, eqs.supplierid, eqs.paytype, s.descs AS name, s.codes,s.currency,s.type')
+        $suppliers_qry = $this->db->select('eqs.sysid, eqs.exvat, eqs.shipping, eqs.supplierid, eqs.paytype, s.descs AS name, s.codes,s.currency, s.type, s.tax_exempt')
             ->from('eprs_suppliers_main as s')
             ->join('eprs_quotation_suppliers as eqs', 'eqs.supplierid = s.sysid', 'left')
             ->where(array('eqs.prfid' => $id, 'eqs.status' => 1))
