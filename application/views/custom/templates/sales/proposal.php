@@ -181,12 +181,10 @@ if ($app->duid > 0 && $app->durate > 0) {
 
             html,
             body {
-                width: 8in;
-                height: 12in;
                 margin: 0;
                 padding: 0;
             }
-            
+
             body {
                 padding: 48px;
             }
