@@ -196,7 +196,7 @@ if ($app->duid > 0 && $app->durate > 0) {
 
             header {
                 position: fixed;
-                top: -10px;
+                top: -20px;
                 height: 40px;
                 background-color: transparent;
                 color: white;
