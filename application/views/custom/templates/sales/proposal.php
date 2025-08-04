@@ -396,20 +396,20 @@ if ($app->duid > 0 && $app->durate > 0) {
                 <p style="font-weight: bold; font-family: Arial, Verdana, sans-serif; font-size: 13px; line-height: 20px;">
                     Premium product, better warranty:</p>
                 <ul class="list">
-                    <li style="font-size: 13px; padding-left: 0.25em; padding-bottom: 0.25em"> 5 years replacement warranty
+                    <li style="font-size: 13px; padding-left: 0.25em; padding-bottom: 0.15em"> 5 years replacement warranty
                         for inverters. (Outright purchase, 2 years plan and 5 years plan)</li>
-                    <li style="font-size: 13px; padding-left: 0.25em; padding-bottom: 0.25em"> Free inverter replacement for
+                    <li style="font-size: 13px; padding-left: 0.25em; padding-bottom: 0.15em"> Free inverter replacement for
                         the entire duration of 10 years plan.</li>
-                    <li style="font-size: 13px; padding-left: 0.25em; padding-bottom: 0.25em"> Free maintenance and Acts of
+                    <li style="font-size: 13px; padding-left: 0.25em; padding-bottom: 0.15em"> Free maintenance and Acts of
                         God insurance for 10 years plan.</li>
-                    <li style="font-size: 13px; padding-left: 0.25em; padding-bottom: 0.25em"> Premium panels are guaranteed
+                    <li style="font-size: 13px; padding-left: 0.25em; padding-bottom: 0.15em"> Premium panels are guaranteed
                         to be at least 80% efficient or more for 25 years.</li>
-                    <li style="font-size: 13px; padding-left: 0.25em; padding-bottom: 0.25em"> With very low degradation
+                    <li style="font-size: 13px; padding-left: 0.25em; padding-bottom: 0.15em"> With very low degradation
                         rate per annum compared to conventional panels with a major drop in efficiency yearly.</li>
-                    <li style="font-size: 13px; padding-left: 0.25em; padding-bottom: 0.25em"> FREE replacement of solar
+                    <li style="font-size: 13px; padding-left: 0.25em; padding-bottom: 0.15em"> FREE replacement of solar
                         panels if efficiency rate falls below 80% within 25 years.</li>
                     <?php if ($netmetering) { ?>
-                        <li style="font-size: 13px; padding-left: 0.25em; padding-bottom: 0.25em"> FREE net-metering processing
+                        <li style="font-size: 13px; padding-left: 0.25em; padding-bottom: 0.15em"> FREE net-metering processing
                             (submission of government and utility documents required).</li>
                     <?php } ?>
                 </ul>
