@@ -196,7 +196,7 @@ if ($app->duid > 0 && $app->durate > 0) {
 
             header {
                 position: fixed;
-                top: 0px;
+                top: -10px;
                 height: 45px;
                 background-color: transparent;
                 color: white;
@@ -206,7 +206,7 @@ if ($app->duid > 0 && $app->durate > 0) {
 
             footer {
                 position: fixed;
-                bottom: 20px;
+                bottom: 30px;
                 height: 55px;
                 background-color: transparent;
                 color: white;
