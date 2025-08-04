@@ -196,7 +196,7 @@ if ($app->duid > 0 && $app->durate > 0) {
                 list-style-position: outside;
                 font-family: Arial, Verdana, sans-serif;
                 font-size: 13px;
-                line-height: 15px;
+                line-height: 17px;
                 margin-left: 0.5em
             }
 
@@ -262,7 +262,7 @@ if ($app->duid > 0 && $app->durate > 0) {
             ) { ?>
                 <div style="display: block;">
                     <p
-                        style="font-family: Arial, Verdana, sans-serif; font-size: 13px; line-height: 15px; text-align: justify; padding-top: 13px">
+                        style="font-family: Arial, Verdana, sans-serif; font-size: 13px; line-height: 17px; text-align: justify; padding-top: 13px">
                         <?php
                         if (isset($app->firstname)) {
                             echo '<b>' . utf8_decode(ucwords(strtolower($app->firstname . ' ' . $app->lastname))) . '</b><br>';
@@ -275,15 +275,15 @@ if ($app->duid > 0 && $app->durate > 0) {
                         echo utf8_decode($app->address);
                         ?>
                     </p>
-                    <p style="font-family: Arial, Verdana, sans-serif; font-size: 13px; line-height: 15px; text-align: justify">
+                    <p style="font-family: Arial, Verdana, sans-serif; font-size: 13px; line-height: 17px; text-align: justify">
                     </p>
                     <p> </p>
                     <p
-                        style="font-family: Arial, Verdana, sans-serif; font-size: 13px; line-height: 15px; text-align: justify; padding-top: 13px">
+                        style="font-family: Arial, Verdana, sans-serif; font-size: 13px; line-height: 17px; text-align: justify; padding-top: 13px">
                         Good day,</p>
-                    <p style="font-family: Arial, Verdana, sans-serif; font-size: 13px; line-height: 15px; text-align: justify">
+                    <p style="font-family: Arial, Verdana, sans-serif; font-size: 13px; line-height: 17px; text-align: justify">
                     </p>
-                    <p style="font-family: Arial, Verdana, sans-serif; font-size: 13px; line-height: 15px; text-align: justify">
+                    <p style="font-family: Arial, Verdana, sans-serif; font-size: 13px; line-height: 17px; text-align: justify">
                         <?php if (!$netmetering) { ?>
                             Based on the result of our assessment, we estimate you would need a <b>
                                 <?php echo $app->systemsizename; ?>
@@ -300,9 +300,9 @@ if ($app->duid > 0 && $app->durate > 0) {
                     It's like having the sun work for you around the clock!
                 <?php } ?>
                 </p>
-                <p style="font-family: Arial, Verdana, sans-serif; font-size: 13px; line-height: 15px; text-align: justify">
+                <p style="font-family: Arial, Verdana, sans-serif; font-size: 13px; line-height: 17px; text-align: justify">
                 </p>
-                <p style="font-family: Arial, Verdana, sans-serif; font-size: 13px; line-height: 15px; text-align: justify">
+                <p style="font-family: Arial, Verdana, sans-serif; font-size: 13px; line-height: 17px; text-align: justify">
                     <?php
                     if ($kwatt < 20) {
                         $start = 'The ';
@@ -335,9 +335,9 @@ if ($app->duid > 0 && $app->durate > 0) {
                         Note that all rates are subject to change monthly.
                     <?php } ?>
                 </p>
-                <p style="font-family: Arial, Verdana, sans-serif; font-size: 13px; line-height: 15px; text-align: justify">
+                <p style="font-family: Arial, Verdana, sans-serif; font-size: 13px; line-height: 17px; text-align: justify">
                 </p>
-                <p style="font-family: Arial, Verdana, sans-serif; font-size: 13px; line-height: 15px; text-align: justify">
+                <p style="font-family: Arial, Verdana, sans-serif; font-size: 13px; line-height: 17px; text-align: justify">
                     The cost of the system is <b><?php echo $peso . number_format($outright, 2); ?></b>
                     and can be financed via installment plans with <b>ZERO down payment</b> of up to 10 years for as low as
                     <b class="peso"><?php echo number_format($maxprop, 2); ?>/month</b>.
@@ -345,7 +345,7 @@ if ($app->duid > 0 && $app->durate > 0) {
                     solar power production.
                     Please see details below for all payment options.
                 </p>
-                <p style="font-family: Arial, Verdana, sans-serif; font-size: 13px; line-height: 15px; text-align: justify">
+                <p style="font-family: Arial, Verdana, sans-serif; font-size: 13px; line-height: 17px; text-align: justify">
                 </p>
                 <table width="100%" border="0" cellspacing="0" cellpadding="0" style="">
                     <tbody>
@@ -391,9 +391,9 @@ if ($app->duid > 0 && $app->durate > 0) {
                     </tbody>
                 </table>
                 <br>
-                <p style="font-family: Arial, Verdana, sans-serif; font-size: 13px; line-height: 15px; text-align: justify">
+                <p style="font-family: Arial, Verdana, sans-serif; font-size: 13px; line-height: 17px; text-align: justify">
                 </p>
-                <p style="font-weight: bold; font-family: Arial, Verdana, sans-serif; font-size: 13px; line-height: 15px;">
+                <p style="font-weight: bold; font-family: Arial, Verdana, sans-serif; font-size: 13px; line-height: 17px;">
                     Premium product, better warranty:</p>
                 <ul class="list">
                     <li style="font-size: 13px; padding-left: 0.25em; padding-bottom: 0.15em"> 5 years replacement warranty
@@ -413,37 +413,37 @@ if ($app->duid > 0 && $app->durate > 0) {
                             (submission of government and utility documents required).</li>
                     <?php } ?>
                 </ul>
-                <p style="font-family: Arial, Verdana, sans-serif; font-size: 13px; line-height: 15px; text-align: justify">
+                <p style="font-family: Arial, Verdana, sans-serif; font-size: 13px; line-height: 17px; text-align: justify">
                 </p>
 
                 <?php if ($app->systemtype == 1 && $buildtime != '') {
                     $day = ((string) $buildtime == '1') ? ' day' : ' days';
                 ?>
-                    <p style="font-family: Arial, Verdana, sans-serif; font-size: 13px; line-height: 15px; text-align: justify">
+                    <p style="font-family: Arial, Verdana, sans-serif; font-size: 13px; line-height: 17px; text-align: justify">
                         We will be waiting for your confirmation.
                         Once an agreement is signed, we will schedule the date of your installation.
                         <?php echo ($app->systemtype == 1 && $buildtime != '') ? 'The estimated time for completion of the system installation will be ' . $buildtime . $day . '.' : ''; ?>
                     </p>
-                    <p style="font-family: Arial, Verdana, sans-serif; font-size: 13px; line-height: 15px; text-align: justify">
+                    <p style="font-family: Arial, Verdana, sans-serif; font-size: 13px; line-height: 17px; text-align: justify">
                         If you need any further details about your system, please feel free to contact us.</p>
                 <?php } else { ?>
-                    <p style="font-family: Arial, Verdana, sans-serif; font-size: 13px; line-height: 15px; text-align: justify">
+                    <p style="font-family: Arial, Verdana, sans-serif; font-size: 13px; line-height: 17px; text-align: justify">
                         We will be waiting for your confirmation.
                         Once an agreement is signed, we will schedule the date of your installation.
                         If you need any further details about your system, please feel free to contact us.
                     </p>
 
                 <?php } ?>
-                <p style="font-family: Arial, Verdana, sans-serif; font-size: 13px; line-height: 15px; text-align: justify">
+                <p style="font-family: Arial, Verdana, sans-serif; font-size: 13px; line-height: 17px; text-align: justify">
                     Thank you for choosing PA Energy!</p>
                 <p
-                    style="font-family: Arial, Verdana, sans-serif; font-size: 13px; line-height: 15px; text-align: justify; height: auto; page-break-inside: avoid">
+                    style="font-family: Arial, Verdana, sans-serif; font-size: 13px; line-height: 17px; text-align: justify; height: auto; page-break-inside: avoid">
                     <br>
                     <?php if (!isset($corpname) || !isset($app->firstname)) {
                         echo '<br>';
                     } ?>
                 </p>
-                <p style="font-family: Arial, Verdana, sans-serif; font-size: 13px; line-height: 15px;">
+                <p style="font-family: Arial, Verdana, sans-serif; font-size: 13px; line-height: 17px;">
                     <span
                         style="display: inline-block; width: 25%; text-align: center; font-weight: bold; z-index: -1">MARCELO
                         U. CACHO</span>
@@ -461,11 +461,11 @@ if ($app->duid > 0 && $app->durate > 0) {
                 <br>
                 <div class="page_break" style="display: block">
                     <p
-                        style="font-family: Arial, Verdana, sans-serif; font-size: 13px; line-height: 15px; text-align: justify; font-weight: bold; color: #FF6700">
+                        style="font-family: Arial, Verdana, sans-serif; font-size: 13px; line-height: 17px; text-align: justify; font-weight: bold; color: #FF6700">
                         How do I calculate my solar payback period?
                     </p>
                     <?php if (!$netmetering) { ?>
-                        <p style="font-family: Arial, Verdana, sans-serif; font-size: 13px; line-height: 15px; text-align: justify">
+                        <p style="font-family: Arial, Verdana, sans-serif; font-size: 13px; line-height: 17px; text-align: justify">
                             <i>
                                 The cost to install a <b><?php echo strstr($app->systemsizename, ' ', true); ?> system
                                     is <?php echo $peso . number_format($outright, 2); ?></b> and it only takes
@@ -479,7 +479,7 @@ if ($app->duid > 0 && $app->durate > 0) {
                                     class="peso"><?php echo number_format($monthlycost * 12, 2); ?></b>.
                             </i>
                         </p>
-                        <p style="font-family: Arial, Verdana, sans-serif; font-size: 13px; line-height: 15px; text-align: justify">
+                        <p style="font-family: Arial, Verdana, sans-serif; font-size: 13px; line-height: 17px; text-align: justify">
                             <i>
                                 If you divide the yearly savings by the system cost you will get
                                 a <?php echo number_format((($monthlycost * 12) / $outright) * 100, 2); ?>% yearly return on your
@@ -489,30 +489,30 @@ if ($app->duid > 0 && $app->durate > 0) {
                             </i>
                         </p>
                         <p
-                            style="font-family: Arial, Verdana, sans-serif; font-size: 13px; line-height: 15px; text-align: justify; font-weight: bold; color: #FF6700">
+                            style="font-family: Arial, Verdana, sans-serif; font-size: 13px; line-height: 17px; text-align: justify; font-weight: bold; color: #FF6700">
                             Actual savings on a 10-year program during the rainy season.
                         </p>
                         <table width="100%" border="0" cellspacing="0" cellpadding="0">
                             <tbody>
                                 <tr>
                                     <th
-                                        style="font-family: Arial, Verdana, sans-serif; font-size: 8px; border: 1px solid #000; background: #92CDDC; text-align: center; line-height: 15px">
+                                        style="font-family: Arial, Verdana, sans-serif; font-size: 8px; border: 1px solid #000; background: #92CDDC; text-align: center; line-height: 17px">
                                         Cost of Utility Purchased Power
                                     </th>
                                     <th
-                                        style="font-family: Arial, Verdana, sans-serif; font-size: 8px; border: 1px solid #000; background: #C3E4FB; text-align: center; line-height: 15px">
+                                        style="font-family: Arial, Verdana, sans-serif; font-size: 8px; border: 1px solid #000; background: #C3E4FB; text-align: center; line-height: 17px">
                                         *Utility Comparative Rate
                                     </th>
                                     <th
-                                        style="font-family: Arial, Verdana, sans-serif; font-size: 8px; border: 1px solid #000; background: #FFC299; text-align: center; line-height: 15px">
+                                        style="font-family: Arial, Verdana, sans-serif; font-size: 8px; border: 1px solid #000; background: #FFC299; text-align: center; line-height: 17px">
                                         Fixed Monthly Payment
                                     </th>
                                     <th
-                                        style="font-family: Arial, Verdana, sans-serif; font-size: 8px; border: 1px solid #000; background: #B8CCE4; text-align: center; line-height: 15px">
+                                        style="font-family: Arial, Verdana, sans-serif; font-size: 8px; border: 1px solid #000; background: #B8CCE4; text-align: center; line-height: 17px">
                                         PA Energy Comparative Rate
                                     </th>
                                     <th
-                                        style="font-family: Arial, Verdana, sans-serif; font-size: 10px; border: 1px solid #000; background: #FEA022; text-align: center; line-height: 15px">
+                                        style="font-family: Arial, Verdana, sans-serif; font-size: 10px; border: 1px solid #000; background: #FEA022; text-align: center; line-height: 17px">
                                         Actual Savings
                                     </th>
                                 </tr>
@@ -537,30 +537,30 @@ if ($app->duid > 0 && $app->durate > 0) {
                             </tbody>
                         </table>
                         <p
-                            style="font-family: Arial, Verdana, sans-serif; font-size: 13px; line-height: 15px; text-align: justify; font-weight: bold; color: #FF6700">
+                            style="font-family: Arial, Verdana, sans-serif; font-size: 13px; line-height: 17px; text-align: justify; font-weight: bold; color: #FF6700">
                             Actual savings on a 10-year program during the summer season.
                         </p>
                         <table width="100%" border="0" cellspacing="0" cellpadding="0">
                             <tbody>
                                 <tr>
                                     <th
-                                        style="font-family: Arial, Verdana, sans-serif; font-size: 8px; border: 1px solid #000; background: #92CDDC; text-align: center; line-height: 15px">
+                                        style="font-family: Arial, Verdana, sans-serif; font-size: 8px; border: 1px solid #000; background: #92CDDC; text-align: center; line-height: 17px">
                                         Cost of Utility Purchased Power
                                     </th>
                                     <th
-                                        style="font-family: Arial, Verdana, sans-serif; font-size: 8px; border: 1px solid #000; background: #C3E4FB; text-align: center; line-height: 15px">
+                                        style="font-family: Arial, Verdana, sans-serif; font-size: 8px; border: 1px solid #000; background: #C3E4FB; text-align: center; line-height: 17px">
                                         *Utility Comparative Rate
                                     </th>
                                     <th
-                                        style="font-family: Arial, Verdana, sans-serif; font-size: 8px; border: 1px solid #000; background: #FFC299; text-align: center; line-height: 15px">
+                                        style="font-family: Arial, Verdana, sans-serif; font-size: 8px; border: 1px solid #000; background: #FFC299; text-align: center; line-height: 17px">
                                         Fixed Monthly Payment
                                     </th>
                                     <th
-                                        style="font-family: Arial, Verdana, sans-serif; font-size: 8px; border: 1px solid #000; background: #B8CCE4; text-align: center; line-height: 15px">
+                                        style="font-family: Arial, Verdana, sans-serif; font-size: 8px; border: 1px solid #000; background: #B8CCE4; text-align: center; line-height: 17px">
                                         PA Energy Comparative Rate
                                     </th>
                                     <th
-                                        style="font-family: Arial, Verdana, sans-serif; font-size: 10px; border: 1px solid #000; background: #FEA022; text-align: center; line-height: 15px">
+                                        style="font-family: Arial, Verdana, sans-serif; font-size: 10px; border: 1px solid #000; background: #FEA022; text-align: center; line-height: 17px">
                                         Actual Savings
                                     </th>
                                 </tr>
@@ -585,12 +585,12 @@ if ($app->duid > 0 && $app->durate > 0) {
                             </tbody>
                         </table>
                         <p
-                            style="font-family: Arial, Verdana, sans-serif; font-size: 13px; line-height: 15px; text-align: justify; font-weight: bold; color: #ff0000">
+                            style="font-family: Arial, Verdana, sans-serif; font-size: 13px; line-height: 17px; text-align: justify; font-weight: bold; color: #ff0000">
                             *Based on the average <?php echo $distutility; ?> distribution rate in your area
                             of <?php echo $peso . number_format($durate, 2); ?>/kWh. <?php echo $distutility; ?>
                             kwh rate is subject to change monthly.
                         </p>
-                        <p style="font-family: Arial, Verdana, sans-serif; font-size: 13px; line-height: 15px; text-align: justify">
+                        <p style="font-family: Arial, Verdana, sans-serif; font-size: 13px; line-height: 17px; text-align: justify">
                             <i>
                                 Your <?php echo strstr($app->systemsizename, ' ', true); ?> system can get an energy production of
                                 up
@@ -602,7 +602,7 @@ if ($app->duid > 0 && $app->durate > 0) {
                             </i>
                         </p>
                         <p
-                            style="font-family: Arial, Verdana, sans-serif; font-size: 13px; line-height: 15px; text-align: justify; color: #6A7BCD">
+                            style="font-family: Arial, Verdana, sans-serif; font-size: 13px; line-height: 17px; text-align: justify; color: #6A7BCD">
                             <i>
                                 Note: Savings are based on consumption within the property, and are an annual average. Some months
                                 are
@@ -611,7 +611,7 @@ if ($app->duid > 0 && $app->durate > 0) {
                         </p>
                     <?php } else { ?>
                         <p
-                            style="font-family: Arial, Verdana, sans-serif; font-size: 13px; line-height: 15px; text-align: justify; font-style: italic">
+                            style="font-family: Arial, Verdana, sans-serif; font-size: 13px; line-height: 17px; text-align: justify; font-style: italic">
                             Your solar energy system is set to <b>produce <?php echo number_format($aveprod); ?> kWh per month</b>.
                             During the day, <b><?php echo number_format($day_usage); ?> kWh</b> (equivalent to
                             <b><?php echo number_format($clamp, 1); ?> kW of solar capacity</b> subject to actual daytime power
@@ -626,7 +626,7 @@ if ($app->duid > 0 && $app->durate > 0) {
                             Altogether, your monthly savings amount to <b><?php echo $peso . number_format($total_savings, 2); ?></b>.
                         </p>
                         <p
-                            style="font-family: Arial, Verdana, sans-serif; font-size: 13px; line-height: 15px; text-align: justify; font-style: italic">
+                            style="font-family: Arial, Verdana, sans-serif; font-size: 13px; line-height: 17px; text-align: justify; font-style: italic">
                             Now, let's talk return on investment (ROI).
                             With a system cost of <b><?php echo $peso . number_format($outright, 2); ?></b>, your annual savings of
                             <b><?php echo $peso . number_format($annual_savings, 2); ?></b> mean you'll recoup your investment in
@@ -635,27 +635,27 @@ if ($app->duid > 0 && $app->durate > 0) {
                             than any bank interest rate!
                         </p>
                         <p
-                            style="font-weight: bold; font-family: Arial, Verdana, sans-serif; font-size: 16px; line-height: 15px; color: #FF6700">
+                            style="font-weight: bold; font-family: Arial, Verdana, sans-serif; font-size: 16px; line-height: 17px; color: #FF6700">
                             Projected savings on a 10-year program.
                         <table style="width: 100%; border-collapse: collapse;">
                             <tbody>
                                 <tr>
                                     <th
-                                        style="font-family: Arial, Verdana, sans-serif; font-size: 13px; border: 1px solid #000; background: #92CDDC; text-align: center; line-height: 15px">
+                                        style="font-family: Arial, Verdana, sans-serif; font-size: 13px; border: 1px solid #000; background: #92CDDC; text-align: center; line-height: 17px">
                                         Current Utility Bill
                                     </th>
                                     <th
-                                        style="font-family: Arial, Verdana, sans-serif; font-size: 13px; border: 1px solid #000; background: #C3E4FB; text-align: center; line-height: 15px">
+                                        style="font-family: Arial, Verdana, sans-serif; font-size: 13px; border: 1px solid #000; background: #C3E4FB; text-align: center; line-height: 17px">
                                         Solar Savings
                                     </th>
                                     <th
-                                        style="font-family: Arial, Verdana, sans-serif; font-size: 13px; border: 1px solid #000; background: #FFC299; text-align: center; line-height: 15px">
+                                        style="font-family: Arial, Verdana, sans-serif; font-size: 13px; border: 1px solid #000; background: #FFC299; text-align: center; line-height: 17px">
                                         New Power Bill
                                     </th>
-                                    <!--<th style="font-family: Arial, Verdana, sans-serif; font-size: 13px; border: 1px solid #000; background: #B8CCE4; text-align: center; line-height: 15px">
+                                    <!--<th style="font-family: Arial, Verdana, sans-serif; font-size: 13px; border: 1px solid #000; background: #B8CCE4; text-align: center; line-height: 17px">
                                 10-Year Plan Monthly Payment
                             </th>
-                            <th style="font-family: Arial, Verdana, sans-serif; font-size: 13px; border: 1px solid #000; background: #FEA022; text-align: center; line-height: 15px">
+                            <th style="font-family: Arial, Verdana, sans-serif; font-size: 13px; border: 1px solid #000; background: #FEA022; text-align: center; line-height: 17px">
                                 Projected Savings Per Month
                             </th>-->
                                 </tr>
@@ -678,13 +678,13 @@ if ($app->duid > 0 && $app->durate > 0) {
                         </table>
                         </p>
                         <p
-                            style="font-family: Arial, Verdana, sans-serif; font-size: 13px; line-height: 15px; text-align: justify; font-weight: bold; color: #ff0000">
+                            style="font-family: Arial, Verdana, sans-serif; font-size: 13px; line-height: 17px; text-align: justify; font-weight: bold; color: #ff0000">
                             *Based on the average <?php echo $distutility; ?> distribution rate in your area
                             of <?php echo $peso . number_format($durate, 2); ?>/kWh. <?php echo $distutility; ?>
                             kwh rate is subject to change monthly.
                         </p>
                         <p
-                            style="font-family: Arial, Verdana, sans-serif; color: #AC6100; font-size: 13px; line-height: 15px; text-align: justify; font-style: italic">
+                            style="font-family: Arial, Verdana, sans-serif; color: #AC6100; font-size: 13px; line-height: 17px; text-align: justify; font-style: italic">
                             Disclaimer: Your solar system's monthly energy production can vary due to factors like weather, shading,
                             and panel efficiency.
                             While we've estimated <?php echo number_format($aveprod); ?> kWh per month, actual output may differ.
@@ -710,14 +710,14 @@ if ($app->duid > 0 && $app->durate > 0) {
                     </div>
                 </div>
                 <!-- <div class="page_break">
-                <p style="font-family: Arial, Verdana, sans-serif; font-size: 21px; line-height: 15px; text-align: center; font-weight: bold; color: #FF6700">SOLAR PANEL ROOF LAYOUT</p>
+                <p style="font-family: Arial, Verdana, sans-serif; font-size: 21px; line-height: 17px; text-align: center; font-weight: bold; color: #FF6700">SOLAR PANEL ROOF LAYOUT</p>
                 <br>
                 <?php
                 /*
                 if (count($pvl) > 0) {
                     $pvwidth = (count($pvl) > 1) ? 95 / 2 : 100;
                     foreach ($pvl as $pvimg) {
-                        echo '<p style="font-family: Arial, Verdana, sans-serif; font-size: 21px; line-height: 15px; text-align: center; font-weight: bold; color: #FF6700">';
+                        echo '<p style="font-family: Arial, Verdana, sans-serif; font-size: 21px; line-height: 17px; text-align: center; font-weight: bold; color: #FF6700">';
                         echo '<img src="' . $pvimg . '" data-type="PVL" width="' . $pvwidth . '%"/>';
                         echo '</p>';
                     }
@@ -731,7 +731,7 @@ if ($app->duid > 0 && $app->durate > 0) {
 
                 <div class="page_break">
                     <p
-                        style="font-family: Arial, Verdana, sans-serif; font-size: 21px; line-height: 15px; text-align: center; font-weight: bold; color: #FF6700">
+                        style="font-family: Arial, Verdana, sans-serif; font-size: 21px; line-height: 17px; text-align: center; font-weight: bold; color: #FF6700">
                         SOLAR PANEL ROOF LAYOUT</p>
                     <br>
                     <div style="display: flex; flex-wrap: wrap; justify-content: center; align-items: flex-start; gap: 10px;">
@@ -752,13 +752,13 @@ if ($app->duid > 0 && $app->durate > 0) {
                 <?php if (count($mpp) > 0) { ?>
                     <div class="page_break" style="display: block">
                         <p
-                            style="font-family: Arial, Verdana, sans-serif; font-size: 21px; line-height: 15px; text-align: center; font-weight: bold; color: #FF6700">
+                            style="font-family: Arial, Verdana, sans-serif; font-size: 21px; line-height: 17px; text-align: center; font-weight: bold; color: #FF6700">
                             PROJECTED MONTHLY PRODUCTION</p>
                         <br>
                         <?php
                         $mpwidth = (count($mpp) > 1) ? 95 / 2 : 100;
                         foreach ($mpp as $mpimg) {
-                            echo '<p style="font-family: Arial, Verdana, sans-serif; font-size: 21px; line-height: 15px; text-align: center; font-weight: bold; color: #FF6700">';
+                            echo '<p style="font-family: Arial, Verdana, sans-serif; font-size: 21px; line-height: 17px; text-align: center; font-weight: bold; color: #FF6700">';
                             echo '<img src="' . $mpimg . '" data-type="PVL" width="' . $mpwidth . '%" style="max-height: 690px;"/>';
                             echo '</p>';
                         }
