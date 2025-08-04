@@ -698,20 +698,18 @@ if ($app->duid > 0 && $app->durate > 0) {
                             However, over the course of the panel's 25-year warranty, savings are guaranteed.
                         </p>
                     <?php } ?>
-                    <div style="page-break-inside: avoid; display: table; width: 100%;">
-                        <p style="font-weight: bold; font-family: Arial, Verdana, sans-serif; font-size: 14px; line-height: 10px; color: #FF6700; margin-bottom: 0.5em;"> Benefits of Going Solar:</p>
-                        <ul class="list" style="margin-top: 0;">
-                            <li> Drastically reduces your electric bills.</li>
-                            <li> Protects your business against rising energy costs.</li>
-                            <li> No worries about unpredictable rate increases.</li>
-                            <li> Increases your property value.</li>
-                            <li> Earn a great return on your investment.</li>
-                            <li> Cools your house's temperature.</li>
-                            <li> Very low maintenance. Less hassle.</li>
-                            <li> Reduces your carbon footprint.</li>
-                            <li> Environmentally friendly.</li>
-                        </ul>
-                    </div>
+                    <p style="font-weight: bold; font-family: Arial, Verdana, sans-serif; font-size: 14px; line-height: 10px; color: #FF6700; margin-bottom: 0.5em;"> Benefits of Going Solar:</p>
+                    <ul class="list" style="margin-top: 0;">
+                        <li> Drastically reduces your electric bills.</li>
+                        <li> Protects your business against rising energy costs.</li>
+                        <li> No worries about unpredictable rate increases.</li>
+                        <li> Increases your property value.</li>
+                        <li> Earn a great return on your investment.</li>
+                        <li> Cools your house's temperature.</li>
+                        <li> Very low maintenance. Less hassle.</li>
+                        <li> Reduces your carbon footprint.</li>
+                        <li> Environmentally friendly.</li>
+                    </ul>
                 </div>
                 <!-- <div class="page_break">
                 <p style="font-family: Arial, Verdana, sans-serif; font-size: 21px; line-height: 17px; text-align: center; font-weight: bold; color: #FF6700">SOLAR PANEL ROOF LAYOUT</p>
