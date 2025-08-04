@@ -751,7 +751,7 @@ if ($app->duid > 0 && $app->durate > 0) {
                         if (count($pvl) > 0) {
                             $pvwidth = (count($pvl) > 1) ? '48%' : '100%';
                             foreach ($pvl as $pvimg) {
-                                echo '<div style="flex: 1 1 48%; max-width: 48%; box-sizing: border-box; display: flex; flex-direction: column; align-items: center; margin-bottom: 10px;">';
+                                echo '<div style="flex: 1 1 70%; max-width: 48%; box-sizing: border-box; display: flex; flex-direction: column; align-items: center; margin-bottom: 10px;">';
                                 echo '<img src="' . $pvimg . '" data-type="PVL" style="width: 100%; height: auto; max-width: 100%; border: none; box-shadow: none;" />';
                                 echo '</div>';
                             }
