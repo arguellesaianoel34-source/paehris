@@ -220,12 +220,12 @@ if ($app->duid > 0 && $app->durate > 0) {
             }
 
             main {
-                margin-top: 100px;
+                margin-top: 110px;
             }
 
             .page_break {
                 page-break-before: always;
-                margin-top: 100px;
+                margin-top: 110px;
             }
 
             .peso:before {
