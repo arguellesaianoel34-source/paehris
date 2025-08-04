@@ -174,6 +174,20 @@ if ($app->duid > 0 && $app->durate > 0) {
     <head>
         <title></title>
         <style>
+            /* Short bond paper size: 8.5 x 13 inches */
+            @page {
+                size: 8.5in 13in;
+                margin: 48px;
+            }
+
+            html,
+            body {
+                width: 8.5in;
+                height: 13in;
+                margin: 0;
+                padding: 0;
+            }
+
             html {
                 margin-right: 48px;
                 margin-left: 48px;
@@ -461,8 +475,10 @@ if ($app->duid > 0 && $app->durate > 0) {
                         style="display: inline-block; width: 25%; text-align: center; border-top: 1px solid #000; z-index: -1">Conforme</span>
                 </p>
                 </div>
-                <br>
-                <br>
+
+
+
+                <!-- PAGE 2 -->
                 <div class="page_break" style="display: block">
                     <p
                         style="font-family: Arial, Verdana, sans-serif; font-size: 13px; line-height: 17px; text-align: justify; font-weight: bold; color: #FF6700">
