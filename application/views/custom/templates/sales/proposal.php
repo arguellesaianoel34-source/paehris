@@ -179,10 +179,25 @@ if ($app->duid > 0 && $app->durate > 0) {
                 margin-left: 48px;
             }
 
+
+            main {
+                margin-top: 100px;
+            }
+
             header {
                 position: fixed;
                 top: 0px;
-                height: 40px;
+                height: 50px;
+                background-color: transparent;
+                color: white;
+                text-align: center;
+                line-height: 35px;
+            }
+
+            footer {
+                position: fixed;
+                bottom: 10px;
+                height: 50px;
                 background-color: transparent;
                 color: white;
                 text-align: center;
@@ -209,19 +224,6 @@ if ($app->duid > 0 && $app->durate > 0) {
                 color: #FF6700;
             }
 
-            footer {
-                position: fixed;
-                bottom: 10px;
-                height: 40px;
-                background-color: transparent;
-                color: white;
-                text-align: center;
-                line-height: 35px;
-            }
-
-            main {
-                margin-top: 110px;
-            }
 
             .page_break {
                 page-break-before: always;
