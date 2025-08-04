@@ -176,24 +176,16 @@ if ($app->duid > 0 && $app->durate > 0) {
         <style>
             /* Short bond paper size: 8.5 x 13 inches */
             @page {
-                size: 8.5in 13in;
+                size: 8in 12in;
                 margin: 48px;
             }
 
             html,
             body {
-                width: 8.5in;
-                height: 13in;
+                width: 8in;
+                height: 12in;
                 margin: 0;
                 padding: 0;
-            }
-
-            /* If you want a visible margin in browser, use body padding */
-            body {
-                padding: 48px;
-            }
-
-            html {
                 margin-right: 48px;
                 margin-left: 48px;
             }
