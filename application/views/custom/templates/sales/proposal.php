@@ -186,7 +186,8 @@ if ($app->duid > 0 && $app->durate > 0) {
             }
 
             body {
-                padding: 48px;
+                padding-left: 48px;
+                padding-right: 48px;
             }
 
             main {
