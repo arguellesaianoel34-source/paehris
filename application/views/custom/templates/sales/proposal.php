@@ -207,7 +207,7 @@ if ($app->duid > 0 && $app->durate > 0) {
             footer {
                 position: fixed;
                 bottom: 20px;
-                height: 45px;
+                height: 55px;
                 background-color: transparent;
                 color: white;
                 text-align: center;
@@ -743,7 +743,7 @@ if ($app->duid > 0 && $app->durate > 0) {
 
                 <div class="page_break">
                     <p
-                        style="font-family: Arial, Verdana, sans-serif; font-size: 21px; line-height: 17px; text-align: center; font-weight: bold; color: #FF6700">
+                        style="margin-top: 20px; font-family: Arial, Verdana, sans-serif; font-size: 21px; line-height: 17px; text-align: center; font-weight: bold; color: #FF6700">
                         SOLAR PANEL ROOF LAYOUT</p>
                     <br>
                     <div style="display: flex; flex-wrap: wrap; justify-content: center; align-items: flex-start; gap: 10px;">
@@ -764,7 +764,7 @@ if ($app->duid > 0 && $app->durate > 0) {
                 <?php if (count($mpp) > 0) { ?>
                     <div class="page_break" style="display: block">
                         <p
-                            style="font-family: Arial, Verdana, sans-serif; font-size: 21px; line-height: 17px; text-align: center; font-weight: bold; color: #FF6700">
+                            style="margin-top: 20px; font-family: Arial, Verdana, sans-serif; font-size: 21px; line-height: 17px; text-align: center; font-weight: bold; color: #FF6700">
                             PROJECTED MONTHLY PRODUCTION</p>
                         <br>
                         <?php
