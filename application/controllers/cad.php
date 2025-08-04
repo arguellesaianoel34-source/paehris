@@ -1294,9 +1294,9 @@ class Cad extends CI_Controller
 
     
 
-    function getdocumentpreviewnew()
+    function getdocumentpreviewnew($dataid = false, $doctype = false)
     {
-        $layout = $this->cad->get_document_layout();
+        $layout = $this->cad->get_document_layout_new($dataid, $doctype);
 
         $papersize = $layout->papersize;
         $html = $layout->html;
