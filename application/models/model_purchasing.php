@@ -2562,6 +2562,8 @@ class Model_purchasing extends CI_Model
         return json_encode($data);
     }
 
+
+
     function dt_approver_remarks()
     {
         $data = array();

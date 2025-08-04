@@ -5556,6 +5556,107 @@ Class Model_cad extends CI_Model {
         return (object)$data;
     }
 
+
+    function get_document_layout_new($dataid = false, $doctype = false, $finalize = false) {
+        $dataid = ($dataid) ?: $this->input->post('id');
+        $doctype = ($doctype) ?: $this->input->post('doctype');
+        $finalize = ($this->input->post('finalize')) ?: $finalize;
+
+        $data = array();
+        $html = '';
+
+        $docname = get_types_name($doctype);
+        $app = application_info($dataid);
+        $data['app'] = $app;
+
+        if ($doctype != 3436) {
+            $data['docid'] = false;
+            $saved = $this->db->select('sysid,html,signed')
+                ->from('prime_documents_main')
+                ->where(array('dataid' => $dataid, 'doctype' => $doctype, 'status' => 1))
+                ->get()->row();
+
+            $qry_corp_app = $this->db->select()
+                ->from('application_customers_corporation')
+                ->where(array('appid' => $dataid))
+                ->get()->row();
+
+            if ($qry_corp_app) {
+                $info = array();
+                if ($qry_corp_app->types == 2) {
+                    $info = get_corporation_info($qry_corp_app->corpid);
+                } else {
+                    $info = get_government_info($qry_corp_app->corpid);
+                }
+                if ($info->qry) {
+                    $app->corpname = $info->info->descs;
+
+                    if ($qry_corp_app->types == 2) {
+                        $qry_branch = $this->db->select()
+                            ->from('corporation_branches')
+                            ->where(array('corpid' => $qry_corp_app->corpid, 'sysid' => $qry_corp_app->branchid))
+                            ->get()->row();
+                        if ($qry_branch) {
+                            $app->corpbranch = $qry_branch->names;
+                        }
+                    } else {
+                        $app->corpbranch = ($info) ? $info->info->names : '';
+                    }
+                }
+            }
+
+            if ($saved) {
+                $newhtml = rehash_pdf_img($saved->html);
+                if ($saved->signed > 0) {
+                    $domDoc = new DOMDocument();
+                    $domDoc->loadHTML($newhtml, LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD | LIBXML_NOWARNING | LIBXML_NOERROR);
+                    $xpath = new DOMXPath($domDoc);
+
+                    $signpane = $xpath->query('//img[@class="signature"]');
+                    $signature = $this->db->select('imgdata')
+                        ->from('prime_user_signature')
+                        ->where(array('userid' => $saved->signed, 'status' => 1))
+                        ->get()->row();
+
+                    if ($signature) {
+                        foreach ($signpane as $sign) {
+                            $sign->setAttribute('src',$signature->imgdata);
+                            $signstyle = 'width: 25%; height: auto; position: absolute; margin-top: -50px; margin-left: -25%';
+                            $sign->setAttribute('style',$signstyle);
+                        }
+                        $html .= $domDoc->saveHTML();
+                    }
+                } else {
+                    $html .= $newhtml;
+                }
+                $data['docid'] = $saved->sysid;
+            } else {
+                $docparams = array();
+                $docparams['id'] = $dataid;
+                $docparams['doctype'] = $doctype;
+                $docparams['app'] = $app;
+                if ($doctype == 3434) {
+                    $billingstart = $this->input->post('billingstart');
+                    if ($billingstart) {
+                        $docparams['billingstart'] = $billingstart;
+                    }
+                }
+                $doc = $this->load->view('custom/templates/salesdocs', $docparams, true);
+                $html = ($finalize) ? $doc : rehash_pdf_img($doc);
+            }
+        } else {
+            $tssr = get_tssr_layout($dataid);
+            //$data['tssr'] = $tssr;
+            $html .= $tssr->html;
+        }
+        $data['html'] = $html;
+        $data['title'] = $docname->names.' - '.ucwords(strtolower($app->appname));
+        $data['filename'] = $docname->names.' - '.ucwords(strtolower($app->appname));
+        $data['papersize'] = ($doctype == 3434) ? 'folio' : false;
+
+        return (object)$data;
+    }
+
     function save_customer_plan() {
         $data = array();
         $appid = $this->input->post('appid');
