@@ -177,7 +177,6 @@ if ($app->duid > 0 && $app->durate > 0) {
             /* Short bond paper size: 8.5 x 13 inches */
             @page {
                 size: 8in 12in;
-                margin: 48px;
             }
 
             html,
@@ -186,6 +185,10 @@ if ($app->duid > 0 && $app->durate > 0) {
                 height: 12in;
                 margin: 0;
                 padding: 0;
+            }
+            
+            body {
+                padding: 48px;
             }
 
             main {
