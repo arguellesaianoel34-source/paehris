@@ -176,7 +176,7 @@ if ($app->duid > 0 && $app->durate > 0) {
         <style>
             /* Short bond paper size: 8.5 x 13 inches */
             @page {
-                size: 8in 11.5in;
+                size: 8in 10in;
             }
 
             html,
