@@ -2392,7 +2392,7 @@ class Model_purchasing extends CI_Model
 
         if (count($quote) > 0) {
             foreach ($quote as $itemid => $qt) {
-                $amout_qry = $this->db->select('eti.qty,eqd.quotationid,eqd.amount,esm.currency')
+                $amout_qry = $this->db->select('eti.qty,eqd.quotationid,eqd.amount,esm.currency,esm.text_exempt')
                     ->from('eprs_quotation_details AS eqd')
                     ->join('eprs_transaction_items AS eti', 'eqd.prfitemid = eti.sysid', 'left')
                     ->join('eprs_quotation_suppliers AS eqs', 'eqd.quotationid = eqs.sysid', 'left')
@@ -2430,21 +2430,27 @@ class Model_purchasing extends CI_Model
 
         //LOOKUP IF VAT-EX OR VAT-IN
         foreach ($cost as $quotationid => $totalamt) {
-            $supplier = $this->db->select('eqs.exvat,eqs.exrate,s.currency,s.type')
+            $supplier = $this->db->select('eqs.exvat,eqs.exrate,s.currency,s.type,s.text_exempt')
                 ->from('eprs_quotation_suppliers AS eqs')
                 ->join('eprs_suppliers_main AS s', 'eqs.supplierid = s.sysid', 'left')
                 ->where('eqs.sysid', $quotationid)
                 ->get()->row();
 
             if ($supplier->currency == 83) {
-                if ($supplier->exvat == 1) {
+                if ($supplier->text_exempt == 1) {
                     $netvat[$quotationid] = $totalamt;
-                    $vat[$quotationid] = round($totalamt * 0.12, 2);
-                    $gross[$quotationid] = $totalamt + $vat[$quotationid];
-                } else {
-                    $vat[$quotationid] = round($totalamt * 12 / 112, 2);
-                    $netvat[$quotationid] = $totalamt - $vat[$quotationid];
+                    $vat[$quotationid] = 0;
                     $gross[$quotationid] = $totalamt;
+                } else {
+                    if ($supplier->exvat == 1) {
+                        $netvat[$quotationid] = $totalamt;
+                        $vat[$quotationid] = round($totalamt * 0.12, 2);
+                        $gross[$quotationid] = $totalamt + $vat[$quotationid];
+                    } else {
+                        $vat[$quotationid] = round($totalamt * 12 / 112, 2);
+                        $netvat[$quotationid] = $totalamt - $vat[$quotationid];
+                        $gross[$quotationid] = $totalamt;
+                    }
                 }
                 $ewtrate = 0.01;
 
