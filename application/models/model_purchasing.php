@@ -2437,11 +2437,12 @@ class Model_purchasing extends CI_Model
                 ->get()->row();
 
             if ($supplier->currency == 83) {
-                if ($supplier->text_exempt == 1) {
-                    $netvat[$quotationid] = $totalamt;
-                    $vat[$quotationid] = 0;
-                    $gross[$quotationid] = $totalamt;
-                } else {
+
+                // if ($supplier->text_exempt == 1) {
+                //     $netvat[$quotationid] = $totalamt;
+                //     $vat[$quotationid] = 0;
+                //     $gross[$quotationid] = $totalamt;
+                // } else {
                     if ($supplier->exvat == 1) {
                         $netvat[$quotationid] = $totalamt;
                         $vat[$quotationid] = round($totalamt * 0.12, 2);
@@ -2451,7 +2452,7 @@ class Model_purchasing extends CI_Model
                         $netvat[$quotationid] = $totalamt - $vat[$quotationid];
                         $gross[$quotationid] = $totalamt;
                     }
-                }
+                //}
                 $ewtrate = 0.01;
 
                 if ($supplier->type < 0) {
@@ -2561,8 +2562,6 @@ class Model_purchasing extends CI_Model
 
         return json_encode($data);
     }
-
-
 
     function dt_approver_remarks()
     {
