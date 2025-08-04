@@ -188,6 +188,11 @@ if ($app->duid > 0 && $app->durate > 0) {
                 padding: 0;
             }
 
+            /* If you want a visible margin in browser, use body padding */
+            body {
+                padding: 48px;
+            }
+
             html {
                 margin-right: 48px;
                 margin-left: 48px;
