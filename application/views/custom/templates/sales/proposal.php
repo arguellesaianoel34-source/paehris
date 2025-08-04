@@ -213,7 +213,7 @@ if ($app->duid > 0 && $app->durate > 0) {
                 list-style-position: outside;
                 font-family: Arial, Verdana, sans-serif;
                 font-size: 13px;
-                line-height: 17px;
+                line-height: 15px;
                 margin-left: 0.5em
             }
 
@@ -229,7 +229,7 @@ if ($app->duid > 0 && $app->durate > 0) {
 
             .page_break {
                 page-break-before: always;
-                margin-top: 110px;
+                margin-top: 105px;
             }
 
             .peso:before {
