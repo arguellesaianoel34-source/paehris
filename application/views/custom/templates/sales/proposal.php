@@ -192,6 +192,7 @@ if ($app->duid > 0 && $app->durate > 0) {
                 color: white;
                 text-align: center;
                 line-height: 35px;
+                display: none;
             }
 
             footer {
@@ -202,6 +203,7 @@ if ($app->duid > 0 && $app->durate > 0) {
                 color: white;
                 text-align: center;
                 line-height: 35px;
+                display: none;
             }
 
             ul.list {
