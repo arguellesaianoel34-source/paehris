@@ -176,7 +176,7 @@ if ($app->duid > 0 && $app->durate > 0) {
         <style>
             /* Short bond paper size: 8.5 x 13 inches */
             @page {
-                size: 8in 10in;
+                size: 8in 12in;
             }
 
             html,
@@ -206,7 +206,7 @@ if ($app->duid > 0 && $app->durate > 0) {
 
             footer {
                 position: fixed;
-                bottom: 10px;
+                bottom: 20px;
                 height: 45px;
                 background-color: transparent;
                 color: white;
