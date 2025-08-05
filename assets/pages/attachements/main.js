@@ -587,10 +587,10 @@ var ATTACHEMENTS = function() {
         var list = [];
         PECO.fileInput(filedropzone,{
             callback: function (d) {
-                //console.log(d);
-                //files.push(d.uploaded.upload_data.full_path);
-                //console.log(files);
-                //PECO.initAlerts(d.msg, d.title, d.func, false, false);
+                console.log(d);
+                files.push(d.uploaded.upload_data.full_path);
+                console.log(files);
+                PECO.initAlerts(d.msg, d.title, d.func, false, false);
             }
         });
     }
