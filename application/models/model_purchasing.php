@@ -2392,7 +2392,7 @@ class Model_purchasing extends CI_Model
 
         if (count($quote) > 0) {
             foreach ($quote as $itemid => $qt) {
-                $amout_qry = $this->db->select('eti.qty,eqd.quotationid,eqd.amount,esm.currency,esm.text_exempt')
+                $amout_qry = $this->db->select('eti.qty,eqd.quotationid,eqd.amount,esm.currency,esm.tax_exempt')
                     ->from('eprs_quotation_details AS eqd')
                     ->join('eprs_transaction_items AS eti', 'eqd.prfitemid = eti.sysid', 'left')
                     ->join('eprs_quotation_suppliers AS eqs', 'eqd.quotationid = eqs.sysid', 'left')
@@ -2430,7 +2430,7 @@ class Model_purchasing extends CI_Model
 
         //LOOKUP IF VAT-EX OR VAT-IN
         foreach ($cost as $quotationid => $totalamt) {
-            $supplier = $this->db->select('eqs.exvat,eqs.exrate,s.currency,s.type,s.text_exempt')
+            $supplier = $this->db->select('eqs.exvat,eqs.exrate,s.currency,s.type,s.tax_exempt')
                 ->from('eprs_quotation_suppliers AS eqs')
                 ->join('eprs_suppliers_main AS s', 'eqs.supplierid = s.sysid', 'left')
                 ->where('eqs.sysid', $quotationid)
@@ -2438,11 +2438,11 @@ class Model_purchasing extends CI_Model
 
             if ($supplier->currency == 83) {
 
-                // if ($supplier->text_exempt == 1) {
-                //     $netvat[$quotationid] = $totalamt;
-                //     $vat[$quotationid] = 0;
-                //     $gross[$quotationid] = $totalamt;
-                // } else {
+                if ($supplier->tax_exempt == 1) {
+                    $netvat[$quotationid] = $totalamt;
+                    $vat[$quotationid] = 0;
+                    $gross[$quotationid] = $totalamt;
+                } else {
                     if ($supplier->exvat == 1) {
                         $netvat[$quotationid] = $totalamt;
                         $vat[$quotationid] = round($totalamt * 0.12, 2);
@@ -2452,7 +2452,7 @@ class Model_purchasing extends CI_Model
                         $netvat[$quotationid] = $totalamt - $vat[$quotationid];
                         $gross[$quotationid] = $totalamt;
                     }
-                //}
+                }
                 $ewtrate = 0.01;
 
                 if ($supplier->type < 0) {
