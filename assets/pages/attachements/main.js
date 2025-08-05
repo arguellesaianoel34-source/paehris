@@ -585,7 +585,7 @@ var ATTACHEMENTS = function() {
     var init_attlogs = function () {
         var files = [];
         var list = [];
-        PECO.fileInput(filedropzone,{
+        PECO.fileInput(filedropzone, {
             callback: function (d) {
                 console.log(d);
                 files.push(d.uploaded.upload_data.full_path);
