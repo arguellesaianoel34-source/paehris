@@ -87,8 +87,8 @@ $db['audit'] = array_merge($default_db_config, array(
 // ############### PECO MAIN #########################
 // ###################################################
 $db['peco'] = array_merge($default_db_config, array(
-    //'hostname' => '44.195.210.193',
-    'hostname' => 'localhost',
+    'hostname' => '44.195.210.193',
+    //'hostname' => 'localhost',
     'username' => 'uub4rmw23inpzxn9_pae_root',
     'password' => 'P3c0!2022web##',
     'database' => 'rwlisxy9bxboh4qh_peco_erp',
