@@ -89,7 +89,7 @@ $db['audit'] = array_merge($default_db_config, array(
 $db['peco'] = array_merge($default_db_config, array(
     'hostname' => '172.174.114.142',
     //'hostname' => '44.195.210.193',
-    'username' => 'uub4rmw23inpzxn9_pae_root',
+    'username' => 'rwlisxy9bxboh4qh_pecoerp',
     'password' => 'P3c0!2022web##',
     'database' => 'rwlisxy9bxboh4qh_peco_erp',
 ));
