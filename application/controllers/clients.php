@@ -6,7 +6,7 @@ class Clients extends CI_Controller {
 
     public function __construct() {
         parent::__construct();
-        $this->load->model('ApplicationCustomersDetails', 'clients');
+        $this->load->model('model_customerprofile', 'clients');
         $this->load->helper('url');
     }
 

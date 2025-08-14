@@ -1,6 +1,7 @@
 <?php
 
-class ApplicationCustomersDetails extends CI_Model
+defined('BASEPATH') OR exit('No direct script access allowed');
+class Model_customerprofile extends CI_Model
 {
     public function __construct()
     {
