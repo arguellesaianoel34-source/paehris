@@ -151,7 +151,11 @@ Class Model_admin extends CI_Model {
     }
 
     function get_navigation_specific_details($hash) {
-        $query = $this->db->select('sysid, name AS pname, parent AS PARENT, desc, pagefile, icon, htmlclass')->from('prime_module_navigations_main')->where(array('status' => 1, 'hashcode' => $hash))->get()->row();
+        $query = $this->db->select('sysid, name AS pname, parent AS PARENT, desc, pagefile, icon, htmlclass, hashcode')
+            ->from('prime_module_navigations_main')
+            ->where(array('status' => 1, 'hashcode' => $hash))
+            ->get()
+            ->row();
         return ( $query ) ? $query : false;
     }
 

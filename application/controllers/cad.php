@@ -1265,13 +1265,11 @@ class Cad extends CI_Controller
 
     function getdocumentpreview()
     {
-
         $layout = $this->cad->get_document_layout();
-
-        // echo $layout->html;
 
         $papersize = $layout->papersize;
         $html = $layout->html;
+        
         $title = $layout->title;
         $filename = $layout->filename;
 
@@ -1280,13 +1278,47 @@ class Cad extends CI_Controller
         $dompdf->loadHtml($html);
         $customPaper = ($papersize && $papersize != '') ? $papersize : 'letter';
 
-        $dompdf->setPaper($customPaper, 'portrate');
+        $dompdf->setPaper($customPaper, 'portrait');
         $dompdf->render();
+        
         // Add PDF Document Information
         $dompdf->add_info('Subject', $title);
         $dompdf->add_info('Author', user_info()->username ?? '');
         $dompdf->add_info('Creator', 'ITD');
         $dompdf->add_info('Keywords', $title);
+
+        // Clean (discard) any output so far, then stream
+        $dompdf->stream($filename, array('Attachment' => false));
+    }
+
+
+    
+
+    function getdocumentpreviewnew($dataid = false, $doctype = false)
+    {
+        $layout = $this->cad->get_document_layout_new($dataid, $doctype);
+
+        $papersize = $layout->papersize;
+        $html = $layout->html;
+        
+        $title = $layout->title;
+        $filename = $layout->filename;
+
+        $this->load->library('pdf');
+        $dompdf = new Dompdf\Dompdf();
+        $dompdf->loadHtml($html);
+        $customPaper = ($papersize && $papersize != '') ? $papersize : 'letter';
+
+        $dompdf->setPaper($customPaper, 'portrait');
+        $dompdf->render();
+        
+        // Add PDF Document Information
+        $dompdf->add_info('Subject', $title);
+        $dompdf->add_info('Author', user_info()->username ?? '');
+        $dompdf->add_info('Creator', 'ITD');
+        $dompdf->add_info('Keywords', $title);
+
+        // Clean (discard) any output so far, then stream
         $dompdf->stream($filename, array('Attachment' => false));
     }
 

@@ -46,7 +46,18 @@ define('SYSTEM_ONLINE', FALSE); // TRUE IF CONNECT DB TO LOCALHOST
 define('SYSTEM_DEV_MODE', TRUE); // TRUE IF CONNECT DB TO LOCALHOST
 define('SYSTEM_DEV_PORT', FALSE); // FALSE if default | add port if 3306 is not the mysql port
 define('SYSTEM_GOOGLE_API', 'AIzaSyDqC5lmJR1TtWTnySj2psx8-3JynOFUyYE');
-define('APP_URL', ($_SERVER['SERVER_PORT'] == 443 ? 'https' : 'http') . "://{$_SERVER['SERVER_NAME']}".str_replace(basename($_SERVER['SCRIPT_NAME']),"",$_SERVER['SCRIPT_NAME']));
+
+
+define('APP_URL', 
+    (($_SERVER['SERVER_PORT'] == 443 ? 'https' : 'http') . '://' . 
+    $_SERVER['SERVER_NAME'] . 
+    (
+        ($_SERVER['SERVER_PORT'] != 80 && $_SERVER['SERVER_PORT'] != 443) 
+        ? ':' . $_SERVER['SERVER_PORT'] 
+        : ''
+    ) . 
+    str_replace(basename($_SERVER['SCRIPT_NAME']), "", $_SERVER['SCRIPT_NAME']))
+);
 
 /* End of file constants.php */
 /* Location: ./application/config/constants.php */

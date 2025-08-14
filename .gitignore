@@ -8,6 +8,8 @@ node_modules/
 dist/
 /.vscode/
 /.idea/
+/server/
+
 
 # Compiled Java class files
 *.class
@@ -50,6 +52,15 @@ Thumbs.db
 *.mov
 *.wmv
 
-/application/config/database.php
+# /application/config/database.php
 /uploads/
 /.stfolder/
+<<<<<<< HEAD
+run.ps1
+=======
+/php/
+
+# PHP configuration files
+
+run.ps1
+>>>>>>> phase1
