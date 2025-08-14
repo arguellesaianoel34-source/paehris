@@ -1508,8 +1508,10 @@ if (!function_exists('rehash_pdf_img')) {
                 $attrib = array();
 
                 foreach ($styles as $attr) {
-                    $atr = explode(': ',$attr);
-                    $attrib[trim($atr[0])] = $atr[1];
+                    $atr = explode(': ', $attr, 2);
+                    if (isset($atr[1])) {
+                        $attrib[trim($atr[0])] = $atr[1];
+                    }
                 }
 
                 /*echo "<pre>";

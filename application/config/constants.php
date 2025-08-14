@@ -47,11 +47,17 @@ const SYSTEM_DEV_MODE = true; // TRUE IF CONNECT DB TO LOCALHOST
 const SYSTEM_DEV_PORT = false; // FALSE if default | add port if 3306 is not the mysql port
 const SYSTEM_GOOGLE_API = 'AIzaSyDqC5lmJR1TtWTnySj2psx8-3JynOFUyYE';
 
-const APP_URL =
-    ($_SERVER['SERVER_PORT'] == 443 ? 'https' : 'http') .
-    '://' . $_SERVER['SERVER_NAME'] .
-    (($_SERVER['SERVER_NAME'] === 'localhost' && $_SERVER['SERVER_PORT'] == 8080) ? ':8080' : '') .
-    str_replace(basename($_SERVER['SCRIPT_NAME']), '', $_SERVER['SCRIPT_NAME']);
+
+define('APP_URL', 
+    (($_SERVER['SERVER_PORT'] == 443 ? 'https' : 'http') . '://' . 
+    $_SERVER['SERVER_NAME'] . 
+    (
+        ($_SERVER['SERVER_PORT'] != 80 && $_SERVER['SERVER_PORT'] != 443) 
+        ? ':' . $_SERVER['SERVER_PORT'] 
+        : ''
+    ) . 
+    str_replace(basename($_SERVER['SCRIPT_NAME']), "", $_SERVER['SCRIPT_NAME']))
+);
 
 /* End of file constants.php */
 /* Location: ./application/config/constants.php */

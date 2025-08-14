@@ -1795,8 +1795,7 @@ class Model_purchasing extends CI_Model
 
             if ($new_po->qry) {
                 $poid = $new_po->insert_id;
-                $data['ponum'] = 'PAE-' . str_pad($ponum, 8, '0', STR_PAD_LEFT);
-                ;
+                $data['ponum'] = 'PAE-' . str_pad($ponum, 8, '0', STR_PAD_LEFT);;
             }
         }
 
@@ -2121,7 +2120,7 @@ class Model_purchasing extends CI_Model
             ->where('sysid', $id)
             ->get()->row();
 
-        $suppliers_qry = $this->db->select('eqs.sysid, eqs.exvat, eqs.shipping, eqs.supplierid, eqs.paytype, s.descs AS name, s.codes,s.currency,s.type')
+        $suppliers_qry = $this->db->select('eqs.sysid, eqs.exvat, eqs.shipping, eqs.supplierid, eqs.paytype, s.descs AS name, s.codes,s.currency, s.type, s.tax_exempt')
             ->from('eprs_suppliers_main as s')
             ->join('eprs_quotation_suppliers as eqs', 'eqs.supplierid = s.sysid', 'left')
             ->where(array('eqs.prfid' => $id, 'eqs.status' => 1))
@@ -2185,14 +2184,20 @@ class Model_purchasing extends CI_Model
                 //SUMMARY OF COST COMPUTATION
                 if ($supplier->currency == 83) {
                     if ($supplier->paytype && ($supplier->paytype != 1 || $supplier->type < 1)) {
-                        if ($supplier->exvat == 1) {
+                        if ($supplier->tax_exempt == 1) {
                             $netvat = $supp_total;
-                            $vat = round($supp_total * 0.12, 2);
-                            $gross = $supp_total + $vat;
-                        } else {
-                            $vat = round($supp_total * 12 / 112, 2);
-                            $netvat = $supp_total - $vat;
+                            $vat = 0;
                             $gross = $supp_total;
+                        } else {
+                            if ($supplier->exvat == 1) {
+                                $netvat = $supp_total;
+                                $vat = round($supp_total * 0.12, 2);
+                                $gross = $supp_total + $vat;
+                            } else {
+                                $vat = round($supp_total * 12 / 112, 2);
+                                $netvat = $supp_total - $vat;
+                                $gross = $supp_total;
+                            }
                         }
 
                         if ($supplier->type < 0) {
@@ -2387,7 +2392,7 @@ class Model_purchasing extends CI_Model
 
         if (count($quote) > 0) {
             foreach ($quote as $itemid => $qt) {
-                $amout_qry = $this->db->select('eti.qty,eqd.quotationid,eqd.amount,esm.currency')
+                $amout_qry = $this->db->select('eti.qty,eqd.quotationid,eqd.amount,esm.currency,esm.tax_exempt')
                     ->from('eprs_quotation_details AS eqd')
                     ->join('eprs_transaction_items AS eti', 'eqd.prfitemid = eti.sysid', 'left')
                     ->join('eprs_quotation_suppliers AS eqs', 'eqd.quotationid = eqs.sysid', 'left')
@@ -2425,27 +2430,34 @@ class Model_purchasing extends CI_Model
 
         //LOOKUP IF VAT-EX OR VAT-IN
         foreach ($cost as $quotationid => $totalamt) {
-            $supplier = $this->db->select('eqs.exvat,eqs.exrate,s.currency,s.type')
+            $supplier = $this->db->select('eqs.exvat,eqs.exrate,s.currency,s.type,s.tax_exempt')
                 ->from('eprs_quotation_suppliers AS eqs')
                 ->join('eprs_suppliers_main AS s', 'eqs.supplierid = s.sysid', 'left')
                 ->where('eqs.sysid', $quotationid)
                 ->get()->row();
 
             if ($supplier->currency == 83) {
-                if ($supplier->exvat == 1) {
+
+                if ($supplier->tax_exempt == 1) {
                     $netvat[$quotationid] = $totalamt;
-                    $vat[$quotationid] = round($totalamt * 0.12, 2);
-                    $gross[$quotationid] = $totalamt + $vat[$quotationid];
-                } else {
-                    $vat[$quotationid] = round($totalamt * 12 / 112, 2);
-                    $netvat[$quotationid] = $totalamt - $vat[$quotationid];
+                    $vat[$quotationid] = 0;
                     $gross[$quotationid] = $totalamt;
+                } else {
+                    if ($supplier->exvat == 1) {
+                        $netvat[$quotationid] = $totalamt;
+                        $vat[$quotationid] = round($totalamt * 0.12, 2);
+                        $gross[$quotationid] = $totalamt + $vat[$quotationid];
+                    } else {
+                        $vat[$quotationid] = round($totalamt * 12 / 112, 2);
+                        $netvat[$quotationid] = $totalamt - $vat[$quotationid];
+                        $gross[$quotationid] = $totalamt;
+                    }
                 }
                 $ewtrate = 0.01;
 
                 if ($supplier->type < 0) {
                     $ewtrate = 0;
-                } else{
+                } else {
                     if ($supplier->type == 4002) {
                         $ewtrate = 0.02;
                     }
@@ -2464,7 +2476,7 @@ class Model_purchasing extends CI_Model
 
                 if ($supplier->type < 0) {
                     $ewtrate = 0;
-                } else{
+                } else {
                     if ($supplier->type == 4002) {
                         $ewtrate = 0.02;
                     }
@@ -2546,8 +2558,7 @@ class Model_purchasing extends CI_Model
         $data['gross'] = $gross;
         $data['ewt'] = $ewt;
         $data['suptotal'] = $suptotal;
-        $data['gtotal'] = number_format(array_sum($suptotal) + (array_sum($suptotal) * 0.02), 2);
-        ;
+        $data['gtotal'] = number_format(array_sum($suptotal) + (array_sum($suptotal) * 0.02), 2);;
 
         return json_encode($data);
     }
@@ -4125,7 +4136,7 @@ class Model_purchasing extends CI_Model
                 //REMOVE OLD QUOTATION AND ADD NEW ONE
                 if ($past_quotation) {
                     $new_quotation['status'] = $past_quotation->status;
-                    $x_quote = update_db($this->db, 'eprs_quotation_details', array('status' => 0), array('sysid' => $past_quotation->sysid, ));
+                    $x_quote = update_db($this->db, 'eprs_quotation_details', array('status' => 0), array('sysid' => $past_quotation->sysid,));
                     if (!$x_quote->qry) {
                         $transproc['removeQuote'][$items] = $x_quote->error;
                     }

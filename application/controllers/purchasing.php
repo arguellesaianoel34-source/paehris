@@ -1,7 +1,9 @@
 <?php if (!defined('BASEPATH')) exit('No direct script access allowed');
 
-class Purchasing extends CI_Controller {
-    public function __construct() {
+class Purchasing extends CI_Controller
+{
+    public function __construct()
+    {
         parent::__construct();
         $this->load->model('model_purchasing', 'purchasing', true);
         $this->load->model('model_bos');
@@ -13,11 +15,12 @@ class Purchasing extends CI_Controller {
      * Get the account codes that were saved in the database.
      * @return array Retuns an array of data which contains the HTML of <option> to be used in account code selection front-end.
      */
-    public function getAccountCodes(){
+    public function getAccountCodes()
+    {
         $query = $this->model_purchasing->getAccountCodes();
         $html = '';
         foreach ($query->result() as $row) {
-            $html .= '<option value="' . $row->sysid . '">' . $row->codes . ' - ' . $row->descs .'</option>';
+            $html .= '<option value="' . $row->sysid . '">' . $row->codes . ' - ' . $row->descs . '</option>';
         }
         $data = [
             'html' => $html
@@ -28,53 +31,57 @@ class Purchasing extends CI_Controller {
      * Get all the predefined units stored in the database.
      * @return array Returns the <option> HTML of the results to be used in the unit selection.
      */
-    public function getUnit(){
+    public function getUnit()
+    {
         $unit = $this->model_bos->getUnitData();
         $html = '';
         foreach ($unit->result() as $row) {
-            $html .= '<option value="' . $row->sysid . '">' . $row->unit_code . ' - ' . $row->unit_name .'</option>';
+            $html .= '<option value="' . $row->sysid . '">' . $row->unit_code . ' - ' . $row->unit_name . '</option>';
         }
         $data = [
             'html' => $html
         ];
         echo json_encode($data);
     }
-    public function getCostCenters(){
+    public function getCostCenters()
+    {
         echo $this->bos->getCostCenterData();
     }
     //TODO UNFINISHED, please improve the logic in order for the ajax to receive the data for viewing.
-    function getBtypeBudgets($btype_id, $cc_id, $year){
+    function getBtypeBudgets($btype_id, $cc_id, $year)
+    {
         $data = array(
-            'qry'           =>false,
-            'query_result'  =>null,
-            'msg'           =>'No queries has been made, please use the right budget type.'
+            'qry'           => false,
+            'query_result'  => null,
+            'msg'           => 'No queries has been made, please use the right budget type.'
         );
-        if ($btype_id == 77){
+        if ($btype_id == 77) {
             $budget_data = $this->model_eprs->getCcOpexBudget($cc_id, $year);
-            if ($budget_data){
+            if ($budget_data) {
                 $data['qry'] = true;
                 $data['query_result'] = $budget_data;
                 $data['msg'] = 'OPEX budget retrieval successful!';
-            }else{
+            } else {
                 #return an error message
                 $data['msg'] = 'OPEX budget empty!';
             }
-        }else if ($btype_id == 76 || $btype_id == 78){
+        } else if ($btype_id == 76 || $btype_id == 78) {
             $budget_data = $this->model_eprs->getCcCapexSpBudget($cc_id, $btype_id, $year);
-            if ($budget_data){
+            if ($budget_data) {
                 $data['qry'] = true;
                 $data['query_result'] = $budget_data;
                 $data['msg'] = 'CAPEX/SP budget retrieval successful!';
-            }else{
+            } else {
                 $data['msg'] = 'CAPEX/SP budget empty!';
             }
-        }else{
+        } else {
             $data['msg'] = 'Budget ID is invalid, please contact the administrator.';
         }
         echo json_encode($data);
     }
-    
-    function toggleItemPrsRequest(){
+
+    function toggleItemPrsRequest()
+    {
         $item_id = $this->input->post('itemId');
         $toggled = $this->model_eprs->toggleItemPrsRequest($item_id);
         $toggled_value = null;
@@ -82,26 +89,26 @@ class Purchasing extends CI_Controller {
         $information = '';
         $func = 'warning';
         $msg = 'toggleItemPrsRequest query has been failed.';
-        if ($toggled){
+        if ($toggled) {
             $toggled_value = $toggled->row()->prs_request;
-            if ($toggled_value == 1){
+            if ($toggled_value == 1) {
                 $msg = 'Item ADDED to PRS request.';
                 $information = 'ITEM ADDITION';
-            }else{
+            } else {
                 $information = 'ITEM REMOVAL';
                 $msg = 'Item REMOVED to PRS request.';
             }
-            
+
             $qry = true;
             $func = 'success';
         }
         echo json_encode(
             array(
-                'qry'       =>$qry,
-                'msg'       =>$msg,
-                'func'      =>$func,
-                'info'      =>$information,
-                'toggleVal' =>$toggled_value
+                'qry'       => $qry,
+                'msg'       => $msg,
+                'func'      => $func,
+                'info'      => $information,
+                'toggleVal' => $toggled_value
             )
         );
     }
@@ -111,181 +118,215 @@ class Purchasing extends CI_Controller {
      * @param int $checked The action made by the user 1 for "checked", 0 for "unchecked".
      * @return array associative array of values.
      */
-    function toggleBudgetItems($budget_data_id, $checked){
+    function toggleBudgetItems($budget_data_id, $checked)
+    {
         $data = array();
-        if ($checked == 1){
+        if ($checked == 1) {
             $toggled = $this->model_eprs->togglePrsItemOne($budget_data_id);
             $data['qry'] = $toggled;
             $data['msg'] = 'Items within this budget will be added to the request.';
             $data['func'] = 'success';
-        }else if ($checked == 0){
+        } else if ($checked == 0) {
             $toggled = $this->model_eprs->togglePrsItemZero($budget_data_id);
             $data['qry'] = $toggled;
             $data['msg'] = 'The budget and the items within were removed from PRS request.';
             $data['func'] = 'success';
-        }else{
+        } else {
             $data['qry'] = false;
             $data['msg'] = 'Budget does not match any approved budget in the system.';
             $data['func'] = 'warning';
         }
         return $data;
     }
-    function toggleBtypeRequest(){
+    function toggleBtypeRequest()
+    {
         $budget_data_id     = $this->input->post('budgetId');
         $checked            = $this->input->post('checked');
         $budget_toggle_val = false;
         $toggle_stats = $this->toggleBudgetItems($budget_data_id, $checked);
         $budget_toggle = $this->model_eprs->toggleBudgetPrsRequest($budget_data_id);
-        if($budget_toggle){
+        if ($budget_toggle) {
             $budget_toggle_val = $budget_toggle->row()->prs_request;
         }
         $data = array(
-            'toggleData'        =>$toggle_stats,
-            'budgetToggleVal'   =>$budget_toggle_val
+            'toggleData'        => $toggle_stats,
+            'budgetToggleVal'   => $budget_toggle_val
         );
-        echo json_encode($data); 
+        echo json_encode($data);
     }
-#########################################################################################################################################################
-################################################################## CODE TESTING #########################################################################
-#########################################################################################################################################################
-    function testToggleItemPrs(){
+    #########################################################################################################################################################
+    ################################################################## CODE TESTING #########################################################################
+    #########################################################################################################################################################
+    function testToggleItemPrs()
+    {
         print_r($this->toggleItemPrsRequest(229));
     }
-    function test(){
+    function test()
+    {
         $budgetid_arr = $this->input->post('budgeids');
         $num_of_budget_submited = 0;
         $budget_id_arr = array();
-        foreach($budgetid_arr as $row){
-                $budget_id_arr[] = $row;
-                $num_of_budget_submited += 1;	
+        foreach ($budgetid_arr as $row) {
+            $budget_id_arr[] = $row;
+            $num_of_budget_submited += 1;
         }
-        $data['budgetid'] = $budget_id_arr;				
-        $data['budgetnum'] = $num_of_budget_submited;				
+        $data['budgetid'] = $budget_id_arr;
+        $data['budgetnum'] = $num_of_budget_submited;
         $data['input'] = $this->input->post();
-        echo json_encode($data);	
+        echo json_encode($data);
     }
-    function testgetBtypeBudgets(){
+    function testgetBtypeBudgets()
+    {
         print_r($this->getBtypeBudgets(76, 14, 2017));
     }
 
 
-    function tblsuppliers() {
+    function tblsuppliers()
+    {
         echo $this->purchasing->tbl_suppliers();
     }
 
-    function addprfitem() {
+    function addprfitem()
+    {
         echo $this->purchasing->add_prf_item();
     }
 
-    function dtprfitems() {
+    function dtprfitems()
+    {
         echo $this->purchasing->dt_prf_items();
     }
 
-    function saveprfdraft() {
+    function saveprfdraft()
+    {
         echo $this->purchasing->save_prf_draft();
     }
 
-    function saveitemedit() {
+    function saveitemedit()
+    {
         echo $this->purchasing->save_item_edit();
     }
 
-    function removeprsitem() {
+    function removeprsitem()
+    {
         echo $this->purchasing->remove_prs_item();
     }
 
-    function discardprf() {
+    function discardprf()
+    {
         echo $this->purchasing->discard_prf();
     }
 
-    function sendprfapproval() {
+    function sendprfapproval()
+    {
         echo $this->purchasing->send_prf_approval();
     }
 
-    function getprslist() {
+    function getprslist()
+    {
         echo $this->purchasing->get_prs_list();
     }
 
-    function getprfitemsforapproval() {
+    function getprfitemsforapproval()
+    {
         echo $this->purchasing->get_prf_items_for_approval();
     }
 
-    function showprfitemcomments() {
+    function showprfitemcomments()
+    {
         echo $this->purchasing->show_prf_item_comments();
     }
 
-    function showrfqitemcomments() {
+    function showrfqitemcomments()
+    {
         echo $this->purchasing->show_rfq_item_comments();
     }
 
-    function disapproveprfitem() {
+    function disapproveprfitem()
+    {
         echo $this->purchasing->disapprove_prf_item();
     }
 
-    function approveprf() {
+    function approveprf()
+    {
         echo $this->purchasing->approve_prf();
     }
 
-    function returnprf() {
+    function returnprf()
+    {
         echo $this->purchasing->return_prf();
     }
 
-    function disapproveprf() {
+    function disapproveprf()
+    {
         echo $this->purchasing->disapprove_prf();
     }
 
-    function requoterfq() {
+    function requoterfq()
+    {
         echo $this->purchasing->requote_rfq();
     }
 
-    function getrfqitemslist() {
+    function getrfqitemslist()
+    {
         echo $this->purchasing->get_rfq_items_list();
     }
 
-    function dtquotationitems() {
+    function dtquotationitems()
+    {
         echo $this->purchasing->dt_quotation_items();
     }
 
-    function select2quotationsupplier() {
+    function select2quotationsupplier()
+    {
         echo $this->purchasing->select2_quotation_supplier();
     }
 
-    function select2paytype() {
+    function select2paytype()
+    {
         echo get_item_type('PAYTYPE');
     }
 
-    function addsupplierquotation() {
+    function addsupplierquotation()
+    {
         echo $this->purchasing->add_supplier_quotation();
     }
 
-    function saveprfquotation() {
+    function saveprfquotation()
+    {
         echo $this->purchasing->save_prf_quotation();
     }
 
-    function getsuppliersummaryofcost() {
+    function getsuppliersummaryofcost()
+    {
         echo $this->purchasing->get_supplier_summary_of_cost();
     }
 
-    function computesummaryofcost() {
+    function computesummaryofcost()
+    {
         echo $this->purchasing->compute_summary_of_cost();
     }
 
-    function dtapproverremarks() {
+    function dtapproverremarks()
+    {
         echo $this->purchasing->dt_approver_remarks();
     }
 
-    function reviseitemqty() {
+    function reviseitemqty()
+    {
         echo $this->purchasing->revise_item_qty();
     }
 
-    function deletesupplierquotation() {
+    function deletesupplierquotation()
+    {
         echo $this->purchasing->delete_supplier_quotation();
     }
 
-    function select2routes() {
+    function select2routes()
+    {
         $data = array();
         $route = $this->input->post('data');
 
-        if ($route ) {
+        if ($route) {
             if (is_array($route)) {
                 $this->db->where_in('levels', $route);
             } else {
@@ -297,11 +338,11 @@ class Purchasing extends CI_Controller {
 
         $qry = $this->db->select()
             ->from('prime_transaction_flow_main_stages')
-            ->where(array('flowid' => 3,'status' => 1))
+            ->where(array('flowid' => 3, 'status' => 1))
             ->order_by('levels')
             ->get();
-        if($qry->num_rows() > 0) {
-            foreach($qry->result() as $row) {
+        if ($qry->num_rows() > 0) {
+            foreach ($qry->result() as $row) {
                 $data['list'][] = array(
                     'id' => $row->levels,
                     'text' => $row->levels . ' - ' . $row->desc
@@ -313,79 +354,98 @@ class Purchasing extends CI_Controller {
         echo json_encode($data);
     }
 
-    function dtposuppliers() {
+    function dtposuppliers()
+    {
         echo $this->purchasing->dt_po_suppliers();
     }
 
-    function savepaymentrequest() {
+    function savepaymentrequest()
+    {
         echo $this->purchasing->save_payment_request();
     }
 
-    function generatepo() {
+    function generatepo()
+    {
         echo $this->purchasing->generate_po();
     }
 
-    function myprslist() {
+    function myprslist()
+    {
         echo $this->purchasing->my_prs_list();
     }
 
-    function myprsdraft() {
+    function myprsdraft()
+    {
         echo $this->purchasing->my_prs_draft();
     }
 
-    function editjustification() {
+    function editjustification()
+    {
         echo $this->purchasing->edit_justification();
     }
 
-    function newsuppliervalidation() {
+    function newsuppliervalidation()
+    {
         echo $this->purchasing->new_supplier_validation();
     }
 
-    function savenewsupplier() {
+    function savenewsupplier()
+    {
         echo $this->purchasing->save_new_supplier();
     }
 
-    function prslist() {
+    function prslist()
+    {
         echo $this->purchasing->prs_list();
     }
 
-    function prfsubdetails() {
+    function prfsubdetails()
+    {
         echo $this->purchasing->prf_sub_details();
     }
 
-    function loadprfitems() {
+    function loadprfitems()
+    {
         echo $this->purchasing->load_prf_items();
     }
 
-    function prsviewerlist() {
+    function prsviewerlist()
+    {
         echo $this->purchasing->prs_viewer_list();
     }
 
-    function updatesupplierquotation() {
+    function updatesupplierquotation()
+    {
         echo $this->purchasing->update_supplier_quotation();
     }
 
-    function updatesupplierdetails() {
+    function updatesupplierdetails()
+    {
         echo $this->purchasing->update_supplier_details();
     }
 
-    function exportquotationsheet() {
+    function exportquotationsheet()
+    {
         echo $this->purchasing->export_quotation_sheet();
     }
 
-    function uploadpastpurchases() {
+    function uploadpastpurchases()
+    {
         echo $this->purchasing->upload_past_purchases();
     }
 
-    function itemlastprice() {
+    function itemlastprice()
+    {
         echo $this->purchasing->item_last_price();
     }
 
-    function cancelpurchaserequest() {
+    function cancelpurchaserequest()
+    {
         echo $this->purchasing->cancel_purchase_request();
     }
 
-    function getsupplierpaymentdetails() {
+    function getsupplierpaymentdetails()
+    {
         echo $this->purchasing->get_supplier_payment_details();
     }
 }

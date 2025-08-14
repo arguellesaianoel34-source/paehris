@@ -3780,7 +3780,37 @@ WHERE telr.status = 301 AND telra.status = 301 AND empid = ".$empid." AND ('".$d
                     $filepath = $upload['upload_data']['full_path'];
                     if ($file = fopen($filepath,"r")) {
                         while (($line = fgets($file)) !== false) {
-                            list($bioid,$date,$time) = preg_split('/\s+/', $line);
+                            $line = trim($line); // Remove any trailing whitespace/newlines
+                            if (empty($line)) continue; // Skip empty lines
+                            
+                            $columns = preg_split('/\t+/', $line); // Split by tab first
+                            if (count($columns) < 2) {
+                                $columns = preg_split('/\s+/', $line); // Fallback to space split
+                            }
+                            
+                            // Handle different file formats
+                            if (count($columns) >= 8) {
+                                // New format: bioid, datetime, other_columns...
+                                $bioid = $columns[0];
+                                $datetime = $columns[1];
+                                
+                                // Split datetime into date and time
+                                if (strpos($datetime, ' ') !== false) {
+                                    list($date, $time) = explode(' ', $datetime, 2);
+                                } else {
+                                    $date = $datetime;
+                                    $time = '00:00:00';
+                                }
+                            } else if (count($columns) >= 3) {
+                                // Original format: bioid, date, time
+                                $bioid = $columns[0];
+                                $date = $columns[1];
+                                $time = $columns[2];
+                            } else {
+                                // Invalid format, skip this line
+                                continue;
+                            }
+                            
                             $log = array('bioid' => $bioid,'logdate' => $date,'logtime' => $time);
                             //$data['rawLogs'][] = $log;
                             filter_time_logs($logs,$log);
@@ -3806,7 +3836,8 @@ WHERE telr.status = 301 AND telra.status = 301 AND empid = ".$empid." AND ('".$d
                 $tvi = $tviDB->insert_batch('prime_employee_attendance_timelogs', $batch);
                 $peco = $pecoDB->insert_batch('prime_employee_attendance_timelogs', $batch);
 
-                if (!$pae || !$tvi || !$peco) {
+                if (!$pae || !$tvi || !$peco
+                ) {
                     $allInsert = false;
                     break;
                 }
@@ -3830,7 +3861,9 @@ WHERE telr.status = 301 AND telra.status = 301 AND empid = ".$empid." AND ('".$d
 
             }
 
-            if ($allInsert && $this->db->trans_status() && $tviDB->trans_status() && $pecoDB->trans_status()) {
+            if ($allInsert && $this->db->trans_status() && $tviDB->trans_status() 
+                && $pecoDB->trans_status()
+            ) {
                 $this->db->trans_commit();
                 $pecoDB->trans_commit();
                 $tviDB->trans_commit();
