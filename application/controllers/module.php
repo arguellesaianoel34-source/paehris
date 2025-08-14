@@ -99,7 +99,9 @@ class Module extends CI_Controller
             $data['pageicon'] = $pageqry->icon;
             $data['pageclass'] = $pageqry->htmlclass;
             $data['navid'] = $pageqry->sysid;
-            $data['hashcode'] = $pageqry->hashcode;
+            $data['hashcode'] = $this->page;
+
+
             if (user_id() > 0) {
                 if ($pageqry) {
                     $logs = log_user_page($pageqry->sysid);
