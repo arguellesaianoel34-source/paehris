@@ -10,7 +10,7 @@ if (!function_exists('safe')) {
 
 // Load the model
 $CI =& get_instance();
-$CI->load->model('ApplicationCustomersDetails', 'client', TRUE);
+$CI->load->model('model_customerprofile', 'client', TRUE);
 
 $details = $CI->client->get_customer_details($dataid);
 
