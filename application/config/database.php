@@ -8,18 +8,19 @@ $connect                    = 'dev';
 
 $db_config = [];
 
-if( $connect == 'dev' ) {
-    // LOCALHOST
-    $db_config['host_server']            = 'localhost';
-    $db_config['host_user']              = 'root';
-    $db_config['host_db']                = 'pae_erp';
-    $db_config['host_pass']              = 'iF4D3R0N88!';
+switch ($connect) {
+    case 'dev':
+        // LOCALHOST
+        $db_config['host_server']            = 'localhost';
+        $db_config['host_user']              = 'pae_erp';
+        $db_config['host_db']                = 'pae_erp';
+        $db_config['host_pass']              = 'iF4D3R0N88!';
 
-    $db_config['audit_server']           = 'localhost';
-    $db_config['audit_user']             = 'root';
-    $db_config['audit_db']               = 'pae_erp_audit';
-    $db_config['audit_pass']             = 'iF4D3R0N88!';
-
+        $db_config['audit_server']           = 'localhost';
+        $db_config['audit_user']             = 'pae_erp';
+        $db_config['audit_db']               = 'pae_erp_audit';
+        $db_config['audit_pass']             = 'iF4D3R0N88!';
+        break;
     case 'online':
         // Turbify
         $db_config['host_server']            = 'localhost';
@@ -32,7 +33,6 @@ if( $connect == 'dev' ) {
         $db_config['audit_db']               = 'uub4rmw23inpzxn9_erp_audit';
         $db_config['audit_pass']             = '959@M+U1GOat';
         break;
-
     default:
         // PAE SERVER
         $db_config['host_server']            = '172.20.224.5';
@@ -48,6 +48,9 @@ if( $connect == 'dev' ) {
 }
 
 $query_builder = TRUE;
+
+//print_r($db_config); // Debugging line to check the database configuration
+//exit;
 
 // Default settings for all databases
 $default_db_config = array(
