@@ -5880,7 +5880,10 @@ class Model_reports extends CI_model
             $excelmonth = ($month) ? '_'.date('M',mktime(0,0,0,$month,1)) : '';
             $excelyear = ($year) ? '_'.$year : '';
             $excelccid = ($costcenter) ? '_'.get_costcenter_name($costcenter,true) : '';
-            $excelpayclass = ($payclass) ? '_'.$payclass_arr[$payclass] : '';
+
+
+            $payClass = $payclass_arr[$payclass] ?? '';
+            $excelpayclass = ($payclass) ? '_'.$payClass : '';
             $excelreptype = str_replace(' ','',$type_qry->names);
 
             $filename = 'PAYROLL_REPORT_'.$excelreptype.$excelmonth.$excelyear.$excelccid.$excelpayclass.'_ASOF_'.$as_off; //save our workbook as this file name
