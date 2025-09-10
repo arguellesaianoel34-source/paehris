@@ -4,7 +4,6 @@ var HRIS = function () {
     PECO.getSweetAlert();
     PECO.getSelect2Plugins();
 
-
     var base_url = PECO.base_url();
     var dt = $('#emptable').dataTable();
     var filedropzone = $(document).find('#accompfiledrop');

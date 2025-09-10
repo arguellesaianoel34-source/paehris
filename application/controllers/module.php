@@ -393,6 +393,7 @@ class Module extends CI_Controller
         }
     }
 
+    
     private function does_page_dashboard($hash)
     {
         return $this->model_admin->get_user_dashboard_access($hash);

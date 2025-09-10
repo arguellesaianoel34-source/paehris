@@ -16,6 +16,7 @@ if(!function_exists('get_findings_label')) {
     }
 }
 
+
 if (!function_exists('check_acct_gdr')) {
 
     function check_acct_gdr($dataid) {
