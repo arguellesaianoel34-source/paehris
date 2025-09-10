@@ -8,7 +8,6 @@ if (!defined('BASEPATH'))
  * 
  * @property CI_Loader $load
  * @property CI_Input $input
- * @property CI_DB_query_builder $db
  * @property CI_URI $uri
  * @property Model_reports $model_reports
  * @property Model_payroll $model_payroll
@@ -19,7 +18,7 @@ if (!defined('BASEPATH'))
 class Payroll extends CI_Controller
 {
 
-    
+
     public function __construct()
     {
         parent::__construct();
@@ -45,6 +44,7 @@ class Payroll extends CI_Controller
         echo $this->model_payroll->payroll_info();
     }
 
+    
     public function payslipinfo()
     {
         echo $this->model_payroll->payslip_info();

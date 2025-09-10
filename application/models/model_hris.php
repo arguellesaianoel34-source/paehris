@@ -3823,6 +3823,7 @@ WHERE telr.status = 301 AND telra.status = 301 AND empid = ".$empid." AND ('".$d
             }
         }
 
+        
         if (count($logs) > 0) {
             $batches = array_chunk($logs, 500);
             $tviDB = $this->load->database('tvi',true);

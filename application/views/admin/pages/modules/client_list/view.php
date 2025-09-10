@@ -16,7 +16,6 @@ $details = $CI->client->get_customer_details($dataid);
 
 // echo '<pre>';
 // print_r($details); // Debugging line to check the details array
-
 // exit;
 ?>
 

@@ -7,7 +7,6 @@
  */
 class Model_reports extends CI_model
 {
-
     function datatable_apt_summary()
     {
         $data = array();
