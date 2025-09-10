@@ -3,6 +3,21 @@
 if (!defined('BASEPATH'))
     exit('No direct script access allowed');
 
+/**
+ * Module Controller
+ * 
+ * @property CI_Loader $load
+ * @property CI_URI $uri
+ * @property CI_Router $router
+ * @property CI_Session $session
+ * @property CI_DB_active_record $db
+ * @property Model_admin $model_admin
+ * @property Model_query $model_query
+ * @property Model_search $model_search
+ * @property Model_cwdo $model_cwdo
+ * @property Model_systems $model_systems
+ * @property Model_cad $model_cad
+ */
 class Module extends CI_Controller
 {
 

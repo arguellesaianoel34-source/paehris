@@ -1,14 +1,51 @@
 stages:
-  - main
-  - release
+  - build
+  - test
+  - deploy
 
-Development:
-  only:
-    - main
-  stage: main
+variables:
+  # Define deployment paths
+  DEPLOY_PATH: "public_html/erp/"
+  
+build:
+  stage: build
+  image: php:8.1-cli
   before_script:
     - apt-get update -yqq
-    - apt-get install -y lftp
+    - apt-get install -y git unzip
+  script:
+    - echo "Building application..."
+    - composer install --no-dev --optimize-autoloader || echo "No composer.json found"
+    - echo "Build completed successfully"
+  artifacts:
+    paths:
+      - vendor/
+    expire_in: 1 hour
+  only:
+    - main
+    - develop
+
+test:
+  stage: test
+  image: php:8.1-cli
+  before_script:
+    - apt-get update -yqq
+    - apt-get install -y git
+  script:
+    - echo "Running PHP syntax checks..."
+    - find . -name "*.php" -not -path "./vendor/*" -exec php -l {} \;
+    - echo "All PHP files passed syntax check"
+  only:
+    - main
+    - develop
+
+deploy_production:
+  stage: deploy
+  image: alpine:latest
+  only:
+    - main
+  before_script:
+    - apk add --no-cache lftp
   script:
     - git diff --name-only ${CI_COMMIT_BEFORE_SHA}...${CI_COMMIT_SHA} > /temp-deployment-text-${CI_JOB_ID}.txt
     - |

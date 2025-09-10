@@ -3,11 +3,12 @@
 if (!defined('BASEPATH'))
     exit('No direct script access allowed');
 
+global $ci;
 
 if(!function_exists('get_findings_label')) {
     function get_findings_label($id)
     {
-        $ci = &get_instance();
+        global $ci;
         $qry = $ci->db->select('codes')->from('meter_reading_findings AS f')
             ->where('f.sysid', $id)
             ->get()->row();
@@ -18,7 +19,7 @@ if(!function_exists('get_findings_label')) {
 if (!function_exists('check_acct_gdr')) {
 
     function check_acct_gdr($dataid) {
-        $ci = &get_instance();
+        global $ci;
         $qr = $ci->db->select("
                 rl.totalwatt,
                 rl.totalcost,
@@ -42,7 +43,7 @@ if (!function_exists('check_acct_gdr')) {
         function check_acct_app($dataid) {
             $data = array();
             $ecales = array();
-            $ci = &get_instance();
+            global $ci;
             $ecales = $ci->db->select()
                 ->from('customer_ecales_logs')
                 ->where(array('dataid' => $dataid))
@@ -60,7 +61,7 @@ if (!function_exists('check_acct_gdr')) {
 
         function items_select_list() {
             $data = array();
-            $ci = &get_instance();
+            global $ci;
             $qry = $ci->db->select('ms.sysid, m.codes, ms.descs')
                 ->from('items_main_spec AS ms')
                 ->join('items_main_category AS m', 'm.sysid = ms.itemid')
@@ -82,7 +83,7 @@ if (!function_exists('check_acct_gdr')) {
     if (!function_exists('get_item_info')) {
 
         function get_item_info($itemspecid) {
-            $ci = &get_instance();
+            global $ci;
             $qry = $ci->db->select('
                 ms.sysid, 
                 ms.descs, 
@@ -108,7 +109,7 @@ if (!function_exists('check_acct_gdr')) {
     if (!function_exists('get_service_info')) {
 
         function get_service_info($serviceid) {
-            $ci = &get_instance();
+            global $ci;
             $qry = $ci->db->select()
                 ->from('prime_service_rate_history')
                 ->where(array('serviceid' => $serviceid , 'status' => 1))
@@ -120,7 +121,7 @@ if (!function_exists('check_acct_gdr')) {
 
     if (!function_exists('ecales_id')) {
         function ecales_id($dataid) {
-            $ci = &get_instance();
+            global $ci;
             $qry = $ci->db->select()->from('customer_ecales_logs')
                 ->where(array('dataid' => $dataid))
                 ->where_not_in('status',array(0,303))->get()->row();
@@ -132,7 +133,7 @@ if (!function_exists('check_acct_gdr')) {
     if (!function_exists('customer_mapping')) {
 
         function customer_mapping($dataid) {
-            $ci = &get_instance();
+            global $ci;
             $data = array();
 
             $qry_account_owner_addr = $ci->db->select('addrspec')
@@ -186,7 +187,7 @@ if (!function_exists('check_acct_gdr')) {
     }
 
     function account_verifications($person = false) {
-        $ci = &get_instance();
+        global $ci;
         $personid = $ci->input->post('personid');
         $profiletype = $ci->input->post('profiletype');
         if($personid==false) {
@@ -344,7 +345,7 @@ if (!function_exists('check_acct_gdr')) {
     }
 
     function verify_query($type, $id) {
-        $ci = &get_instance();
+        global $ci;
         if(is_array($id)) {
             // @TODO Need to find out if this algorithm works!
             foreach($id as $key => $value) {
@@ -371,7 +372,7 @@ if (!function_exists('check_acct_gdr')) {
     }
 
     function veriry_legacy_ra7832($personid) {
-        $ci = &get_instance();
+        global $ci;
         if(is_array($personid)){
             /*
             foreach($personid as $key => $value) {
@@ -409,7 +410,7 @@ if (!function_exists('check_acct_gdr')) {
 
     if(!function_exists('create_temp_account')) {
         function create_temp_account($ownerid, $apptype) {
-            $ci = &get_instance();
+            global $ci;
             $data = array();
             $acctrate = $ci->input->post('acctrate');
             $accttype = $ci->input->post('statconn');
@@ -553,7 +554,7 @@ if (!function_exists('check_acct_gdr')) {
     if(!function_exists('create_account_temp_requirements')) {
         function create_account_temp_requirements($accountid, $moduleid)
         {
-            $ci = &get_instance();
+            global $ci;
             $data = array();
             $ins_req_count = 0;
             $req = $ci->input->post('acctreq');
@@ -592,7 +593,7 @@ if (!function_exists('check_acct_gdr')) {
     }
 
     function check_customer_application_balance($dataid) {
-        $ci = &get_instance();
+        global $ci;
         $debit = 0;
         $credit = 0;
         $ledger = 0;
@@ -641,7 +642,7 @@ if (!function_exists('check_acct_gdr')) {
     }
     // start credentials help for hris
     function get_person_credentials($id) {
-        $ci = & get_instance();
+        global $ci;
         $q = $ci->db->select('
             p.sysid,
             cred.passport_num,
@@ -696,7 +697,7 @@ if (!function_exists('check_acct_gdr')) {
 if (!function_exists('get_dependents'))
 {
     function get_dependents() {
-        $ci = & get_instance();
+        global $ci;
         $query = $ci->db->query( "select empid from prime_employee_dependents
                                           " );
         foreach ($query->result() as $row)
@@ -710,7 +711,7 @@ if (!function_exists('get_dependents'))
 
 if(!function_exists('insert_application_charges')) {
     function insert_application_charges($chargeid = false, $amt = false, $dataid = false, $moduleid = false, $group = false) {
-        $ci = &get_instance();
+        global $ci;
         $ci->db->trans_begin();
         $data = array();
         $qry = false;
@@ -784,7 +785,7 @@ if(!function_exists('insert_application_charges')) {
 if(!function_exists('get_application_details')) {
     function get_application_details($appid) {
         $data = array();
-        $ci = &get_instance();
+        global $ci;
         $qry_details = $ci->db->select("
                 CD.personid,
                 CD.apptype,
@@ -887,7 +888,7 @@ if(!function_exists('get_application_details')) {
 
 
 function application_info($dataid) {
-    $ci = &get_instance();
+    global $ci;
     $data = array();
     $info = get_application_details($dataid);
     if($info->info) {
@@ -1041,33 +1042,7 @@ function application_info($dataid) {
             }
         }
 
-        /*if($info->info->systemsizeid) {
-            $sql_system_size = $ci->db->query("SELECT * FROM customer_system_size WHERE sysid = {$info->info->systemsizeid} AND status = 1")->row();
-            $system_size_name = ($sql_system_size) ? $sql_system_size->descs . ' <span class="badge badge-success" style="padding: 2px 5px !important; width: auto!important;"><i class="fa fa-check"></i> Saved</span>' : '';
-            $system_size_name_raw = $sql_system_size->descs;
-        }else{
-            $get_system_size = get_system_size_range($dataid);
-
-            if ($get_system_size) {
-                $system_size_name = $get_system_size->descs . ' <span class="badge badge-danger" style="padding: 2px 5px !important; width: auto!important;">RECOMMENDED</span>';
-                $system_size_name_raw = $get_system_size->descs;
-            } else {
-                $published_qry = $this->db->select('power')
-                    ->from('application_customers_system_size')
-                    ->where(array('appid' => $dataid,'status' => 305))
-                    ->get()->row();
-
-                if ($published_qry) {
-                    $power = (($published_qry->power/1000) > 1) ? $published_qry->power/1000 : $published_qry->power;
-                    $unit = (($published_qry->power/1000) > 1) ? 'kWp' : 'Wp';
-                    $system_size_name = $power.$unit.' Grid-Tied <span class="badge badge-primary" style="padding: 2px 5px !important; width: auto!important;"><i class="fa fa-check"></i> Non-Standard</span>';
-                    $system_size_name_raw = $power.$unit.' Grid-Tied';
-                } else {
-                    $system_size_name = false;
-                    $system_size_name_raw = false;
-                }
-            }
-        }*/
+        // Legacy system size logic removed (commented out)
 
 
         $data['personid'] = $info->info->personid;
@@ -1141,7 +1116,7 @@ function application_info($dataid) {
 
 if(!function_exists('get_ar_billing')) {
     function get_ar_billing($acctid, $ar_year) {
-        $ci = &get_instance();
+        global $ci;
         $qry_billtrn = false;
 
         $check_bill_row = $ci->db->select('sysid')
@@ -1172,7 +1147,7 @@ if(!function_exists('get_ar_billing')) {
 
 if(!function_exists('get_ar_billing_details')) {
     function get_ar_billing_details($acctid, $mtr, $year, $month) {
-        $ci = &get_instance();
+        global $ci;
         $qry = $ci->db->select('totalvat, current')
             ->from('billing_reports_main')
             ->where(
@@ -1190,7 +1165,7 @@ if(!function_exists('get_ar_billing_details')) {
 
 if(!function_exists('check_ar_billing')) {
     function check_ar_billing($acctid, $mtr, $year, $month) {
-        $ci = &get_instance();
+        global $ci;
         $qry = $ci->db->select('acctid')
             ->from('billing_reports_main')
             ->where(
@@ -1207,7 +1182,7 @@ if(!function_exists('check_ar_billing')) {
 }
 if(!function_exists('get_billing_refcode')) {
     function get_billing_refcode($billid) {
-        $ci = &get_instance();
+        global $ci;
         $code = '';
         $qry_ref_code = $ci->db->select('tp.sysid, tp.names, tp.desc')
             ->from('billing_reports_tagging_trn AS rtt')
@@ -1227,7 +1202,7 @@ if(!function_exists('mrd_check_hno')) {
     function mrd_check_hno($acctid, $mtrno)
     {
         $data = array();
-        $ci = &get_instance();
+        global $ci;
         $q = false;
         $qry = $ci->db->select('CAST(datecreated AS date) AS hnodate')
             ->from('trn_reading_findings')
@@ -1263,7 +1238,7 @@ if(!function_exists('mrd_get_last_findings')) {
     function mrd_get_last_findings($acctid, $mtrno)
     {
         $data = array();
-        $ci = &get_instance();
+        global $ci;
         $q = false;
         $qry = $ci->db->query("
                     SELECT mrf.codes, mrf.descriptions AS descs, rf.datecreated
@@ -1288,7 +1263,7 @@ if(!function_exists('get_meter_info')) {
 
     function get_meter_info($sysid)
     {
-        $ci = &get_instance();
+        global $ci;
         $results = array();
         $qry = false;
         $row = $ci->db->query("
@@ -1391,7 +1366,7 @@ if(!function_exists('get_meter_info')) {
 
 if(!function_exists('get_joborder_info')) {
     function get_joborder_info($dataid) {
-        $ci = &get_instance();
+        global $ci;
         $qry = $ci->db->query("
           SELECT
             jdl.acctid,
@@ -1438,7 +1413,7 @@ if(!function_exists('get_joborder_info')) {
 if(!function_exists('customer_application_basicinfo')) {
     function customer_application_basicinfo($dataid, $editable = false, $showrate = true) {
         $data = array();
-        $ci = &get_instance();
+        global $ci;
         $data['dataid'] = $dataid;
         $data['editable'] = $editable;
         $data['showrate'] = $showrate;
@@ -1449,7 +1424,7 @@ if(!function_exists('customer_application_basicinfo')) {
 if(!function_exists('customer_application_editinfo')) {
     function customer_application_editinfo($dataid, $editable = false, $showrate = true) {
         $data = array();
-        $ci = &get_instance();
+        global $ci;
         $data['dataid'] = $dataid;
         $data['editable'] = $editable;
         $data['showrate'] = $showrate;
@@ -1461,7 +1436,7 @@ if(!function_exists('customer_application_editinfo')) {
 if(!function_exists('customer_application_requirements_list')) {
     function customer_application_requirements_list($dataid, $editable = false) {
         $data = array();
-        $ci = &get_instance();
+        global $ci;
         $data['dataid'] = $dataid;
         $data['editable'] = $editable;
         $ci->load->view('admin/pages/customer/appreqlist', $data);
@@ -1471,7 +1446,7 @@ if(!function_exists('customer_application_requirements_list')) {
 if(!function_exists('customer_application_charges_list')) {
     function customer_application_charges_list($dataid, $editable = false) {
         $data = array();
-        $ci = &get_instance();
+        global $ci;
         $data['dataid'] = $dataid;
         $data['editable'] = $editable;
         $ci->load->view('admin/pages/customer/appcharges', $data);
@@ -1482,7 +1457,7 @@ if(!function_exists('customer_application_charges_list')) {
 if(!function_exists('customer_application_view_right')) {
     function customer_application_view_right($dataid, $editable = false, $showrate = true) {
         $data = array();
-        $ci = &get_instance();
+        global $ci;
         $data['dataid'] = $dataid;
         $ci->load->view('admin/pages/customer/appviewright', $data);
     }
@@ -1490,7 +1465,7 @@ if(!function_exists('customer_application_view_right')) {
 if(!function_exists('customer_application_inspection_list')) {
     function customer_application_inspection_list($dataid, $editable = false) {
         $data = array();
-        $ci = &get_instance();
+        global $ci;
         $data['dataid'] = $dataid;
         $ci->load->view('admin/pages/customer/appinspection', $data);
     }
@@ -1501,7 +1476,7 @@ if(!function_exists('customer_application_inspection_list')) {
 if(!function_exists('crm_gallery')) {
     function crm_gallery($dataid, $editable = false) {
         $data = array();
-        $ci = &get_instance();
+        global $ci;
         $data['dataid'] = $dataid;
         $data['editable'] = $editable;
         $ci->load->view('admin/pages/customer/crm_gallery', $data);
@@ -1511,7 +1486,7 @@ if(!function_exists('crm_gallery')) {
 if(!function_exists('crm_transaction')) {
     function crm_transaction($dataid, $editable = false) {
         $data = array();
-        $ci = &get_instance();
+        global $ci;
         $data['dataid'] = $dataid;
         $data['editable'] = $editable;
         $ci->load->view('admin/pages/customer/crm_transaction', $data);
@@ -1521,7 +1496,7 @@ if(!function_exists('crm_transaction')) {
 
 if(!function_exists('get_system_size_range')) {
     function get_system_size_range($appid) {
-        $ci = &get_instance();
+        global $ci;
 
         // GET THE APPLICATION
         $q = $ci->db->select('e.sysid, ep.codes, e.watts, e.qty, e.equipid, ep.codes, ep.descs, e.remarks, ep.types')
@@ -1557,7 +1532,7 @@ if(!function_exists('get_system_size_range')) {
 
 if(!function_exists('get_dist_utility_list')) {
     function get_dist_utility_list($id = false) {
-        $ci = &get_instance();
+        global $ci;
         $data = array();
         if ($id) {
             $ci->db->where('sysid',$id);
@@ -1627,7 +1602,7 @@ if(!function_exists('convert_geocoordinates_to_decimal')) {
 if(!function_exists('customer_application_installation_setup')) {
     function customer_application_installation_setup($dataid) {
         $data = array();
-        $ci = &get_instance();
+        global $ci;
         $data['dataid'] = $dataid;
         $ci->load->view('admin/pages/customer/installationsetup', $data);
     }
@@ -1636,7 +1611,7 @@ if(!function_exists('customer_application_installation_setup')) {
 if(!function_exists('eprs_request_info')) {
     function eprs_request_info($dataid, $editable = false, $showrate = true) {
         $data = array();
-        $ci = &get_instance();
+        global $ci;
         $data['dataid'] = $dataid;
         $data['editable'] = $editable;
         $data['showrate'] = $showrate;

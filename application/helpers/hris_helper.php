@@ -3,10 +3,11 @@
 if (!defined('BASEPATH'))
     exit('No direct script access allowed');
 
+global $ci;
 
 if (!function_exists('get_user_employee_info')) {
     function get_user_employee_info($userid = false) {
-        $ci = &get_instance();
+        global $ci;
         $userid = ($userid) ? $userid : user_id();
         $qry = $ci->db->select('
         u.sysid as userid ,
@@ -27,7 +28,7 @@ if (!function_exists('get_user_employee_info')) {
 if (!function_exists('get_employee_info')) {
 
     function get_employee_info($empid = false) {
-        $ci = &get_instance();
+        global $ci;
         $qry = false;
         if($empid) {
             $qry = $ci->db->select('
@@ -154,7 +155,7 @@ if (!function_exists('get_employee_info')) {
 if (!function_exists('get_person_userinfo')) {
 
     function get_person_userinfo($personid = false) {
-        $ci = &get_instance();
+        global $ci;
         $qry = false;
         if($personid) {
             $qry = $ci->db->select('
@@ -170,7 +171,7 @@ if (!function_exists('get_person_userinfo')) {
 }
 
 function check_emp_schedule2($empid, $date) {
-    $ci = &get_instance();
+    global $ci;
     $query = $ci->db->query('select * from prime_employee_main_schedule_matrix where empid = "' . $empid . '" and "' . $date . '" between schedstart and schedend ');
     if ($query->num_rows() > 0) {
         return true;
@@ -180,7 +181,7 @@ function check_emp_schedule2($empid, $date) {
 }
 
 function check_emp_logtime_schedule($empid, $date) {
-    $ci = &get_instance();
+    global $ci;
     $query = $ci->db->query('select ws.am_start, ws.am_end, ws.pm_start, ws.pm_end from prime_employee_main_schedule_matrix sm
 left join prime_employee_main_workshift ws
 on sm.workshiftid = ws.sysid where sm.empid = "' . $empid . '" and "' . $date . '" between sm.schedstart and sm.schedend ');
@@ -199,7 +200,7 @@ on sm.workshiftid = ws.sysid where sm.empid = "' . $empid . '" and "' . $date . 
 if (!function_exists('get_logtime')) {
 
     function get_logtime($logdate, $empid, $logtype) {
-        $ci = &get_instance();
+        global $ci;
         $amin = '';
         $amout = '';
         $pmin = '';
@@ -390,7 +391,7 @@ if (!function_exists('fake_btn')) {
 if (!function_exists('select_department')) {
 
     function select_department() {
-        $ci = & get_instance();
+        global $ci;
         $query = $ci->db->query("SELECT * FROM prime_costcenter_main");
         return ($query) ? $query->result() : FALSE;
     }
@@ -400,7 +401,7 @@ if (!function_exists('select_department')) {
 if (!function_exists('select_position')) {
 
     function select_position() {
-        $ci = & get_instance();
+        global $ci;
         $query = $ci->db->query("select * from prime_types_parameter 
                                           where codes = 'EMPOST'");
         return ($query) ? $query->result() : FALSE;
@@ -411,7 +412,7 @@ if (!function_exists('select_position')) {
 if (!function_exists('select_payclass')) {
 
     function select_payclass() {
-        $ci = & get_instance();
+        global $ci;
         $query = $ci->db->query("select * from prime_types_parameter where codes = 'EMPAYCLASS'
                                           ");
         return ($query) ? $query->result() : FALSE;
@@ -421,7 +422,7 @@ if (!function_exists('select_payclass')) {
 if (!function_exists('select_country')) {
 
     function select_country() {
-        $ci = & get_instance();
+        global $ci;
         $query = $ci->db->query("select * from address_country
                                           ");
         return ($query) ? $query->result() : FALSE;
@@ -431,7 +432,7 @@ if (!function_exists('select_country')) {
 if (!function_exists('select_job_category')) {
 
     function select_job_category() {
-        $ci = & get_instance();
+        global $ci;
         $query = $ci->db->query("select * from prime_types_parameter where codes = 'EMPJOBCAT'
                                           ");
         return ($query) ? $query->result() : FALSE;
@@ -442,13 +443,13 @@ if (!function_exists('select_job_category')) {
 if (!function_exists('compute_net_salary')) {
 
     function compute_net_salary($empid) {
-        $ci = & get_instance();
+        global $ci;
         $base_salary = $ci->db->query("select pem.sysid, esalary.salary from person as p
                             left join prime_employee_main as pem on pem.personid = p.sysid
                             left join prime_employee_salary as esalary on esalary.emp_id = pem.sysid
                                           ")->row();
         if ($base_salary) {
-            $base_salary_amount15 = bsdiv($base_salary->salary, 2, 2);
+            $base_salary_amount15 = round($base_salary->salary / 2, 2);
         } else {
             $base_salary_amount15 = 0;
         }
@@ -469,7 +470,7 @@ if (!function_exists('compute_net_salary')) {
                             ")->row();
         $net_income = ($base_salary->salary) - (($sss->sss_employee_share) + ($philhealth->employee_share) + ($pagibig->employee_share));
         //TODO add deduction for absences and lates
-        return ($query) ? $query->result() : FALSE;
+        return $net_income;
     }
 
 }
@@ -477,7 +478,7 @@ if (!function_exists('compute_net_salary')) {
 if (!function_exists('select_emp_position')) {
 
     function select_emp_position($id) {
-        $ci = & get_instance();
+        global $ci;
         $query = $ci->db->query("SELECT parameter.sysid , parameter.names FROM prime_types_parameter as parameter
 left join prime_employee_main_positions as positions on parameter.sysid = positions.position_id where positions.emp_id = $id AND positions.status = 1 group by  parameter.sysid ,parameter.names,positions.emp_id")->row();
         return ($query) ? $query : FALSE;
@@ -488,7 +489,7 @@ left join prime_employee_main_positions as positions on parameter.sysid = positi
 if (!function_exists('select_emp_payclass')) {
 
     function select_emp_payclass($id) {
-        $ci = & get_instance();
+        global $ci;
         $query = $ci->db->query("SELECT
                 parameter.names,
                 parameter.sysid as payclassid
@@ -509,7 +510,7 @@ if (!function_exists('select_emp_payclass')) {
 if (!function_exists('select_emp_jobcat')) {
 
     function select_emp_jobcat($id) {
-        $ci = & get_instance();
+        global $ci;
         $query = $ci->db->query("SELECT parameter.sysid,parameter.names FROM prime_types_parameter as parameter
 left join prime_employee_main_job_category as jobcat on parameter.sysid = jobcat.jobcatid where jobcat.empid = $id  group by parameter.sysid, parameter.names, jobcat.empid")->row();
         return ($query) ? $query : FALSE;
@@ -520,7 +521,7 @@ left join prime_employee_main_job_category as jobcat on parameter.sysid = jobcat
 if (!function_exists('get_emp_datestart')) {
 
     function get_emp_datestart($id) {
-        $ci = & get_instance();
+        global $ci;
         $query = $ci->db->query("SELECT datestart FROM prime_employee_main where sysid = $id");
 
         return ((object) $query) ? (object) $query->row() : FALSE;
@@ -573,7 +574,7 @@ function emp_badge_yr_service($yr) {
 if (!function_exists('get_emp_duration')) {
 
     function get_emp_duration($id) {
-        $ci = & get_instance();
+        global $ci;
         $datestarted = $ci->db->query("SELECT e.datestart FROM prime_employee_main as e left join person as p on p.sysid = e.personid where e.sysid = $id")->row();
         $then = $datestarted->datestart;
         $datetime1 = new DateTime($then);
@@ -609,7 +610,7 @@ if (!function_exists('get_emp_duration')) {
 if (!function_exists('get_emp_department')) {
 
     function get_emp_department($id) {
-        $ci = & get_instance();
+        global $ci;
         $query = $ci->db->query("select cmain.desc 
                 from prime_employee_main as e
                 left join prime_employee_costcenter as costcenter on costcenter.empid = e.sysid
@@ -622,7 +623,7 @@ if (!function_exists('get_emp_department')) {
 }
 if (!function_exists('get_deptartment_info')) {
     function get_deptartment_info($id) {
-        $ci = & get_instance();
+        global $ci;
         $query = $ci->db->query("SELECT * FROM prime_costcenter_main WHERE sysid = $id")->row();
         return $query;
     }
@@ -631,7 +632,7 @@ if (!function_exists('get_emp_basic_salary')) {
 
     function get_emp_basic_salary($id) {
         $data=array();
-        $ci = & get_instance();
+        global $ci;
         $emp_position = select_emp_position($id);
         $emppayclass = select_emp_payclass($id);
         $emp_position_id = ($emp_position && isset($emp_position->sysid)) ? $emp_position->sysid : 0;
@@ -668,7 +669,7 @@ if (!function_exists('get_emp_basic_salary')) {
 if (!function_exists('get_emp_timelogs')) {
 
     function get_emp_timelogs($id) {
-        $ci = & get_instance();
+        global $ci;
         $query = $ci->db->query("select att.logdate, att.logtime from prime_employee_attendance_timelogs as att 
 left join prime_employee_bioid as id on id.bioid = att.bioid
 left join prime_employee_main as e on e.sysid = id.empid where e.sysid= $id and e.sysid != 1")->result();
@@ -680,7 +681,7 @@ left join prime_employee_main as e on e.sysid = id.empid where e.sysid= $id and 
 if (!function_exists('get_emp_timelogs_daily')) {
 
     function get_emp_timelogs_daily($id) {
-        $ci = & get_instance();
+        global $ci;
         $query = $ci->db->query("select att.logdate, att.logtime from prime_employee_attendance_timelogs as att 
 left join prime_employee_bioid as id on id.bioid = att.bioid
 left join prime_employee_main as e on e.sysid = id.empid where e.sysid = $id order by att.logdate desc, att.logtime desc limit 1")->row();
@@ -692,7 +693,7 @@ left join prime_employee_main as e on e.sysid = id.empid where e.sysid = $id ord
 }
 if (!function_exists('get_emp_workshift')) {
     function get_emp_workshift($id) {
-        $ci = & get_instance();
+        global $ci;
         $query = $ci->db->query("select 
 ws.sysid ,
 ws.desc,
@@ -717,7 +718,7 @@ ws.status")->row();
 if (!function_exists('get_employee_approval')) {
 
     function get_employee_approval($empid) {
-        $ci = &get_instance();
+        global $ci;
 
         $qry_empcc = $ci->db->select('ec.ccid, cgh.empid, p.lastname, p.firstname')
             ->from('prime_employee_costcenter AS ec')
@@ -735,7 +736,7 @@ if (!function_exists('get_employee_approval')) {
 //GET EMPLOYEE HEAD
 if (!function_exists('get_employee_dephead')) {
     function get_employee_dephead($empid) {
-        $ci = &get_instance();
+        global $ci;
 
         $qry_empcc = $ci->db->select('ec.ccid, ech.empid, p.lastname, p.firstname')
             ->from('prime_employee_costcenter AS ec')
@@ -762,7 +763,7 @@ function emp_pic_draw($id, $height, $width) {
 //GET SALARY OF EMPLOYEE
 function get_employee_salary($empid) {
     // QUERY EMPLOYEE BASIC SALARY STATUS ONE FROM SALARY TABLE HERE
-    $ci = &get_instance();
+    global $ci;
     $qry_empsalary = $ci->db->select('amt')
         ->from('prime_employee_salary')
         ->where(array('empid' => $empid, 'status' => 1))
@@ -774,7 +775,7 @@ function get_employee_salary($empid) {
 function get_employee_transactions($empid, $month, $year, $paytype, $paytypepopover, $payclass = false , $viewtype, $res = false) {
 
     $data = array();
-    $ci = &get_instance();
+    global $ci;
     // QUERY TRANSACTIONS
     $total_loans = 0;
     $total_bonus = 0;
@@ -1217,7 +1218,7 @@ function compute_employee_netpay($empid, $month = false, $year = false, $paytype
 {
     // $paytype = 2;
     // QUERY DEDUCTION MONTHLY HERE
-    $ci = &get_instance();
+    global $ci;
     $data = array();
     $total_deduction = 0;
     $deduct_arr = array();
@@ -1787,12 +1788,7 @@ function compute_employee_netpay($empid, $month = false, $year = false, $paytype
         $data['netpay'] = $netpay;
 
     } else {
-        /*
-            $get_employee_employment = $this->db->query("
-                    SELECT datestart FROM prime_employee_main
-                    WHERE sysid = $empid
-                ")->get()->row();
-        */
+        // Employee employment date query removed (commented out)
         $earnings_amount = ($res) ? ($earnings_amount/2) : $earnings_amount;
         $netpay = (($earnings_amount + $totalannualnet)  - $total_deduction) ;
         $net_15 = (!$res) ? round( ($netpay / 2),2,PHP_ROUND_HALF_UP ) : $netpay;
@@ -1876,7 +1872,7 @@ function compute_final_employee_netpay($empid, $month = false, $year = false, $p
 {
     // $paytype = 2;
     // QUERY DEDUCTION MONTHLY HERE
-    $ci = &get_instance();
+    global $ci;
     $data = array();
     $total_deduction = 0;
     $deduct_arr = array();
@@ -2435,12 +2431,7 @@ function compute_final_employee_netpay($empid, $month = false, $year = false, $p
         $data['netpay'] = $netpay;
 
     } else {
-        /*
-            $get_employee_employment = $this->db->query("
-                    SELECT datestart FROM prime_employee_main
-                    WHERE sysid = $empid
-                ")->get()->row();
-        */
+        // Employee employment date query removed (commented out)
 
         $net_15 = round( ($netpay / 2),2,PHP_ROUND_HALF_UP );
         $net_30 = ( $netpay - $net_15 );
@@ -2521,7 +2512,7 @@ function compute_employee_netpay_temp($empid, $month = false, $year = false, $pa
 {
     // $paytype = 2;
     // QUERY DEDUCTION MONTHLY HERE
-    $ci = &get_instance();
+    global $ci;
     $data = array();
     $total_deduction = 0;
     $deduct_arr = array();
@@ -3032,7 +3023,7 @@ if (!function_exists('draw_employee_calendar')) {
     /* draws a calendar */
     function draw_employee_calendar($month, $year, $empid) {
 
-        $ci = &get_instance();
+        global $ci;
         $userid = user_id();
         $cur_day = date('d');
         $cur_month = date('m');
@@ -3214,7 +3205,7 @@ WHERE tewg.empid = '".$empid."' AND date('$dateval') >= tewg.fromdate  AND date(
 if (!function_exists('checkempsched')) {
 
     function checkempsched($empid, $days, $months , $years , $stat){
-        $ci = &get_instance();
+        global $ci;
         $undertimeamout = '';
         $undertimepmout = '';
         $specifiedTime = '00:00:00';
@@ -3389,7 +3380,7 @@ if (!function_exists('converttimetominutes')) {
 // GET PAYROLL AMOUNT
 if(!function_exists('get_payroll_trn_amount')) {
     function get_payroll_trn_amount($payrollid, $trntype) {
-        $ci = &get_instance();
+        global $ci;
         $sql = $ci->db->select("SUM(amt) AS amt")->from("payroll_reports_trn")
             ->where(array("payrollid" => $payrollid, "trntype" => $trntype, "status" => 1))->get()->row();
         return ($sql) ? $sql : 0;
@@ -3401,7 +3392,7 @@ if(!function_exists('get_payroll_trn_amount')) {
 if(!function_exists('get_per_ccid_amts')) {
     function get_per_ccid_amts($ccid, $groupid)
     {
-        $ci = &get_instance();
+        global $ci;
         $basic = 0;
         $sumdeptssscont = 0;
         $sumdepthdmfcont = 0;
@@ -3452,7 +3443,7 @@ if(!function_exists('get_per_ccid_amts')) {
             ->join("prime_employee_main_payclass as pemp", "pemp.emp_id  = prm.empid", "left")
             ->join("payroll_reports_trn as prt", "prt.payrollid = prm.sysid", "left")
             ->join("person as p", "p.sysid = pem.personid", "left")
-            ->where(array("pec.ccid" => $ccid,  "pec.type" => 1, "prm.groupid" => $groupid, "pec.status" => 1))
+            ->where(array("pec.ccid" => $ccid,  "pec.type" => 1, "prm.groupid" => $groupid, "pec.status" => 1, "pem.status" => 1))
             ->group_by("prg.years , prg.months , prg.payclass ,prm.empid ,prm.basic, prm.deductions , prm.earnings , prm.tax , prm.net,prt.payrollid , p.firstname , p.lastname, prm.ccid,")
             ->order_by("p.lastname", "asc")
             ->get();
@@ -3628,7 +3619,7 @@ if(!function_exists('get_per_ccid_amts')) {
 //EXPORT BANK FILE
 if(!function_exists('query_bankfile_records')) {
     function query_bankfile_records($empid, $acctno, $payclass, $paytype, $net_15, $net_30, $month, $year) {
-        $ci = &get_instance();
+        global $ci;
 
         $data = array();
 
@@ -3691,7 +3682,7 @@ if(!function_exists('query_bankfile_records')) {
 if(!function_exists('get_payslip_trn')) {
     function get_payslip_trn($empid , $month , $year  , $paytype , $payclass){
 
-        $ci = &get_instance();
+        global $ci;
         $data = array();
         $res = false;
 
@@ -3797,7 +3788,7 @@ if(!function_exists('get_payslip_trn')) {
 //GET PAYSLIP PER EMPLOYEE
 if(!function_exists('form_payslip_single')) {
     function form_payslip_single($empid , $month, $year, $paytype, $payclass, $single = false , $pagenum = 0) {
-        $ci = &get_instance();
+        global $ci;
         $data = array();
         $res = false;
         $html = '';
@@ -4064,7 +4055,7 @@ if(!function_exists('add_month_to_date')) {
 if(!function_exists('get_employee_evaluation_data')) {
     function get_employee_evaluation_data($empid,$evaltype,$year,$ratedby,$questid)
     {
-        $ci = &get_instance();
+        global $ci;
         $data = array();
 
         $getinfo = $ci->db->select("")->from("evaluation_main")
@@ -4113,7 +4104,7 @@ if(!function_exists('add_months')) {
 //GET ANNUAL PAYSLIP PER EMPLOYEE
 if(!function_exists('form_annual_payslip_single')) {
     function form_annual_payslip_single($empid, $month, $year, $paytype, $typesid, $single = false , $pagenum = 0 , $viewtype) {
-        $ci = &get_instance();
+        global $ci;
         $data = array();
         $res = false;
         $html = '';
@@ -4259,7 +4250,7 @@ if(!function_exists('form_annual_payslip_single')) {
 //GET PAYCLASS TYPES
 if(!function_exists('getpayclass')) {
     function getpayclass(){
-        $ci = &get_instance();
+        global $ci;
         $data = array();
 
         $sql = $ci->db->select("sysid,desc,names")->from("prime_types_parameter")
@@ -4279,7 +4270,7 @@ if(!function_exists('getpayclass')) {
 //GET POSITIONS TYPES
 if(!function_exists('getpositions')) {
     function getpositions(){
-        $ci = &get_instance();
+        global $ci;
         $data = array();
 
         $sql = $ci->db->select("sysid,codes,names")->from("prime_types_parameter")
@@ -4299,7 +4290,7 @@ if(!function_exists('getpositions')) {
 //COST GROUP TYPES - MAIN OFFICE - POWER PLANT
 if(!function_exists('getcostgroup')) {
     function getcostgroup(){
-        $ci = &get_instance();
+        global $ci;
         $data = array();
 
         $sql = $ci->db->select("sysid,codes,names")->from("prime_types_parameter")
@@ -4319,7 +4310,7 @@ if(!function_exists('getcostgroup')) {
 //GET SALARY INCREASE TYPE
 if(!function_exists('getsalinctype')) {
     function getsalinctype(){
-        $ci = &get_instance();
+        global $ci;
         $data = array();
 
         $sql = $ci->db->select("sysid,codes,names")->from("prime_types_parameter")
@@ -4339,7 +4330,7 @@ if(!function_exists('getsalinctype')) {
 //GET CONTACT TYPES
 if(!function_exists('getcontacttypes')) {
     function getcontacttypes(){
-        $ci = &get_instance();
+        global $ci;
         $data = array();
 
         $sql = $ci->db->select("sysid,codes,names")->from("prime_types_parameter")
@@ -4359,7 +4350,7 @@ if(!function_exists('getcontacttypes')) {
 //GET LOG TYPES
 if(!function_exists('getlogtypes')) {
     function getlogtypes(){
-        $ci = &get_instance();
+        global $ci;
         $data = array();
 
         $sql = $ci->db->select("sysid,codes,names")->from("prime_types_parameter")
@@ -4379,7 +4370,7 @@ if(!function_exists('getlogtypes')) {
 //GET TS TEAM TYPES
 if(!function_exists('gettsteam')) {
     function gettsteam(){
-        $ci = &get_instance();
+        global $ci;
         $data = array();
 
         $sql = $ci->db->select("sysid,codes,names")->from("prime_types_parameter")
@@ -4399,7 +4390,7 @@ if(!function_exists('gettsteam')) {
 //GET ALL LEAVE TYPES
 if(!function_exists('getleavecreditstypes')) {
     function getleavecreditstypes(){
-        $ci = &get_instance();
+        global $ci;
         $data = array();
 
         $sql = $ci->db->select("sysid,codes,names")->from("prime_types_parameter")
@@ -4419,7 +4410,7 @@ if(!function_exists('getleavecreditstypes')) {
 //GET JOB STATUS REGULAR, CONTRACTUAL, PROBATIONARY
 if(!function_exists('getjobcatlist')) {
     function getjobcatlist(){
-        $ci = &get_instance();
+        global $ci;
         $data = array();
 
         $sql = $ci->db->select("sysid,codes,names")->from("prime_types_parameter")
@@ -4439,7 +4430,7 @@ if(!function_exists('getjobcatlist')) {
 //GET PAYROLL TYPE
 if(!function_exists('getpayrollpaytype')) {
     function getpayrollpaytype(){
-        $ci = &get_instance();
+        global $ci;
         $data = array();
 
         $sql = $ci->db->select("sysid,codes,names")->from("prime_types_parameter")
@@ -4459,7 +4450,7 @@ if(!function_exists('getpayrollpaytype')) {
 //GET COSTCENTERS
 if(!function_exists('getcostcenters')) {
     function getcostcenters(){
-        $ci = &get_instance();
+        global $ci;
         $data = array();
 
         $sql = $ci->db->select("sysid,codes,desc")->from("prime_costcenter_main")
@@ -4482,7 +4473,7 @@ if(!function_exists('getcostcenters')) {
 // LOGGING
 if(!function_exists('update_logs')) {
     function update_logs($moduleid, $dataid, $statusid, $remarks, $specificdate) {
-        $ci = &get_instance();
+        global $ci;
         if(user_id() > 0) {
             $ins_arr = array(
                 'dataid' => $dataid,
@@ -4504,7 +4495,7 @@ if(!function_exists('update_logs')) {
 // GET EMPLOYEE APPROVAL
 if(!function_exists(('get_employee_request_approval'))) {
     function get_employee_request_approval($empid) {
-        $ci = &get_instance();
+        global $ci;
         $qry_approvals = $ci->db->query("
                     SELECT
                     cc.empid AS empid,
@@ -4530,7 +4521,7 @@ if(!function_exists(('get_employee_request_approval'))) {
 
 if(!function_exists(('get_employee_list_by_payclass'))) {
     function get_employee_list_by_payclass($payclass) {
-        $ci = &get_instance();
+        global $ci;
         if ($payclass == 1) {
             $confi = $ci->db->select('payclass')
                 ->from('prime_employee_main_payclass_grouping')
@@ -4560,7 +4551,7 @@ if(!function_exists(('get_employee_list_by_payclass'))) {
 
 if(!function_exists(('non_confi_payclass'))) {
     function non_confi_payclass($id = false) {
-        $ci = &get_instance();
+        global $ci;
         $payclass = array();
 
         $qry = $ci->db->select('payclass')

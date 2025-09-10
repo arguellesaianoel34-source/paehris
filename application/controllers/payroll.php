@@ -3,6 +3,19 @@
 if (!defined('BASEPATH'))
     exit('No direct script access allowed');
 
+/**
+ * Payroll Controller
+ * 
+ * @property CI_Loader $load
+ * @property CI_Input $input
+ * @property CI_DB_query_builder $db
+ * @property CI_URI $uri
+ * @property Model_reports $model_reports
+ * @property Model_payroll $model_payroll
+ * @property Model_hris $model_hris
+ * @property Datatables $datatables
+ * @property PHPExcel $excel
+ */
 class Payroll extends CI_Controller
 {
 
@@ -1604,7 +1617,7 @@ on jc.empid = e.sysid where e.status = 1 and payclass.payclass_id != 128 and jc.
                     ->join("prime_employee_costcenter as pec", "pec.empid = pem.sysid", "left")
                     ->join("prime_costcenter_main as pcm", "pcm.sysid = pec.ccid", "left")
                     ->join("prime_employee_main_payclass as pemp", "pemp.emp_id = pem.sysid", "left")
-                    ->where(array("prg.status != " => 302, 'pec.type' => 1, "pec.status" => 1, "payrollemp.status" => 1))
+                    ->where(array("prg.status != " => 302, 'pec.type' => 1, "pec.status" => 1, "payrollemp.status" => 1, "pem.status" => 1))
                     ->group_by("pem.sysid,payrollemp.accntno,prg.months,prg.years , pem.empid,p.firstname,p.lastname,p.middlename,prt.payrollid,pcm.names,prm.basic, prm.deductions , prm.earnings , prm.tax , prm.net")
                     ->order_by("p.lastname")
                     ->get();
@@ -2102,7 +2115,7 @@ on jc.empid = e.sysid where e.status = 1 and payclass.payclass_id != 128 and jc.
                     ->join("prime_employee_costcenter as pec", "pec.empid = pem.sysid", "left")
                     ->join("prime_costcenter_main as pcm", "pcm.sysid = pec.ccid", "left")
                     ->join("prime_employee_main_payclass as pemp", "pemp.emp_id = pem.sysid", "left")
-                    ->where(array("prg.status = " => 301, 'pec.type' => 1, "pec.status" => 1, "payrollemp.status" => 1))
+                    ->where(array("prg.status = " => 301, 'pec.type' => 1, "pec.status" => 1, "payrollemp.status" => 1, "pem.status" => 1))
                     ->group_by("pem.sysid,payrollemp.accntno,prg.months,prg.years , pem.empid,p.firstname,p.lastname,p.middlename,prt.payrollid,pcm.names,prm.basic, prm.deductions , prm.earnings , prm.tax , prm.net")
                     ->order_by("p.lastname")
                     ->get();
@@ -3321,7 +3334,7 @@ on jc.empid = e.sysid where e.status = 1 and payclass.payclass_id != 128 and jc.
             ->join("prime_employee_main_payclass as pemp", "pemp.emp_id  = prm.empid", "left")
             ->join("payroll_reports_trn as prt", "prt.payrollid = prm.sysid", "left")
             ->join("person as p", "p.sysid = pem.personid", "left")
-            ->where(array("pec.ccid" => $id, "pec.type" => 1, "prm.groupid" => $groupid, "pec.status" => 1))
+            ->where(array("pec.ccid" => $id, "pec.type" => 1, "prm.groupid" => $groupid, "pec.status" => 1, "pem.status" => 1))
             ->group_by("pem.sysid ,prg.payclass, prm.empid ,prm.basic, prm.deductions , prm.earnings , prm.tax , prm.net , p.firstname , p.lastname,prt.payrollid ")
             ->order_by("p.lastname", "asc")
             ->get();
@@ -3691,7 +3704,7 @@ on jc.empid = e.sysid where e.status = 1 and payclass.payclass_id != 128 and jc.
                     ->join("prime_employee_main_payclass as pemp", "pemp.emp_id  = prm.empid", "left")
                     ->join("payroll_reports_trn as prt", "prt.payrollid = prm.sysid", "left")
                     ->join("person as p", "p.sysid = pem.personid", "left")
-                    ->where(array("pec.ccid" => $row->sysid, "prm.groupid" => $groupid, "pec.type" => 1, "pec.status" => 1))
+                    ->where(array("pec.ccid" => $row->sysid, "prm.groupid" => $groupid, "pec.type" => 1, "pec.status" => 1, "pem.status" => 1))
                     ->group_by("pem.sysid ,prg.months,prg.years, prg.payclass, prm.empid ,prm.basic, prm.deductions , prm.earnings , prm.tax , prm.net,prt.payrollid , p.firstname , p.lastname ")
                     ->order_by("p.lastname", "ASC")
                     ->get();
@@ -5415,7 +5428,7 @@ on jc.empid = e.sysid where e.status = 1 and payclass.payclass_id != 128 and jc.
 
             if ($person_info && isset($person_info->info)) {
                 $info = $person_info->info;
-                $compute = compute_employee_netpay($empid, $month, $year, $paytype, 1, $payclass);
+                $compute = compute_employee_netpay($empid, $month, $year, $paytype, 1, $payclass, 1);
                 $data['compute'] = $compute;
                 if($compute) {
                     $func = 'success';
@@ -6877,7 +6890,10 @@ on jc.empid = e.sysid where e.status = 1 and payclass.payclass_id != 128 and jc.
         $year = $this->input->post('year');
         $this->db->trans_begin();
 
-
+        // Ensure employees is an array
+        if (!is_array($employees)) {
+            $employees = array($employees);
+        }
 
         foreach($employees as $value){
             $explodearr =   explode(',', $value);
@@ -7273,7 +7289,7 @@ on jc.empid = e.sysid where e.status = 1 and payclass.payclass_id != 128 and jc.
                     ->join("payroll_reports_main as prm" , "prm.groupid = prg.sysid" , "left")
                     ->join("prime_employee_main as pem" , "pem.sysid = prm.empid" , "left")
                     ->join("person as p" , "p.sysid = pem.personid" , "left")
-                    ->where(array("prg.sysid" => $groupid , "prm.groupid"=> $groupid , "prm.ccid" => $ccrow->ccid))
+                    ->where(array("prg.sysid" => $groupid , "prm.groupid"=> $groupid , "prm.ccid" => $ccrow->ccid, "pem.status" => 1))
                     ->get();
 
                 if($sql->num_rows() > 0){
