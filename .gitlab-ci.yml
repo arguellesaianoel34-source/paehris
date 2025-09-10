@@ -1,129 +1,83 @@
-
 stages:
-  - build
-  - deploy
+  - main
+  - release
 
-variables:
-  # Define deployment paths
-  DEPLOY_PATH: "public_html/erp/"
-  NODE_VERSION: "18"
-  
-# Build stage for dependencies and assets
-build_assets:
-  stage: build
-  image: node:${NODE_VERSION}-alpine
+Development:
   only:
     - main
+  stage: main
   before_script:
-    - apk add --no-cache git
-  script:
-    - echo "Installing Node.js dependencies..."
-    - npm ci --only=production
-    - echo "Build completed successfully"
-  artifacts:
-    paths:
-      - node_modules/
-    expire_in: 1 hour
-  cache:
-    key: ${CI_COMMIT_REF_SLUG}
-    paths:
-      - node_modules/
-
-deploy_production:
-  stage: deploy
-  image: alpine:latest
-  only:
-    - main
-  dependencies:
-    - build_assets
-  before_script:
-    - apk add --no-cache git lftp curl
-    - echo "Preparing deployment..."
-  script:
-    - git diff --name-only ${CI_COMMIT_BEFORE_SHA}...${CI_COMMIT_SHA} > /temp-deployment-text-${CI_JOB_ID}.txt
+    - apt-get update -yqq
+    - apt-get install -y lftp
+    # Validate required environment variables
     - |
-      echo "======================================================"
-      echo "GitLab CI/CD Deployment Started"
-      echo "Commit: ${CI_COMMIT_SHA}"
-      echo "Branch: ${CI_COMMIT_REF_NAME}"
-      echo "======================================================"
-      
-    - |
-      # Check if there are files to deploy
-      if [ ! -s /temp-deployment-text-${CI_JOB_ID}.txt ]; then
-        echo "No files changed in this commit. Skipping deployment."
-        exit 0
+      if [ -z "$FTP_USER" ] || [ -z "$FTP_PASSWORD" ]; then
+        echo "Error: FTP_USER and FTP_PASSWORD environment variables must be set"
+        exit 1
       fi
-      
+  script:
+    # Get list of changed files
+    - |
+      if [ -n "$CI_COMMIT_BEFORE_SHA" ]; then
+        git diff --name-only ${CI_COMMIT_BEFORE_SHA}...${CI_COMMIT_SHA} > /tmp/deployment-files-${CI_JOB_ID}.txt
+      else
+        # For initial commit, deploy all files
+        git ls-files > /tmp/deployment-files-${CI_JOB_ID}.txt
+      fi
+    
+    # Display files to be deployed
     - |
       echo "------------------------------------------------------"
       echo "Files to be deployed:"
       echo "------------------------------------------------------"
-      cat /temp-deployment-text-${CI_JOB_ID}.txt
+      cat /tmp/deployment-files-${CI_JOB_ID}.txt
       echo "------------------------------------------------------"
-      echo "Total files: $(wc -l < /temp-deployment-text-${CI_JOB_ID}.txt)"
-      echo "------------------------------------------------------"
-
-    - |
-      # Validate FTP credentials
-      if [ -z "${FTP_USER}" ] || [ -z "${FTP_PASSWORD}" ]; then
-        echo "ERROR: FTP credentials not configured in GitLab CI/CD variables"
-        echo "Please set FTP_USER and FTP_PASSWORD in Project Settings > CI/CD > Variables"
-        exit 1
-      fi
       
+      # Check if there are files to deploy
+      if [ ! -s /tmp/deployment-files-${CI_JOB_ID}.txt ]; then
+        echo "No files to deploy. Exiting."
+        exit 0
+      fi
+    
+    # Deploy files via FTP
     - |
-      echo "Starting file upload to: ${DEPLOY_PATH}"
-      upload_count=0
-      error_count=0
+      echo "Starting FTP deployment to ftp.paenergy.ph..."
       
       while IFS= read -r file; do
         if [ -f "$file" ]; then
+          # Get the directory path from the file
           dir_path=$(dirname "$file")
-          upload_count=$((upload_count + 1))
           
-          echo "[$upload_count] Uploading: $file"
+          echo "Uploading: $file to public_html/erp/$dir_path/"
           
-          # Upload with error handling
-          if lftp -c "
-            set ftp:ssl-allow no;
-            set net:timeout 30;
-            set net:max-retries 3;
-            open -u ${FTP_USER},${FTP_PASSWORD} ftp.paenergy.ph;
-            
-            cd ${DEPLOY_PATH};
-            mkdir -p \"${dir_path}\";
-            put -O \"${dir_path}/\" \"${file}\";
-            "; then
-            echo "✓ Successfully uploaded: $file"
-          else
-            echo "✗ Failed to upload: $file"
-            error_count=$((error_count + 1))
-          fi
+          lftp -c "
+          set ftp:ssl-allow no;
+          set net:timeout 30;
+          set net:max-retries 3;
+          open -u $FTP_USER,$FTP_PASSWORD ftp.paenergy.ph || exit 1;
+          
+          # Change to the target directory
+          cd public_html/erp || exit 1;
+          
+          # Create directory structure if needed
+          mkdir -p '$dir_path' || true;
+          
+          # Upload the file
+          put '$file' -o '$file' || exit 1;
+          
+          quit;
+          " || {
+            echo "Failed to upload $file"
+            exit 1
+          }
         else
-          echo "⚠ File not found (may have been deleted): $file"
+          echo "Warning: File $file not found, skipping..."
         fi
-      done < /temp-deployment-text-${CI_JOB_ID}.txt
-
+      done < /tmp/deployment-files-${CI_JOB_ID}.txt
+    
+    # Cleanup and success message
     - |
-      echo "======================================================"
-      echo "Deployment Summary:"
-      echo "Total files processed: $upload_count"
-      echo "Successful uploads: $((upload_count - error_count))"
-      echo "Failed uploads: $error_count"
-      echo "======================================================"
-      
-      if [ $error_count -gt 0 ]; then
-        echo "⚠ WARNING: Some files failed to upload. Check logs above."
-        echo "Deployment completed with errors."
-        exit 1
-      else
-        echo "✓ All files uploaded successfully!"
-        echo "🚀 Deployment completed successfully!"
-        echo "Application URL: https://paenergy.ph/erp/"
-      fi
-      
-  after_script:
-    - echo "Cleaning up temporary files..."
-    - rm -f /temp-deployment-text-${CI_JOB_ID}.txt
-    - echo "Deployment job finished at $(date)"
+      rm -f /tmp/deployment-files-${CI_JOB_ID}.txt
+      echo "------------------------------------------------------"
+      echo "Deployment completed successfully!"
+      echo "------------------------------------------------------"
