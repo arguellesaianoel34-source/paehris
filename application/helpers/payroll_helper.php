@@ -32,6 +32,7 @@ function getpayrolltrn($payrollid , $typesid){
             }
         }
     }
+    return 0; // Return 0 if no matching transaction found
 }
 if(!function_exists('getpayrollpayclass')) {
     function getpayrollpayclass(){

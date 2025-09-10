@@ -78,7 +78,7 @@ var FormEditable = function () {
         }), $("#fruits").on("shown", function (a, e) {
         }), $("#tags").editable({
             inputclass: "form-control input-medium",
-            select2: {data: ["html", "javascript", "css", "ajax"], tags: !0, tokenSeparators: [",", " "], multiple: !0}
+            select2: {tags: !0, tokenSeparators: [",", " "], multiple: !0}
         });
         var a = [];
         $.each({
