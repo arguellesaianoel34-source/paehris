@@ -12,7 +12,7 @@ deploy_production:
   only:
     - main
   before_script:
-    - apt-get update && apt-get install -y git
+    - apk add --no-cache git
   script:
     - git diff --name-only ${CI_COMMIT_BEFORE_SHA}...${CI_COMMIT_SHA} > /temp-deployment-text-${CI_JOB_ID}.txt
     - |
