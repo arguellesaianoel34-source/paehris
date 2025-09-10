@@ -1,4 +1,4 @@
-image: node:18
+
 stages:
   - deploy
 
@@ -12,7 +12,7 @@ deploy_production:
   only:
     - main
   before_script:
-    - apk add --no-cache lftp
+    - apt-get update && apt-get install -y git
   script:
     - git diff --name-only ${CI_COMMIT_BEFORE_SHA}...${CI_COMMIT_SHA} > /temp-deployment-text-${CI_JOB_ID}.txt
     - |
