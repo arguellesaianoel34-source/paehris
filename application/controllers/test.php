@@ -9,7 +9,6 @@ class Test extends CI_Controller
     public function __construct()
     {
         parent::__construct();
-        $this->load->helper('payroll_helper');
     }
     function index (){
 
@@ -49,7 +48,7 @@ class Test extends CI_Controller
     }
     function getemployeettransactions(){
         $data = array();
-        $data['datas'] =  get_employee_transactions(150, 1, 2019, 1, 1, 129, 1);
+        $data['datas'] =  get_employee_transactions(150, 1, 2019, 1, 1, 129);
         //  $data['data2'] = get_employee_transactions(159, 9, 2018, 1, 0, 129) ;
         echo json_encode($data);
     }

@@ -3,28 +3,6 @@
 if (!defined('BASEPATH'))
     exit('No direct script access allowed');
 
-/**
- * CodeIgniter Instance Type Definitions for Intelephense
- * 
- * @property CI_Loader $load
- * @property CI_DB_query_builder $db
- * @property CI_URI $uri
- * @property CI_Input $input
- * @property CI_Output $output
- * @property CI_Config $config
- * @property CI_Session $session
- * @property CI_Router $router
- * @property object $model_admin
- * @property object $model_auth
- */
-class CI_Controller {}
-
-/**
- * Get CodeIgniter instance
- * @return CI_Controller
- */
-function &get_instance() {}
-
 /*
 if(!function_exists('pecoapps_conn')) {
     function pecoapps_conn(){
@@ -1407,7 +1385,7 @@ if (!function_exists('update_stats')) {
         $ci->db->where('sysid', $id);
         $up = $ci->db->update($tbl, $arr);
         $ret = (object) array('ret' => $stat, 'upd' => $up);
-        return ( $get_stat ) ? (( $up ) ? $ret : false) : false;
+        return ( $get_stat ) ? ( $up ) ? $ret : false : false;
     }
 
 }
@@ -2064,33 +2042,6 @@ if (!function_exists('get_users_info')) {
             }
         }
         return ( $q ) ? $q : false;
-    }
-
-}
-if (!function_exists('get_user_basic')) {
-
-    function get_user_basic($id = NULL) {
-        $ci = & get_instance();
-        $userid = ($id == NULL) ? user_id() : $id;
-        
-        $q = $ci->db->select('u.sysid, u.username, u.firstname, u.lastname, u.status, u.type')
-            ->from('prime_system_users AS u')
-            ->where('u.sysid', $userid)
-            ->get()->row();
-            
-        if($q) {
-            $data = array(
-                'id' => $q->sysid,
-                'text' => $q->firstname . ' ' . $q->lastname,
-                'username' => $q->username,
-                'firstname' => $q->firstname,
-                'lastname' => $q->lastname,
-                'status' => $q->status,
-                'type' => $q->type
-            );
-            return json_encode($data);
-        }
-        return false;
     }
 
 }
@@ -4087,8 +4038,7 @@ if (!function_exists('time_elapsed_string')) {
         $ago = new DateTime($datetime);
         $diff = $now->diff($ago);
 
-        /** @var object $diff */
-        $diff->w = floor($diff->d / 7); // @phpstan-ignore-line
+        $diff->w = floor($diff->d / 7);
         $diff->d -= $diff->w * 7;
 
         $string = array(
@@ -4430,29 +4380,6 @@ if (!function_exists('get_dist_list_select')) {
         if ($qry->num_rows() > 0) {
             foreach ($qry->result() as $row) {
                 $data['list'][] = array('id' => $row->sysid, 'text' => $row->codes . ' - ' . $row->names);
-            }
-        }
-        return json_encode($data);
-    }
-}
-
-if (!function_exists('select2_rate_class')) {
-    function select2_rate_class($filter = array()) {
-        $ci = &get_instance();
-        $data = array();
-        $ci->db->select('sysid, codes, classifications');
-        $ci->db->from('prime_system_rate_class_main');
-        $ci->db->where('status', 1);
-        if (!empty($filter)) {
-            $ci->db->where_in('sysid', $filter);
-        }
-        $qry = $ci->db->get();
-        if ($qry->num_rows() > 0) {
-            foreach ($qry->result() as $row) {
-                $data['list'][] = array(
-                    'id' => $row->sysid,
-                    'text' => $row->codes . ' - ' . $row->classifications
-                );
             }
         }
         return json_encode($data);
@@ -4858,7 +4785,7 @@ if (!function_exists('compute_bill')) {
                         if ($qry_list_charges->num_rows() > 0) {
                             foreach ($qry_list_charges->result() as $rrow) {
                                 // GET IF HAVING SUB
-                                $qry_list_subs = $ci->db->select()->from('trn_billing_rates_group_list')->where(array('groupid' => $charges_main->sysid, 'parentid' => $rrow->sysid, 'status' => 1))->get();
+                                $qry_list_subs = $ci->db->select()->from('trn_billing_rates_group_list')->where(array('groupid' => $row->sysid, 'parentid' => $rrow->sysid, 'status' => 1))->get();
                                 if ($qry_list_subs->num_rows() > 0) {
                                     $arr_list_subs = array();
                                     $amt_total_subs = 0;
@@ -6694,24 +6621,12 @@ if(!function_exists('employee_print_header')) {
         $info = user_info($userid);
 
         $html = '';
-        $name = '';
-        $personid = 0;
-        
-        // Check if user info is valid
-        if($info && isset($info->lastname) && isset($info->firstname)) {
-            $name = $info->lastname . ', '.$info->firstname;
-            $personid = isset($info->personid) ? $info->personid : 0;
-        } else {
-            $name = 'Unknown User';
-        }
+        $name = $info->lastname . ', '.$info->firstname;
 
-        $qry_empinfo = false;
-        if($personid > 0) {
-            $qry_empinfo = get_instance()->db->select('sysid')
-                ->from('prime_employee_main')
-                ->where(array('personid' => $personid, 'status' => 1))
-                ->get()->row();
-        }
+        $qry_empinfo = get_instance()->db->select('sysid')
+            ->from('prime_employee_main')
+            ->where(array('personid' => $info->personid, 'status' => 1))
+            ->get()->row();
 
         $deptcode = '';
         if($code) {
@@ -6719,9 +6634,7 @@ if(!function_exists('employee_print_header')) {
         }else {
             if ($qry_empinfo) {
                 $emp_info = get_employee_info($qry_empinfo->sysid);
-                if($emp_info && isset($emp_info->deptcode)) {
-                    $deptcode = $emp_info->deptcode;
-                }
+                $deptcode = $emp_info->deptcode;
             }
         }
 

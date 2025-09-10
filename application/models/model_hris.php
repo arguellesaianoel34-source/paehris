@@ -860,9 +860,9 @@ Class Model_hris extends CI_Model {
                                     if($qry_trns) {
                                         $payspec = $qry_trns->payspec;
                                     }
-                                    //only bonus and LWOP will be inserted here.
+                                    //only bunos will be inserted here.
 
-                                    if($trn_type == 264 || $trn_type == 262){
+                                    if($trn_type == 264){
                                         $trn_ins_arr = array(
                                             'payrollid' => $payrollid,
                                             'trntype' => $trn_type,
@@ -3823,7 +3823,6 @@ WHERE telr.status = 301 AND telra.status = 301 AND empid = ".$empid." AND ('".$d
             }
         }
 
-        
         if (count($logs) > 0) {
             $batches = array_chunk($logs, 500);
             $tviDB = $this->load->database('tvi',true);

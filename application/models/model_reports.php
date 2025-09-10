@@ -5617,13 +5617,16 @@ class Model_reports extends CI_model
                 $payclassqry = $this->db->select('typesid')
                     ->from('prime_employee_payclass_ref_matrix')
                     ->where('selectval', 2)->get();
-                if ($payclassqry) {
+                if ($payclassqry && $payclassqry->num_rows() > 0) {
                     foreach ($payclassqry->result() AS $row) {
                         $payclass_id[] = $row->typesid;
                     }
+                    $payclass_in_id = implode(', ', $payclass_id);
+                    $where_payclass = ' AND prg.payclass IN (' . $payclass_in_id . ')';
+                } else {
+                    // If no payclass IDs found, set a condition that returns no results
+                    $where_payclass = ' AND prg.payclass = -1';
                 }
-                $payclass_in_id = implode(', ', $payclass_id);
-                $where_payclass = ' AND prg.payclass IN (' . $payclass_in_id . ')';
             }
             $selectval_col = '';
             $selectval_ = '';
@@ -5800,7 +5803,7 @@ class Model_reports extends CI_model
         // ###################################################################
         // ###################################################################
 
-        if ($qry_list) {
+        if ($qry_list && $qry_list->num_rows() > 0) {
             //LIST RESULT COLUMN HEADERS
             $cols = $qry_list->list_fields();
 

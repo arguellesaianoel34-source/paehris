@@ -3,17 +3,6 @@
 if (!defined('BASEPATH'))
     exit('No direct script access allowed');
 
-/**
- * HRIS Controller
- * 
- * @property CI_Loader $load
- * @property CI_Input $input
- * @property CI_DB_query_builder $db
- * @property CI_Session $session
- * @property CI_Upload $upload
- * @property Model_hris $model_hris
- * @property Model_reports $model_reports
- */
 class Hris extends CI_Controller {
 
     public function __construct() {
@@ -138,75 +127,27 @@ class Hris extends CI_Controller {
 
         $data = array();
         $this->db->trans_begin();
-        
-        // Input validation and sanitization
-        $required_fields = array('firstname', 'lastname', 'bday', 'datestart', 'gender', 'agencyfield');
-        foreach ($required_fields as $field) {
-            if (!$this->input->post($field) || trim($this->input->post($field)) === '') {
-                $error_msg = 'Required field missing: ' . $field;
-                log_message('error', 'HRIS savenewemployee validation failed: ' . $error_msg . ' - User ID: ' . user_id());
-                $data['msg'] = $error_msg;
-                $data['func'] = 'error';
-                $data['qry'] = false;
-                echo json_encode($data);
-                return;
-            }
-        }
-        
-        // Sanitize and validate inputs
-        $zipcode = $this->db->escape_str(trim($this->input->post('zipcode')));
-        $agency = (int) $this->input->post('agencyfield');
-        $firstname = $this->db->escape_str(trim($this->input->post('firstname')));
-        $lastname = $this->db->escape_str(trim($this->input->post('lastname')));
-        $middlename = $this->db->escape_str(trim($this->input->post('middlename')));
-        $bday = $this->db->escape_str(trim($this->input->post('bday')));
-        $datestart = $this->db->escape_str(trim($this->input->post('datestart')));
-        $gender = (int) $this->input->post('gender');
-        $addrcity = (int) $this->input->post('addrcity');
-        $addrdistrict = (int) $this->input->post('addrdistrict');
-        $addrspecific = $this->db->escape_str(trim($this->input->post('addrspecific')));
-        $nickname = $this->db->escape_str(trim($this->input->post('nickname')));
-        $marital_status = (int) $this->input->post('marital');
-        $nationality = (int) $this->input->post('nationality');
-        $account_number = $this->db->escape_str(trim($this->input->post('accountno')));
-        $department = (int) $this->input->post('searchdept');
-        $position = (int) $this->input->post('searchpos');
-        $pay_class = (int) $this->input->post('searchpay');
-        $job_cat = (int) $this->input->post('search_job_cat');
-        $salary = (float) $this->input->post('salary');
-        $costgroup = (int) $this->input->post('costgroup');
-        
-        // Validate date formats
-        if (!DateTime::createFromFormat('Y-m-d', $bday)) {
-            $error_msg = 'Invalid birthdate format: ' . $bday;
-            log_message('error', 'HRIS savenewemployee date validation failed: ' . $error_msg . ' - User ID: ' . user_id());
-            $data['msg'] = 'Invalid birthdate format';
-            $data['func'] = 'error';
-            $data['qry'] = false;
-            echo json_encode($data);
-            return;
-        }
-        
-        if (!DateTime::createFromFormat('Y-m-d', $datestart)) {
-            $error_msg = 'Invalid start date format: ' . $datestart;
-            log_message('error', 'HRIS savenewemployee date validation failed: ' . $error_msg . ' - User ID: ' . user_id());
-            $data['msg'] = 'Invalid start date format';
-            $data['func'] = 'error';
-            $data['qry'] = false;
-            echo json_encode($data);
-            return;
-        }
-        
-        // Validate numeric fields
-        if ($agency <= 0 || $gender <= 0 || $salary < 0) {
-            $error_msg = 'Invalid numeric values - Agency: ' . $agency . ', Gender: ' . $gender . ', Salary: ' . $salary;
-            log_message('error', 'HRIS savenewemployee numeric validation failed: ' . $error_msg . ' - User ID: ' . user_id());
-            $data['msg'] = 'Invalid numeric values provided';
-            $data['func'] = 'error';
-            $data['qry'] = false;
-            echo json_encode($data);
-            return;
-        }
+        $zipcode = $this->input->post('zipcode');
+        $agency = $this->input->post('agencyfield');
+        $firstname = $this->input->post('firstname');
+        $lastname = $this->input->post('lastname');
+        $middlename = $this->input->post('middlename');
+        $bday = $this->input->post('bday');
+        $datestart = $this->input->post('datestart');
+        $gender = $this->input->post('gender');
+        $addrcity = $this->input->post('addrcity');
+        $addrdistrict = $this->input->post('addrdistrict');
+        $addrspecific = $this->input->post('addrspecific');
+        $nickname = $this->input->post('nickname');
+        $marital_status = $this->input->post('marital');
+        $nationality = $this->input->post('nationality');
+        $account_number = $this->input->post('accountno');
+        $department = $this->input->post('searchdept');
+        $position = $this->input->post('searchpos');
+        $pay_class = $this->input->post('searchpay');
+        $job_cat = $this->input->post('search_job_cat');
+        $salary = $this->input->post('salary');
+        $costgroup = $this->input->post('costgroup');
 
         $inserttoperson = false;
         $inserttomainemp  = false;
@@ -258,17 +199,8 @@ class Hris extends CI_Controller {
                 'updatedby' => user_id()
             );
             $inserttoperson = $this->db->insert("person", $personarr);
-            if (!$inserttoperson) {
-                $this->db->trans_rollback();
-                $error_msg = 'Failed to insert person data: ' . $this->db->error()['message'];
-                log_message('error', 'HRIS savenewemployee DB error: ' . $error_msg . ' - User ID: ' . user_id());
-                $data['msg'] = 'Failed to create person record';
-                $data['func'] = 'error';
-                $data['qry'] = false;
-                echo json_encode($data);
-                return;
-            }
-            $personid = $this->db->insert_id();
+            $data['person'] = $this->db->_error_message();
+            $personid =  $this->db->insert_id();
         }
         $checkpersonid = $this->db->select("personid")->from("prime_employee_main")
             ->where(array("personid" => $personid , "status" => 1))->get()->row();
@@ -284,18 +216,9 @@ class Hris extends CI_Controller {
                 'createdby' => user_id(),
                 'datecreated' => date('Y-m-d H:i:s')
             );
-            $inserttomainemp = $this->db->insert("prime_employee_main", $employeemainarr);
-            if (!$inserttomainemp) {
-                $this->db->trans_rollback();
-                $error_msg = 'Failed to insert employee data: ' . $this->db->error()['message'];
-                log_message('error', 'HRIS savenewemployee DB error: ' . $error_msg . ' - User ID: ' . user_id());
-                $data['msg'] = 'Failed to create employee record';
-                $data['func'] = 'error';
-                $data['qry'] = false;
-                echo json_encode($data);
-                return;
-            }
-            $lastempid = $this->db->insert_id();
+            $inserttomainemp = $this->db->insert("prime_employee_main" , $employeemainarr);
+            $data['prime_employee_main'] = $this->db->_error_message();
+            $lastempid =  $this->db->insert_id();
             $newemp = true;
         }else{
             $msg = 'Employee already exist!';
@@ -313,15 +236,8 @@ class Hris extends CI_Controller {
                 'updatedby' => user_id()
             );
 
-            $insertpayrollemplist = $this->db->insert("payroll_emplist", $payrollemplistarr);
-            if (!$insertpayrollemplist) {
-                $this->db->trans_rollback();
-                $data['msg'] = 'Failed to create payroll employee record';
-                $data['func'] = 'error';
-                $data['qry'] = false;
-                echo json_encode($data);
-                return;
-            }
+            $this->db->insert("payroll_emplist" , $payrollemplistarr);
+            $data['payrollemplist'] =  $this->db->_error_message();
         }
         if($newemp){
 
@@ -332,15 +248,8 @@ class Hris extends CI_Controller {
                 'createdby' => user_id(),
                 'updatedby' => user_id()
             );
-            $insertagency = $this->db->insert("prime_employee_agency_matrix", $insarr);
-            if (!$insertagency) {
-                $this->db->trans_rollback();
-                $data['msg'] = 'Failed to create employee agency record';
-                $data['func'] = 'error';
-                $data['qry'] = false;
-                echo json_encode($data);
-                return;
-            }
+            $this->db->insert("prime_employee_agency_matrix" , $insarr);
+            $data['agencyinserterror'] = $this->db->_error_message();
 
             $costcenterarr = array(
                 'empid' => $lastempid,
@@ -352,14 +261,7 @@ class Hris extends CI_Controller {
                 'updatedby' => user_id()
             );
             $inserttocostcenter = $this->db->insert("prime_employee_costcenter", $costcenterarr);
-            if (!$inserttocostcenter) {
-                $this->db->trans_rollback();
-                $data['msg'] = 'Failed to create employee cost center record';
-                $data['func'] = 'error';
-                $data['qry'] = false;
-                echo json_encode($data);
-                return;
-            }
+            $data['prime_employee_costcenter'] = $this->db->_error_message();
 
             $positionarr = array(
                 'status' => 1,
@@ -370,17 +272,8 @@ class Hris extends CI_Controller {
                 'updatedby' => user_id()
             );
 
-            $inserttoposition = $this->db->insert("prime_employee_main_positions", $positionarr);
-            if (!$inserttoposition) {
-                $this->db->trans_rollback();
-                $error_msg = 'Failed to insert position data: ' . $this->db->error()['message'];
-                log_message('error', 'HRIS savenewemployee DB error: ' . $error_msg . ' - User ID: ' . user_id());
-                $data['msg'] = 'Failed to create employee position record';
-                $data['func'] = 'error';
-                $data['qry'] = false;
-                echo json_encode($data);
-                return;
-            }
+            $inserttoposition = $this->db->insert("prime_employee_main_positions" , $positionarr);
+            $data['prime_employee_main_positions'] = $this->db->_error_message();
 
 
             $payclassarr = array(
@@ -392,17 +285,8 @@ class Hris extends CI_Controller {
                 'updatedby' => user_id()
             );
 
-            $inserttopayclass = $this->db->insert("prime_employee_main_payclass", $payclassarr);
-            if (!$inserttopayclass) {
-                $this->db->trans_rollback();
-                $error_msg = 'Failed to insert payclass data: ' . $this->db->error()['message'];
-                log_message('error', 'HRIS savenewemployee DB error: ' . $error_msg . ' - User ID: ' . user_id());
-                $data['msg'] = 'Failed to create employee payclass record';
-                $data['func'] = 'error';
-                $data['qry'] = false;
-                echo json_encode($data);
-                return;
-            }
+            $inserttopayclass = $this->db->insert("prime_employee_main_payclass" , $payclassarr);
+            $data['prime_employee_main_payclass'] = $this->db->_error_message();
 
 
             $jobcatarr = array(
@@ -414,17 +298,8 @@ class Hris extends CI_Controller {
                 'updatedby' => user_id()
             );
 
-            $inserttojobcat = $this->db->insert("prime_employee_main_job_category", $jobcatarr);
-            if (!$inserttojobcat) {
-                $this->db->trans_rollback();
-                $error_msg = 'Failed to insert job category data: ' . $this->db->error()['message'];
-                log_message('error', 'HRIS savenewemployee DB error: ' . $error_msg . ' - User ID: ' . user_id());
-                $data['msg'] = 'Failed to create employee job category record';
-                $data['func'] = 'error';
-                $data['qry'] = false;
-                echo json_encode($data);
-                return;
-            }
+            $inserttojobcat = $this->db->insert("prime_employee_main_job_category" , $jobcatarr);
+            $data['prime_employee_main_job_category'] = $this->db->_error_message();
 
 
             $maritalarr = array(
@@ -436,17 +311,8 @@ class Hris extends CI_Controller {
                 'updatedby' => user_id()
             );
 
-            $inserttomarital = $this->db->insert("persons_marital_status_logs", $maritalarr);
-            if (!$inserttomarital) {
-                $this->db->trans_rollback();
-                $error_msg = 'Failed to insert marital status data: ' . $this->db->error()['message'];
-                log_message('error', 'HRIS savenewemployee DB error: ' . $error_msg . ' - User ID: ' . user_id());
-                $data['msg'] = 'Failed to create marital status record';
-                $data['func'] = 'error';
-                $data['qry'] = false;
-                echo json_encode($data);
-                return;
-            }
+            $inserttomarital = $this->db->insert("persons_marital_status_logs",$maritalarr);
+            $data['persons_marital_status_logs'] = $this->db->_error_message();
 
             $nationalarr = array(
                 'status' => 1,
@@ -457,17 +323,8 @@ class Hris extends CI_Controller {
                 'updatedby' => user_id()
             );
 
-            $inserttonationality = $this->db->insert("persons_nationality_logs", $nationalarr);
-            if (!$inserttonationality) {
-                $this->db->trans_rollback();
-                $error_msg = 'Failed to insert nationality data: ' . $this->db->error()['message'];
-                log_message('error', 'HRIS savenewemployee DB error: ' . $error_msg . ' - User ID: ' . user_id());
-                $data['msg'] = 'Failed to create nationality record';
-                $data['func'] = 'error';
-                $data['qry'] = false;
-                echo json_encode($data);
-                return;
-            }
+            $inserttonationality = $this->db->insert("persons_nationality_logs",$nationalarr);
+            $data['persons_nationality_logs'] = $this->db->_error_message();
 
             $credentialsarr = array(
                 'bank_details' => $account_number,
@@ -476,15 +333,8 @@ class Hris extends CI_Controller {
                 'createdby' => user_id(),
                 'updatedby' => user_id()
             );
-            $inserttocredentials = $this->db->insert("person_credentials", $credentialsarr);
-            if (!$inserttocredentials) {
-                $this->db->trans_rollback();
-                $data['msg'] = 'Failed to create credentials record';
-                $data['func'] = 'error';
-                $data['qry'] = false;
-                echo json_encode($data);
-                return;
-            }
+            $inserttocredentials = $this->db->insert("person_credentials" , $credentialsarr);
+            $data['personcredentials'] = $this->db->_error_message();
 
 
 
@@ -498,15 +348,8 @@ class Hris extends CI_Controller {
                 'createdby' => user_id(),
                 'updatedby' => user_id()
             );
-            $inserttoaddresses = $this->db->insert("person_address_matrix", $personaddrarr);
-            if (!$inserttoaddresses) {
-                $this->db->trans_rollback();
-                $data['msg'] = 'Failed to create address record';
-                $data['func'] = 'error';
-                $data['qry'] = false;
-                echo json_encode($data);
-                return;
-            }
+            $inserttoaddresses = $this->db->insert("person_address_matrix" , $personaddrarr);
+            $data['personaddress'] = $this->db->_error_message();
 
             $salaryarr = array(
                 'empid' => $lastempid,
@@ -515,15 +358,8 @@ class Hris extends CI_Controller {
                 'createdby' => user_id(),
                 'updatedby' => user_id()
             );
-            $insertdefaultsalary = $this->db->insert("prime_employee_salary", $salaryarr);
-            if (!$insertdefaultsalary) {
-                $this->db->trans_rollback();
-                $data['msg'] = 'Failed to create salary record';
-                $data['func'] = 'error';
-                $data['qry'] = false;
-                echo json_encode($data);
-                return;
-            }
+            $insertdefaultsalary = $this->db->insert("prime_employee_salary" , $salaryarr);
+            $data['errordefaultsalary'] = $this->db->_error_message();
 
             $ptp_deductions = $this->db->select('sysid')
                 ->from('prime_types_parameter')
@@ -536,17 +372,8 @@ class Hris extends CI_Controller {
                         'empid' => $lastempid,
                         'deductid' => $row->sysid
                     );
-                    $insert_deduction = $this->db->insert('trn_employee_deduction_matrix', $ins_array);
-                    if (!$insert_deduction) {
-                        $this->db->trans_rollback();
-                        $error_msg = 'Failed to insert deduction data: ' . $this->db->error()['message'];
-                        log_message('error', 'HRIS savenewemployee DB error: ' . $error_msg . ' - User ID: ' . user_id());
-                        $data['msg'] = 'Failed to create employee deduction record';
-                        $data['func'] = 'error';
-                        $data['qry'] = false;
-                        echo json_encode($data);
-                        return;
-                    }
+                    $this->db->insert('trn_employee_deduction_matrix',$ins_array);
+                    $data['error_deductions'] = $this->db->_error_message();
                 }
             }
 
@@ -556,32 +383,29 @@ class Hris extends CI_Controller {
                 'workshift_id' => 50
             );
 
-            $insert_workshift = insert_db($this->db, 'prime_employee_main_workshift_matrix', $workshift_arr);
-            if (!$insert_workshift) {
-                $this->db->trans_rollback();
-                $error_msg = 'Failed to insert workshift data: ' . $this->db->error()['message'];
-                log_message('error', 'HRIS savenewemployee DB error: ' . $error_msg . ' - User ID: ' . user_id());
-                $data['msg'] = 'Failed to create workshift record';
-                $data['func'] = 'error';
-                $data['qry'] = false;
-                echo json_encode($data);
-                return;
-            }
+            insert_db($this->db,'prime_employee_main_workshift_matrix',$workshift_arr);
+            $data['error_workshift'] = $this->db->_error_message();
         }
 
 
-        // If we reach here, all operations succeeded
-        if($this->db->trans_status() == true){
+        if($this->db->trans_status() == true  && $inserttoperson && $inserttomainemp && $inserttocostcenter && $inserttoposition && $inserttopayclass &&
+            $inserttojobcat && $inserttomarital && $inserttonationality && $inserttocredentials && $inserttoaddresses  && $insertdefaultsalary){
             $this->db->trans_commit();
-            $data['msg'] = 'New employee added.';
-            $data['func'] = 'success';
-            $data['qry'] = true;
-        } else {
+            $msg = 'New employee added.';
+            $func = 'success';
+            $qry = true;
+        }else{
             $this->db->trans_rollback();
-            $data['msg'] = 'Failed to add new employee';
-            $data['func'] = 'error';
-            $data['qry'] = false;
+            if($msg == ''){
+                $msg = 'Failed to add new employee';
+            }
+
+            $func = 'error';
+            $qry = false;
         }
+        $data['msg'] = $msg;
+        $data['func'] = $func;
+        $data['qry'] = $qry;
         echo json_encode($data);
     }
 
@@ -589,35 +413,9 @@ class Hris extends CI_Controller {
     function editinfo(){
         $data = array();
         $input = $this->input->post();
-        
-        // Input validation and sanitization
-        if (!$input || !isset($input['name']) || !isset($input['pk']) || !isset($input['value'])) {
-            $data['msg'] = 'Invalid input parameters';
-            $data['func'] = 'error';
-            echo json_encode($data);
-            return;
-        }
-        
-        $inputname = $this->db->escape_str(trim($input['name']));
-        $ids = (int) $input['pk']; // Cast to integer for ID
-        $val = $this->db->escape_str(trim($input['value']));
-        
-        // Validate employee ID
-        if ($ids <= 0) {
-            $data['msg'] = 'Invalid employee ID';
-            $data['func'] = 'error';
-            echo json_encode($data);
-            return;
-        }
-        
-        // Validate input name against allowed fields
-        $allowed_fields = array('birthdate', 'bioid', 'workshift');
-        if (!in_array($inputname, $allowed_fields)) {
-            $data['msg'] = 'Invalid field name';
-            $data['func'] = 'error';
-            echo json_encode($data);
-            return;
-        }
+        $inputname = $input['name'];
+        $ids = $input['pk'];
+        $val = $input['value'];
 
         // GET PERSON ID
         $qry_person = $this->db->select('sysid, personid')->from('prime_employee_main')->where('sysid', $ids)->get()->row();
@@ -694,15 +492,7 @@ class Hris extends CI_Controller {
 
         if($inputname == 'birthdate') {
             $this->db->where('sysid', $personid);
-            $update_result = $this->db->update('person', array('birthdate' => $val , "updatedby" => user_id()));
-            if (!$update_result) {
-                $error_msg = 'Failed to update birthdate: ' . $this->db->error()['message'];
-                log_message('error', 'HRIS editinfo DB error: ' . $error_msg . ' - User ID: ' . user_id());
-                $data['msg'] = 'Failed to update birthdate';
-                $data['func'] = 'error';
-                echo json_encode($data);
-                return;
-            }
+            $this->db->update('person', array('birthdate' => $val , "updatedby" => user_id()));
         }
         if($inputname == 'bioid') {
             $this->db->where(array("empid" => $ids));
@@ -715,15 +505,8 @@ class Hris extends CI_Controller {
                 'createdby' => user_id(),
                 'updatedby' => user_id()
             );
-            $insert_result = $this->db->insert("prime_employee_bioid" , $insarr);
-            if (!$insert_result) {
-                $error_msg = 'Failed to insert bioid: ' . $this->db->error()['message'];
-                log_message('error', 'HRIS editinfo DB error: ' . $error_msg . ' - User ID: ' . user_id());
-                $data['msg'] = 'Failed to update bioid';
-                $data['func'] = 'error';
-                echo json_encode($data);
-                return;
-            }
+            $this->db->insert("prime_employee_bioid" , $insarr);
+            $data['error1'] = $this->db->_error_message();
         }
         if($inputname == 'workshift') {
             $this->db->where('empid', $ids);
@@ -735,15 +518,7 @@ class Hris extends CI_Controller {
                 'createdby' => user_id(),
                 'updatedby' => user_id()
             );
-            $insert_result = $this->db->insert("prime_employee_main_workshift_matrix" , $insarr);
-            if (!$insert_result) {
-                $error_msg = 'Failed to insert workshift: ' . $this->db->error()['message'];
-                log_message('error', 'HRIS editinfo DB error: ' . $error_msg . ' - User ID: ' . user_id());
-                $data['msg'] = 'Failed to update workshift';
-                $data['func'] = 'error';
-                echo json_encode($data);
-                return;
-            }
+            $this->db->insert("prime_employee_main_workshift_matrix" , $insarr);
         }
         if($inputname == 'addrspec') {
             //check if district exist
@@ -2592,12 +2367,6 @@ class Hris extends CI_Controller {
         $types = $this->input->post('types');
         $year = $this->input->post('year');
         $hours = $this->input->post('nohours');
-        
-        // Ensure selectedemp is always an array
-        if (!is_array($selectedemp)) {
-            $selectedemp = array($selectedemp);
-        }
-        
         $this->db->trans_begin();
         $count = 0;
         $hours = $hours / 8;
@@ -5347,10 +5116,8 @@ WHERE telr.status = 301 AND telra.status = 301 AND empid = ".$absentemployees->s
         }
 
         $sql = $this->db->select("pmt.sysid,pmt.empid,pmt.tsysid,pmt.amount,pmt.monthdevide,pmt.amountpermonth,pmt.status,pmt.datecreated , pmts.subtype")
-            ->from("payroll_manual_transactions as pmt")->where(array("pmt.empid" => $empid , "pmt.tsysid" => $tabid))
-            ->where_in("pmt.status", array(312, 313))
+            ->from("payroll_manual_transactions as pmt")->where(array("pmt.empid" => $empid , "pmt.tsysid" => $tabid,"pmt.status " => 313 ))
             ->join("payroll_manual_transactions_subtypes as pmts" , "pmts.sysid = pmt.subtype" , "left")
-            ->order_by("pmt.datecreated", "DESC")
             ->get();
 
         if($sql->num_rows() > 0){
@@ -8169,11 +7936,6 @@ WHERE telr.status = 301 AND telra.status = 301 AND empid = ".$absentemployees->s
         $html .= '<div class="container-fluid">';
         $html .= '<div class="row">';
 
-        // Ensure emparr is always an array
-        if (!is_array($emparr)) {
-            $emparr = array($emparr);
-        }
-
         foreach ($emparr as $value){
             $explodearr =   explode(',', $value);
             for($i = 0; $i < count($explodearr) ; $i++){
@@ -9815,11 +9577,6 @@ WHERE telr.status = 301 AND telra.status = 301 AND empid = ".$absentemployees->s
         $month = $this->input->post('month');
         $year = $this->input->post('year');
         $employeeregdtr = $this->input->post('employeeregulardtr');
-
-        // Ensure employeeregdtr is always an array
-        if (!is_array($employeeregdtr)) {
-            $employeeregdtr = array($employeeregdtr);
-        }
 
         $html = '';
         $emparraycount =0;
@@ -12538,7 +12295,7 @@ WHERE telr.status = 301 AND telr.leavedate = '".$date."' ");
         $this->db->where(array("empid" => $empid,"evaltype" => $evaltype,"year" => date('Y'),"createdby" => user_id()));
         $updatejustification = $this->db->update("evaluation_justifications" , $evaljustificationarr);
 
-        
+
         $insarr = array(
             'empid' => $empid,
             'evaltype' => $evaltype,
