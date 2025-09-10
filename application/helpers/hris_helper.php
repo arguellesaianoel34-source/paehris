@@ -3443,7 +3443,8 @@ if(!function_exists('get_per_ccid_amts')) {
             ->join("prime_employee_main_payclass as pemp", "pemp.emp_id  = prm.empid", "left")
             ->join("payroll_reports_trn as prt", "prt.payrollid = prm.sysid", "left")
             ->join("person as p", "p.sysid = pem.personid", "left")
-            ->where(array("pec.ccid" => $ccid,  "pec.type" => 1, "prm.groupid" => $groupid, "pec.status" => 1, "pem.status" => 1))
+            ->join("payroll_emplist as pe", "pe.empid = prm.empid", "left")
+            ->where(array("pec.ccid" => $ccid,  "pec.type" => 1, "prm.groupid" => $groupid, "pec.status" => 1, "pem.status" => 1, "pe.status" => 1))
             ->group_by("prg.years , prg.months , prg.payclass ,prm.empid ,prm.basic, prm.deductions , prm.earnings , prm.tax , prm.net,prt.payrollid , p.firstname , p.lastname, prm.ccid,")
             ->order_by("p.lastname", "asc")
             ->get();
