@@ -1,83 +1,55 @@
-stages:
-  - main
-  - release
 
-Development:
+stages:
+  - deploy
+
+variables:
+  # Define deployment paths
+  DEPLOY_PATH: "public_html/erp/"
+  
+deploy_production:
+  stage: deploy
+  image: alpine:latest
   only:
     - main
-  stage: main
   before_script:
-    - apt-get update -yqq
-    - apt-get install -y lftp
-    # Validate required environment variables
-    - |
-      if [ -z "$FTP_USER" ] || [ -z "$FTP_PASSWORD" ]; then
-        echo "Error: FTP_USER and FTP_PASSWORD environment variables must be set"
-        exit 1
-      fi
+    - apk add --no-cache git lftp
   script:
-    # Get list of changed files
-    - |
-      if [ -n "$CI_COMMIT_BEFORE_SHA" ]; then
-        git diff --name-only ${CI_COMMIT_BEFORE_SHA}...${CI_COMMIT_SHA} > /tmp/deployment-files-${CI_JOB_ID}.txt
-      else
-        # For initial commit, deploy all files
-        git ls-files > /tmp/deployment-files-${CI_JOB_ID}.txt
-      fi
-    
-    # Display files to be deployed
+    - git diff --name-only ${CI_COMMIT_BEFORE_SHA}...${CI_COMMIT_SHA} > /temp-deployment-text-${CI_JOB_ID}.txt
     - |
       echo "------------------------------------------------------"
-      echo "Files to be deployed:"
+      echo "Listing the files to be deployed...."
       echo "------------------------------------------------------"
-      cat /tmp/deployment-files-${CI_JOB_ID}.txt
+      cat /temp-deployment-text-${CI_JOB_ID}.txt
       echo "------------------------------------------------------"
-      
-      # Check if there are files to deploy
-      if [ ! -s /tmp/deployment-files-${CI_JOB_ID}.txt ]; then
-        echo "No files to deploy. Exiting."
-        exit 0
-      fi
-    
-    # Deploy files via FTP
+      echo "Syncing to destination server: public_html/erp/"
+      echo "------------------------------------------------------"
+
+    # --- Start of the corrected script ---
+    # This loop will process one file at a time, but uses lftp's ability
     - |
-      echo "Starting FTP deployment to ftp.paenergy.ph..."
-      
       while IFS= read -r file; do
         if [ -f "$file" ]; then
-          # Get the directory path from the file
+          # Get the directory path from the file (e.g., "app/Models")
           dir_path=$(dirname "$file")
           
-          echo "Uploading: $file to public_html/erp/$dir_path/"
+          echo "Uploading: $file"
           
           lftp -c "
           set ftp:ssl-allow no;
-          set net:timeout 30;
-          set net:max-retries 3;
-          open -u $FTP_USER,$FTP_PASSWORD ftp.paenergy.ph || exit 1;
+          open -u ${FTP_USER},${FTP_PASSWORD} ftp.paenergy.ph;
           
-          # Change to the target directory
-          cd public_html/erp || exit 1;
+          # STEP 1: Create the directory. -p is safe and does nothing if it already exists.
+          mkdir -p \"${dir_path}\";
           
-          # Create directory structure if needed
-          mkdir -p '$dir_path' || true;
-          
-          # Upload the file
-          put '$file' -o '$file' || exit 1;
-          
-          quit;
-          " || {
-            echo "Failed to upload $file"
-            exit 1
-          }
-        else
-          echo "Warning: File $file not found, skipping..."
+          # STEP 2: Put the file into the directory we just created.
+          # The -O flag here correctly places the file inside the specified directory.
+          put -O \"${dir_path}/\" \"${file}\";
+          "
         fi
-      done < /tmp/deployment-files-${CI_JOB_ID}.txt
-    
-    # Cleanup and success message
+      done < /temp-deployment-text-${CI_JOB_ID}.txt
+    # --- End of the corrected script ---
+
     - |
-      rm -f /tmp/deployment-files-${CI_JOB_ID}.txt
       echo "------------------------------------------------------"
-      echo "Deployment completed successfully!"
+      echo "Deployment finished successfully."
       echo "------------------------------------------------------"
