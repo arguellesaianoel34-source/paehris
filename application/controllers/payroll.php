@@ -113,8 +113,7 @@ class Payroll extends CI_Controller
             $bonus = 0;
             $ps = 0;
             //payclass_id is 128 for tank and file
-            $query = $this->db->query("select e.sysid from prime_employee_main as e left join prime_employee_main_payclass as payclass on e.sysid = payclass.emp_id left join prime_employee_main_job_category jc
-on jc.empid = e.sysid  where e.status = 1 and payclass.payclass_id = 128 and jc.jobcatid = 157");
+            $query = $this->db->query("select e.sysid from prime_employee_main as e left join prime_employee_main_payclass as payclass on e.sysid = payclass.emp_id left join prime_employee_main_job_category jc on jc.empid = e.sysid left join payroll_emplist pe on pe.empid = e.sysid where e.status = 1 and payclass.payclass_id = 128 and jc.jobcatid = 157 and pe.status = 1");
 
             foreach ($query->result() as $row) {
                 //initialize shit here
@@ -533,8 +532,7 @@ on jc.empid = e.sysid  where e.status = 1 and payclass.payclass_id = 128 and jc.
             }
             // end 30 here
             // add for confidential process here
-            $query_confid = $this->db->query("select e.sysid from prime_employee_main as e left join prime_employee_main_payclass as payclass on e.sysid = payclass.emp_id left join prime_employee_main_job_category as jc
-on jc.empid = e.sysid where e.status = 1 and payclass.payclass_id != 128 and jc.jobcatid = 157");
+            $query_confid = $this->db->query("select e.sysid from prime_employee_main as e left join prime_employee_main_payclass as payclass on e.sysid = payclass.emp_id left join prime_employee_main_job_category as jc on jc.empid = e.sysid left join payroll_emplist pe on pe.empid = e.sysid where e.status = 1 and payclass.payclass_id != 128 and jc.jobcatid = 157 and pe.status = 1");
 
             foreach ($query_confid->result() as $row) {
                 //initialize shit here

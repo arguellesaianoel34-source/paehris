@@ -678,7 +678,7 @@ Class Model_payroll extends CI_Model {
             ->from('prime_employee_main AS em')
             ->join('prime_employee_main_payclass as pemp', 'pemp.emp_id = em.sysid')
             ->join('payroll_emplist AS pe', 'pe.empid = em.sysid')
-            ->where(array('em.status' => 1))
+            ->where(array('em.status' => 1, 'pe.status' => 1))
             ->order_by('em.sysid', 'desc')
             ->get()->row();
 
@@ -694,7 +694,7 @@ Class Model_payroll extends CI_Model {
             ->from('prime_employee_main AS em')
             ->join('prime_employee_main_payclass as pemp', 'pemp.emp_id = em.sysid')
             ->join('payroll_emplist AS pe', 'pe.empid = em.sysid')
-            ->where(array('em.status' => 1))
+            ->where(array('em.status' => 1, 'pe.status' => 1))
             ->get()->row();
         $data['qry_emp_cnt'] = $this->db->last_query();
         $data['emp_cnt'] = $qry_emp_cnt;
