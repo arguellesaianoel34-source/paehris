@@ -23,12 +23,6 @@ var PAYROLL = function() {
             data: {'num': num, 'sysid': sysid, 'payclass': payclass, 'years': year, 'months': month, 'paytype': paytype},
             dataType: 'json',
         }).done(function(d){
-            // Check for server-side errors
-            if(d.error) {
-                $('#input_start', document).html('<i class="fa fa-times text-danger"></i> Error: ' + d.error);
-                return;
-            }
-            
             if(d.end==false) {
 
                 setTimeout(init_form_loop(d.num, d.sysid, payclass, month, year, paytype),3000);
@@ -141,11 +135,6 @@ var PAYROLL = function() {
                 });
 
 
-            }).fail(function(xhr, status, error) {
-                console.error('AJAX Error:', error);
-                console.error('Status:', status);
-                console.error('Response:', xhr.responseText);
-                $('tbody', tbl_payroll_reports).html('<tr><td colspan="100%"><div class="alert alert-danger">Error loading payroll data: ' + error + '</div></td></tr>');
             });
         })
     };

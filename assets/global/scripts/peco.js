@@ -1501,16 +1501,10 @@ var PECO = function () {
             if(d) {
                 el.val('').trigger('change.select2');
                 el.attr('readonly', false);
-                
-                // Clear existing options and populate with new data
-                el.empty();
-                $.each(d.list, function(index, item) {
-                    el.append(new Option(item.text, item.id));
-                });
-                
                 el.select2({
                     allowClear: true,
                     placeholder: 'Select Brgy..',
+                    data: d.list,
                     formatResult: formatDataListBasic, // omitted for brevity, see the source of this page
                     formatSelection: formatDataSelectionBasic, // omitted for brevity, see the source of this page
                     width: 'resolve', // 100% or resolve
@@ -5599,16 +5593,10 @@ var PECO = function () {
                         var allow_all_arr = {'id': '0', 'text': 'All - records'};
                         dataArr.unshift(allow_all_arr);
                     }
-                    
-                    // Clear existing options and populate with new data
-                    elem.empty();
-                    $.each(dataArr, function(index, item) {
-                        elem.append(new Option(item.text, item.id));
-                    });
-                    
                     elem.select2({
                         allowClear: true,
                         placeholder: placeholder,
+                        data: dataArr,
                         formatResult: formatDataListBasic, // omitted for brevity, see the source of this page
                         formatSelection: selection, // omitted for brevity, see the source of this page
                         width: 'resolve'
@@ -5664,17 +5652,11 @@ var PECO = function () {
                         var allow_all_arr = {'id': '0', 'text': 'All - records'};
                         dataArr.unshift(allow_all_arr);
                     }
-                    
-                    // Clear existing options and populate with new data
-                    elem.empty();
-                    $.each(dataArr, function(index, item) {
-                        elem.append(new Option(item.text, item.id));
-                    });
-                    
                     if  ($.fn.select2) {
                         elem.select2({
                             allowClear: true,
                             placeholder: placeholder,
+                            data: dataArr,
                             formatResult: options, // omitted for brevity, see the source of this page
                             formatSelection: selection, // omitted for brevity, see the source of this page
                             width: '100%', // 100% or resolve
@@ -5687,11 +5669,11 @@ var PECO = function () {
                         PECO.select2_slimscroller();
                     }
                 }else{
-                    elem.empty();
                     elem.select2({
                         allowClear: true,
                         placeholder: 'No data found!',
-                        width: '100%'
+                        width: '100%',
+                        data: {}
                     });
                 }
             }).fail(function() {
@@ -5738,17 +5720,11 @@ var PECO = function () {
                         var allow_all_arr = {'id': '0', 'text': 'All - records'};
                         dataArr.unshift(allow_all_arr);
                     }
-                    
-                    // Clear existing options and populate with new data
-                    elem.empty();
-                    $.each(dataArr, function(index, item) {
-                        elem.append(new Option(item.text, item.id));
-                    });
-                    
                     if  ($.fn.select2) {
                         elem.select2({
                             allowClear: true,
                             placeholder: placeholder,
+                            data: dataArr,
                             formatResult: options, // omitted for brevity, see the source of this page
                             formatSelection: selection, // omitted for brevity, see the source of this page
                             width: 'resolve', // 100% or resolve
@@ -5761,7 +5737,6 @@ var PECO = function () {
                         PECO.select2_slimscroller();
                     }
                 }else{
-                    elem.empty();
                     elem.select2({
                         allowClear: true,
                         placeholder: 'No data found!',

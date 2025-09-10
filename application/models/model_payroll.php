@@ -2,6 +2,7 @@
 
 if (!defined('BASEPATH'))
     exit('No direct script access allowed');
+
 Class Model_payroll extends CI_Model {
 
     function emplist_per_class() {
@@ -641,37 +642,25 @@ Class Model_payroll extends CI_Model {
     }
 
     function send_payslips() {
-        // Wrap entire function in try-catch for comprehensive error handling
-        try {
-            $data = array();
-            $msg = '';
-            $num = $this->input->post('num');
-            $sysid = $this->input->post('sysid');
-            $payclass = $this->input->post('payclass');
-            $months = $this->input->post('months');
-            $years = $this->input->post('years');
-            $paytype = $this->input->post('paytype');
-            $non_confi = array(128,3077,3078);
-            
-            // Initialize nettype properly
-            $nettype = 0; // default value
-            if($paytype == 1){
-                $nettype = 0;
-            }else if($paytype == 2){
-                $nettype = 1;
-            }
-            
-            $per = 0;
-            $end = false;
-            $ins_arr = '';
-            $emp_arr = false;
-            
-            // Add input validation
-            if(empty($payclass) || empty($months) || empty($years)) {
-                $data['error'] = 'Missing required parameters';
-                $data['end'] = true;
-                return json_encode($data);
-            }
+        $data = array();
+        $msg = '';
+        $num = $this->input->post('num');
+        $sysid = $this->input->post('sysid');
+        $payclass = $this->input->post('payclass');
+        $months = $this->input->post('months');
+        $years = $this->input->post('years');
+        $paytype = $this->input->post('paytype');
+        $non_confi = array(128,3077,3078);
+        if($paytype == 1){
+            $nettype = 0;
+        }else if($paytype == 2){
+            $nettype = 1;
+        }
+        $per = 0;
+        $end = false;
+        $ins_arr = '';
+
+        $emp_arr = false;
 
         if($num==0) {
             $this->db->where('em.sysid > ', 0);
@@ -689,7 +678,7 @@ Class Model_payroll extends CI_Model {
             ->from('prime_employee_main AS em')
             ->join('prime_employee_main_payclass as pemp', 'pemp.emp_id = em.sysid')
             ->join('payroll_emplist AS pe', 'pe.empid = em.sysid')
-            ->where(array('em.status' => 1, 'pe.status' => 1))
+            ->where(array('em.status' => 1))
             ->order_by('em.sysid', 'desc')
             ->get()->row();
 
@@ -705,20 +694,13 @@ Class Model_payroll extends CI_Model {
             ->from('prime_employee_main AS em')
             ->join('prime_employee_main_payclass as pemp', 'pemp.emp_id = em.sysid')
             ->join('payroll_emplist AS pe', 'pe.empid = em.sysid')
-            ->where(array('em.status' => 1, 'pe.status' => 1))
+            ->where(array('em.status' => 1))
             ->get()->row();
         $data['qry_emp_cnt'] = $this->db->last_query();
         $data['emp_cnt'] = $qry_emp_cnt;
 
         if($qry_emp) {
             $emp_arr = get_employee_info($qry_emp->sysid);
-            
-            // Check if employee info was retrieved successfully
-            if(!$emp_arr || !isset($emp_arr->sysid)) {
-                $data['error'] = 'Employee information not found';
-                $data['end'] = true;
-                return json_encode($data);
-            }
 
             // SENDING EMAIL
             if(in_array($payclass,$non_confi)){
@@ -782,21 +764,8 @@ Class Model_payroll extends CI_Model {
                     //IF RETURNS NO RESULT
                     if($check_mailsent == false) {
 
-                        // Add error handling for form_payslip_single function
-                        try {
-                            $form_payslip = form_payslip_single($row->sysid, $months, $years, $row->paytype, $payclass, true);
-                            
-                            // Check if payslip generation was successful
-                            if(!$form_payslip || !isset($form_payslip->html) || empty($form_payslip->html)) {
-                                $data['error'] = 'Failed to generate payslip for employee';
-                                $data['end'] = true;
-                                return json_encode($data);
-                            }
-                        } catch (Exception $e) {
-                            $data['error'] = 'Error generating payslip: ' . $e->getMessage();
-                            $data['end'] = true;
-                            return json_encode($data);
-                        }
+
+                        $form_payslip = form_payslip_single($row->sysid, $months, $years, $row->paytype, $payclass, true);
 
                         $html = '';
                         $html .= '<html>';
@@ -836,72 +805,71 @@ Class Model_payroll extends CI_Model {
 
                         if(!file_exists($upload_path  . '/' . $years . '/' . $months . '/' . $filename)) {
 
-                            try {
-                                // Load library
-                                $this->load->library('pdf');
+                            // Load library
+                            $this->load->library('pdf');
 
-                                $dompdf = new Dompdf\Dompdf();
+                            $dompdf = new Dompdf\Dompdf();
 
-                                $dompdf->loadHtml($html);
+                            $dompdf->loadHtml($html);
 
-                                $customPaper = array(0, 0, 610, 205);
-                                $dompdf->setPaper($customPaper, 'portrate');
-                                $dompdf->render();
-                                // Add PDF Document Information
-                                $dompdf->add_info('Subject', 'PECO PAYSLIP | ' . $filename);
-                                $dompdf->add_info('Author', 'Panay Electric Company, Inc.');
-                                $dompdf->add_info('Creator', 'ITD');
-                                $dompdf->add_info('Keywords', 'Payslip');
 
-                                $output = $dompdf->output();
-                                $data['output'] = $output;
-                                
-                                if(empty($output)) {
-                                    $data['error'] = 'Failed to generate PDF output';
-                                    $data['end'] = true;
-                                    return json_encode($data);
-                                }
-                            } catch (Exception $e) {
-                                $data['error'] = 'PDF generation error: ' . $e->getMessage();
-                                $data['end'] = true;
-                                return json_encode($data);
-                            }
 
-                            try {
-                                // Create directory structure
+                            $customPaper = array(0, 0, 610, 205);
+                            $dompdf->setPaper($customPaper, 'portrate');
+                            $dompdf->render();
+                            // Add PDF Document Information
+                            $dompdf->add_info('Subject', 'PECO PAYSLIP | ' . $filename);
+                            $dompdf->add_info('Author', 'Panay Electric Company, Inc.');
+                            $dompdf->add_info('Creator', 'ITD');
+                            $dompdf->add_info('Keywords', 'Payslip');
+
+                            $output = $dompdf->output();
+                            $data['output'] = $output;
+
+                            if (!is_dir($upload_path)) {
+                                mkdir($upload_path, 0777, true);
                                 $year_path = $upload_path . $years;
-                                $month_path = $year_path . '/' . $months . '/';
-                                
-                                if (!is_dir($upload_path)) {
-                                    if(!mkdir($upload_path, 0777, true)) {
-                                        throw new Exception('Failed to create upload directory');
-                                    }
-                                }
-                                
                                 if (!is_dir($year_path)) {
-                                    if(!mkdir($year_path, 0777, true)) {
-                                        throw new Exception('Failed to create year directory');
+                                    mkdir($upload_path . '/' . $years, 0777, true);
+                                    $month_path = $year_path . '/' . $months . '/';
+                                    if (!is_dir($month_path)) {
+                                        mkdir($year_path . '/' . $months, 0777, true);
+                                    } else {
+                                        chmod($year_path . '/' . $months, 0777);
                                     }
-                                }
-                                
-                                if (!is_dir($month_path)) {
-                                    if(!mkdir($month_path, 0777, true)) {
-                                        throw new Exception('Failed to create month directory');
-                                    }
+                                    file_put_contents($month_path . $filename, $output);
                                 } else {
-                                    chmod($month_path, 0777);
+                                    $month_path = $year_path . '/' . $months . '/';
+                                    if (!is_dir($month_path)) {
+                                        mkdir($year_path . '/' . $months, 0777, true);
+                                    } else {
+                                        chmod($year_path . '/' . $months, 0777);
+                                    }
+
+                                    file_put_contents($month_path . $filename, $output);
                                 }
-                                
-                                // Write file
-                                $file_written = file_put_contents($month_path . $filename, $output);
-                                if($file_written === false) {
-                                    throw new Exception('Failed to write PDF file');
+                            } else {
+                                $year_path = $upload_path . $years;
+                                if (!is_dir($year_path)) {
+                                    mkdir($upload_path . '/' . $years, 0777, true);
+                                    $month_path = $year_path . '/' . $months . '/';
+                                    if (!is_dir($month_path)) {
+                                        mkdir($year_path . '/' . $months, 0777, true);
+                                    } else {
+                                        chmod($year_path . '/' . $months, 0777);
+                                    }
+
+                                    file_put_contents($month_path . $filename, $output);
+                                } else {
+                                    $month_path = $year_path . '/' . $months . '/';
+                                    if (!is_dir($month_path)) {
+                                        mkdir($year_path . '/' . $months, 0777, true);
+                                    } else {
+                                        chmod($year_path . '/' . $months, 0777);
+                                    }
+
+                                    file_put_contents($month_path . $filename, $output);
                                 }
-                                
-                            } catch (Exception $e) {
-                                $data['error'] = 'File operation error: ' . $e->getMessage();
-                                $data['end'] = true;
-                                return json_encode($data);
                             }
                         }
 
@@ -923,26 +891,20 @@ Class Model_payroll extends CI_Model {
 
 
                                 //SMTP & mail configuration
-                                try {
-                                    $this->load->library('email');
-                                    $config = array(
-                                        'protocol' => 'smtp',
-                                        'smtp_host' => 'ssl://smtp.googlemail.com',
-                                        'smtp_port' => 465,
-                                        'smtp_user' => 'noreply.peco@gmail.com',
-                                        'smtp_pass' => 'P3C02019',
-                                        'mailtype' => 'html',
-                                        'charset' => 'utf-8'
-                                    );
+                                $this->load->library('email');
+                                $config = array(
+                                    'protocol' => 'smtp',
+                                    'smtp_host' => 'ssl://smtp.googlemail.com',
+                                    'smtp_port' => 465,
+                                    'smtp_user' => 'noreply.peco@gmail.com',
+                                    'smtp_pass' => 'P3C02019',
+                                    'mailtype' => 'html',
+                                    'charset' => 'utf-8'
+                                );
 
-                                    $this->email->initialize($config);
-                                    $this->email->set_mailtype("html");
-                                    $this->email->set_newline("\r\n");
-                                } catch (Exception $e) {
-                                    $data['error'] = 'Email configuration error: ' . $e->getMessage();
-                                    $data['end'] = true;
-                                    return json_encode($data);
-                                }
+                                $this->email->initialize($config);
+                                $this->email->set_mailtype("html");
+                                $this->email->set_newline("\r\n");
 
 
                                 $content = '';
@@ -993,38 +955,20 @@ Class Model_payroll extends CI_Model {
                                 $content .= '</html>';
 
                                 //Email content
-                                try {
-                                    $this->email->to($email);
-                                    $this->email->from('no-reply@paenergy.ph', 'PAE PAYSLIP | ' . strtoupper($month_code) . '-' . $years);
-                                    $this->email->subject('PAE PAYSLIP | ' . strtoupper($month_code) . '-' . $years);
-                                    $this->email->message($content);
-                                    
-                                    // Check if attachment file exists before attaching
-                                    $attachment_path = $upload_path . '/' . $years . '/' . $months . '/' . $filename;
-                                    if(file_exists($attachment_path)) {
-                                        $this->email->attach($attachment_path);
-                                    } else {
-                                        $data['error'] = 'Payslip file not found for attachment';
-                                        $data['end'] = true;
-                                        return json_encode($data);
-                                    }
+                                $this->email->to($email);
+                                $this->email->from('no-reply@paenergy.ph', 'PAE PAYSLIP | ' . strtoupper($month_code) . '-' . $years);
+                                $this->email->subject('PAE PAYSLIP | ' . strtoupper($month_code) . '-' . $years);
+                                $this->email->message($content);
+                                $this->email->attach($upload_path . '/' . $years . '/' . $months . '/' . $filename);
 
-                                    // Send email (uncommented for actual sending)
-                                    $sent = $this->email->send();
-                                    $this->email->clear(true);
-                                    if ($sent) {
-                                        $this->db->where(array('empid' => $row->sysid, 'years' => $years, 'months' => $months , 'mailsent' => 0));
-                                        $this->db->update('payroll_transactions_bankfile', array('mailsent' => 1));
-                                    } else {
-                                        $data['error'] = 'Failed to send email: ' . $this->email->print_debugger();
-                                        $data['end'] = true;
-                                        return json_encode($data);
-                                    }
-                                } catch (Exception $e) {
-                                    $data['error'] = 'Email sending error: ' . $e->getMessage();
-                                    $data['end'] = true;
-                                    return json_encode($data);
-                                }
+                                // $sent = true;
+                                // Send email
+                                /*$sent = $this->email->send();
+                                $this->email->clear(true);
+                                if ($sent) {
+                                    $this->db->where(array('empid' => $row->sysid, 'years' => $years, 'months' => $months , 'mailsent' => 0));
+                                    $this->db->update('payroll_transactions_bankfile', array('mailsent' => 1));
+                                }*/
                             } else {
                                 $msg .= 'Employee has no registered email!';
                                 $end = false;
@@ -1056,27 +1000,16 @@ Class Model_payroll extends CI_Model {
             $per = 100;
         }
 
-            $data['empname'] = ($emp_arr) ? $emp_arr->lastname.', '.$emp_arr->firstname : 'Done!';
+        $data['empname'] = ($emp_arr) ? $emp_arr->lastname.', '.$emp_arr->firstname : 'Done!';
 
-            $data['insarr'] = $emp_arr;
-            $data['end'] = $end;
-            $data['per'] = round($per, 2);
-            $data['sysid'] = $sysid;
-            $data['num'] = $num;
 
-            return json_encode($data);
-            
-        } catch (Exception $e) {
-            // Comprehensive error handler for any unexpected errors
-            $error_data = array(
-                'error' => 'Unexpected error occurred: ' . $e->getMessage(),
-                'end' => true,
-                'per' => 0,
-                'sysid' => isset($sysid) ? $sysid : 0,
-                'num' => isset($num) ? $num : 0
-            );
-            return json_encode($error_data);
-        }
+        $data['insarr'] = $emp_arr;
+        $data['end'] = $end;
+        $data['per'] = round($per, 2);
+        $data['sysid'] = $sysid;
+        $data['num'] = $num;
+
+        return json_encode($data);
     }
 
     function email_payslip() {
@@ -1586,8 +1519,7 @@ Class Model_payroll extends CI_Model {
                     ->join("prime_employee_main_payclass as pemp" ,"pemp.emp_id  = prm.empid" , "left")
                     ->join("payroll_reports_trn as prt" , "prt.payrollid = prm.sysid" , "left")
                     ->join("person as p" , "p.sysid = pem.personid" , "left")
-                    ->join("payroll_emplist as pe" , "pe.empid = prm.empid" , "left")
-                    ->where(array("pec.ccid" => $row->ccid , "pem.status" => 1  , "pec.type" => 1, "prm.groupid" => $groupid , "pec.status" => 1, "pe.status" => 1))
+                    ->where(array("pec.ccid" => $row->ccid , "pem.status" => 1  , "pec.type" => 1, "prm.groupid" => $groupid , "pec.status" => 1))
                     ->order_by("p.lastname" , "asc")
                     ->group_by("prm.empid  , pemp.payclass_id ,prm.basic, prm.deductions , prm.earnings , prm.tax , prm.net,prt.payrollid , p.firstname , p.lastname ")
                     ->get();

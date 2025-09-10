@@ -1142,12 +1142,6 @@ var PAYROLL = function() {
                     PECO.DTphpLoading(overtimeregistertable, 'Loading overtime, Please wait...');
                 }
             }).done(function (data) {
-                console.log('Response data:', data);
-                
-                if(data.debug) {
-                    console.log('Debug info:', data.debug);
-                }
-                
                 if(data.payclass == 1){
                     $(document).find('.changablecol').text('401');
                 }else{
@@ -1185,20 +1179,8 @@ var PAYROLL = function() {
                     PECO.DTDefault(deductionsregistertable, data.msg);
                     PECO.DTDefault(overtimeregistertable, data.msg);
                 }
-            }).fail(function (xhr, status, error) {
-                console.log('AJAX Error Details:');
-                console.log('Status:', status);
-                console.log('Error:', error);
-                console.log('Response Text:', xhr.responseText);
-                console.log('Response Status:', xhr.status);
-                
+            }).fail(function () {
                 PECO.phpError();
-                
-                // Clear loading states
-                PECO.DTDefault(payrollregistertable, 'Error loading payroll register data');
-                PECO.DTDefault(earningregistertable, 'Error loading earnings data');
-                PECO.DTDefault(deductionsregistertable, 'Error loading deductions data');
-                PECO.DTDefault(overtimeregistertable, 'Error loading overtime data');
             });
         });
 

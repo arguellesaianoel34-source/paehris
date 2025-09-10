@@ -3,21 +3,8 @@
 if (!defined('BASEPATH'))
     exit('No direct script access allowed');
 
-/**
- * Payroll Controller
- * 
- * @property CI_Loader $load
- * @property CI_Input $input
- * @property CI_URI $uri
- * @property Model_reports $model_reports
- * @property Model_payroll $model_payroll
- * @property Model_hris $model_hris
- * @property Datatables $datatables
- * @property PHPExcel $excel
- */
 class Payroll extends CI_Controller
 {
-
 
     public function __construct()
     {
@@ -44,7 +31,6 @@ class Payroll extends CI_Controller
         echo $this->model_payroll->payroll_info();
     }
 
-    
     public function payslipinfo()
     {
         echo $this->model_payroll->payslip_info();
@@ -114,7 +100,8 @@ class Payroll extends CI_Controller
             $bonus = 0;
             $ps = 0;
             //payclass_id is 128 for tank and file
-            $query = $this->db->query("select e.sysid from prime_employee_main as e left join prime_employee_main_payclass as payclass on e.sysid = payclass.emp_id left join prime_employee_main_job_category jc on jc.empid = e.sysid left join payroll_emplist pe on pe.empid = e.sysid where e.status = 1 and payclass.payclass_id = 128 and jc.jobcatid = 157 and pe.status = 1");
+            $query = $this->db->query("select e.sysid from prime_employee_main as e left join prime_employee_main_payclass as payclass on e.sysid = payclass.emp_id left join prime_employee_main_job_category jc
+on jc.empid = e.sysid  where e.status = 1 and payclass.payclass_id = 128 and jc.jobcatid = 157");
 
             foreach ($query->result() as $row) {
                 //initialize shit here
@@ -533,7 +520,8 @@ class Payroll extends CI_Controller
             }
             // end 30 here
             // add for confidential process here
-            $query_confid = $this->db->query("select e.sysid from prime_employee_main as e left join prime_employee_main_payclass as payclass on e.sysid = payclass.emp_id left join prime_employee_main_job_category as jc on jc.empid = e.sysid left join payroll_emplist pe on pe.empid = e.sysid where e.status = 1 and payclass.payclass_id != 128 and jc.jobcatid = 157 and pe.status = 1");
+            $query_confid = $this->db->query("select e.sysid from prime_employee_main as e left join prime_employee_main_payclass as payclass on e.sysid = payclass.emp_id left join prime_employee_main_job_category as jc
+on jc.empid = e.sysid where e.status = 1 and payclass.payclass_id != 128 and jc.jobcatid = 157");
 
             foreach ($query_confid->result() as $row) {
                 //initialize shit here
@@ -1616,7 +1604,7 @@ class Payroll extends CI_Controller
                     ->join("prime_employee_costcenter as pec", "pec.empid = pem.sysid", "left")
                     ->join("prime_costcenter_main as pcm", "pcm.sysid = pec.ccid", "left")
                     ->join("prime_employee_main_payclass as pemp", "pemp.emp_id = pem.sysid", "left")
-                    ->where(array("prg.status != " => 302, 'pec.type' => 1, "pec.status" => 1, "payrollemp.status" => 1, "pem.status" => 1))
+                    ->where(array("prg.status != " => 302, 'pec.type' => 1, "pec.status" => 1, "payrollemp.status" => 1))
                     ->group_by("pem.sysid,payrollemp.accntno,prg.months,prg.years , pem.empid,p.firstname,p.lastname,p.middlename,prt.payrollid,pcm.names,prm.basic, prm.deductions , prm.earnings , prm.tax , prm.net")
                     ->order_by("p.lastname")
                     ->get();
@@ -2114,7 +2102,7 @@ class Payroll extends CI_Controller
                     ->join("prime_employee_costcenter as pec", "pec.empid = pem.sysid", "left")
                     ->join("prime_costcenter_main as pcm", "pcm.sysid = pec.ccid", "left")
                     ->join("prime_employee_main_payclass as pemp", "pemp.emp_id = pem.sysid", "left")
-                    ->where(array("prg.status = " => 301, 'pec.type' => 1, "pec.status" => 1, "payrollemp.status" => 1, "pem.status" => 1))
+                    ->where(array("prg.status = " => 301, 'pec.type' => 1, "pec.status" => 1, "payrollemp.status" => 1))
                     ->group_by("pem.sysid,payrollemp.accntno,prg.months,prg.years , pem.empid,p.firstname,p.lastname,p.middlename,prt.payrollid,pcm.names,prm.basic, prm.deductions , prm.earnings , prm.tax , prm.net")
                     ->order_by("p.lastname")
                     ->get();
@@ -3333,7 +3321,7 @@ class Payroll extends CI_Controller
             ->join("prime_employee_main_payclass as pemp", "pemp.emp_id  = prm.empid", "left")
             ->join("payroll_reports_trn as prt", "prt.payrollid = prm.sysid", "left")
             ->join("person as p", "p.sysid = pem.personid", "left")
-            ->where(array("pec.ccid" => $id, "pec.type" => 1, "prm.groupid" => $groupid, "pec.status" => 1, "pem.status" => 1))
+            ->where(array("pec.ccid" => $id, "pec.type" => 1, "prm.groupid" => $groupid, "pec.status" => 1))
             ->group_by("pem.sysid ,prg.payclass, prm.empid ,prm.basic, prm.deductions , prm.earnings , prm.tax , prm.net , p.firstname , p.lastname,prt.payrollid ")
             ->order_by("p.lastname", "asc")
             ->get();
@@ -3703,7 +3691,7 @@ class Payroll extends CI_Controller
                     ->join("prime_employee_main_payclass as pemp", "pemp.emp_id  = prm.empid", "left")
                     ->join("payroll_reports_trn as prt", "prt.payrollid = prm.sysid", "left")
                     ->join("person as p", "p.sysid = pem.personid", "left")
-                    ->where(array("pec.ccid" => $row->sysid, "prm.groupid" => $groupid, "pec.type" => 1, "pec.status" => 1, "pem.status" => 1))
+                    ->where(array("pec.ccid" => $row->sysid, "prm.groupid" => $groupid, "pec.type" => 1, "pec.status" => 1))
                     ->group_by("pem.sysid ,prg.months,prg.years, prg.payclass, prm.empid ,prm.basic, prm.deductions , prm.earnings , prm.tax , prm.net,prt.payrollid , p.firstname , p.lastname ")
                     ->order_by("p.lastname", "ASC")
                     ->get();
@@ -5427,7 +5415,7 @@ class Payroll extends CI_Controller
 
             if ($person_info && isset($person_info->info)) {
                 $info = $person_info->info;
-                $compute = compute_employee_netpay($empid, $month, $year, $paytype, 1, $payclass, 1);
+                $compute = compute_employee_netpay($empid, $month, $year, $paytype, 1, $payclass);
                 $data['compute'] = $compute;
                 if($compute) {
                     $func = 'success';
@@ -6889,10 +6877,7 @@ class Payroll extends CI_Controller
         $year = $this->input->post('year');
         $this->db->trans_begin();
 
-        // Ensure employees is an array
-        if (!is_array($employees)) {
-            $employees = array($employees);
-        }
+
 
         foreach($employees as $value){
             $explodearr =   explode(',', $value);
@@ -7288,7 +7273,7 @@ class Payroll extends CI_Controller
                     ->join("payroll_reports_main as prm" , "prm.groupid = prg.sysid" , "left")
                     ->join("prime_employee_main as pem" , "pem.sysid = prm.empid" , "left")
                     ->join("person as p" , "p.sysid = pem.personid" , "left")
-                    ->where(array("prg.sysid" => $groupid , "prm.groupid"=> $groupid , "prm.ccid" => $ccrow->ccid, "pem.status" => 1))
+                    ->where(array("prg.sysid" => $groupid , "prm.groupid"=> $groupid , "prm.ccid" => $ccrow->ccid))
                     ->get();
 
                 if($sql->num_rows() > 0){
@@ -7509,14 +7494,6 @@ class Payroll extends CI_Controller
         $payrollpayclass = $this->input->post('payrollpayclass');
         $payrollpaytype = $this->input->post('payrollpaytype');
 
-        // Add validation
-        if(empty($payrollyear) || empty($payrollmonth) || empty($payrollpayclass) || empty($payrollpaytype)) {
-            $data['qry'] = false;
-            $data['msg'] = 'Please fill in all required fields (Year, Month, Payclass, Paytype)';
-            echo json_encode($data);
-            return;
-        }
-
         $button = '';
 
         if($payrollpayclass != 1){
@@ -7529,46 +7506,37 @@ class Payroll extends CI_Controller
             ->get()->row();
 
         $data['query'] = $this->db->last_query();
-        $data['debug'] = array(
-            'payrollyear' => $payrollyear,
-            'payrollmonth' => $payrollmonth,
-            'payrollpayclass' => $payrollpayclass,
-            'payrollpaytype' => $payrollpaytype
-        );
 
         if($sql){
-            try {
-                $data['registers']      = $this->model_payroll->get_payroll_register_data($sql->sysid, $payrollyear, $payrollmonth, $payrollpayclass, $payrollpaytype);
-                $data['earnings']       = $this->model_payroll->get_earnings_report($sql->sysid, $payrollyear, $payrollmonth, $payrollpayclass, $payrollpaytype);
-                $data['deductions']     = $this->model_payroll->get_deductions_report($sql->sysid, $payrollyear, $payrollmonth, $payrollpayclass, $payrollpaytype);
-                $data['overtimes']      = $this->model_payroll->get_overtime_report($sql->sysid, $payrollyear, $payrollmonth, $payrollpayclass, $payrollpaytype);
+            $data['registers']      = $this->model_payroll->get_payroll_register_data($sql->sysid, $payrollyear, $payrollmonth, $payrollpayclass, $payrollpaytype);
+            $data['earnings']       = $this->model_payroll->get_earnings_report($sql->sysid, $payrollyear, $payrollmonth, $payrollpayclass, $payrollpaytype);
+            $data['deductions']     = $this->model_payroll->get_deductions_report($sql->sysid, $payrollyear, $payrollmonth, $payrollpayclass, $payrollpaytype);
+            $data['overtimes']      = $this->model_payroll->get_overtime_report($sql->sysid, $payrollyear, $payrollmonth, $payrollpayclass, $payrollpaytype);
 
-                $data['userid'] = user_id();
-                $data['qry'] = true;
-                $data['groupid'] = $sql->sysid;
-                $data['payclass'] = $payrollpayclass;
+            $data['userid'] = user_id();
+            $data['qry'] = true;
+            $data['groupid'] = $sql->sysid;
+            $data['payclass'] = $payrollpayclass;
 
-                if(count(array_intersect(array(36,54), get_users_roles_matrix_id_arr())) || super_admin()) {
-                    $data['access'] = true;
-                    if (!in_array($sql->status,array(301,302))) {
-                        $button .= '<button id="approvebtn" class="btn btn-primary"><i class="fa fa-check"></i> Approve</button>';
-                        $button .= '<button id="disapprovebtn" class="btn btn-danger pull-right"><i class="fa fa-times"></i> Disapprove</button>';
-                    }else{
-                        if ($sql->status == 301){
-                            $button .= '<h4 class="text-success pull-right"><i class="fa fa-check"></i> Approved</h4>';
-                        }
-                    }
+
+
+            if(count(array_intersect(array(36,54), get_users_roles_matrix_id_arr())) || super_admin()) {
+                $data['access'] = true;
+                if (!in_array($sql->status,array(301,302))) {
+                    $button .= '<button id="approvebtn" class="btn btn-primary"><i class="fa fa-check"></i> Approve</button>';
+                    $button .= '<button id="disapprovebtn" class="btn btn-danger pull-right"><i class="fa fa-times"></i> Disapprove</button>';
                 }else{
-                    $data['access'] = false;
+                    if ($sql->status == 301){
+                        $button .= '<h4 class="text-success pull-right"><i class="fa fa-check"></i> Approved</h4>';
+                    }
                 }
-            } catch (Exception $e) {
-                $data['qry'] = false;
-                $data['msg'] = 'Database error: ' . $e->getMessage();
-                $data['error'] = $e->getMessage();
+            }else{
+                $data['access'] = false;
             }
+
         }else{
             $data['qry'] = false;
-            $data['msg'] = 'No record found for the selected criteria!';
+            $data['msg'] = 'No record found!';
         }
 
 
