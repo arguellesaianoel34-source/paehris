@@ -135,6 +135,11 @@ var PAYROLL = function() {
                 });
 
 
+            }).fail(function(xhr, status, error) {
+                console.error('AJAX Error:', error);
+                console.error('Status:', status);
+                console.error('Response:', xhr.responseText);
+                $('tbody', tbl_payroll_reports).html('<tr><td colspan="100%"><div class="alert alert-danger">Error loading payroll data: ' + error + '</div></td></tr>');
             });
         })
     };
