@@ -7509,6 +7509,14 @@ class Payroll extends CI_Controller
         $payrollpayclass = $this->input->post('payrollpayclass');
         $payrollpaytype = $this->input->post('payrollpaytype');
 
+        // Add validation
+        if(empty($payrollyear) || empty($payrollmonth) || empty($payrollpayclass) || empty($payrollpaytype)) {
+            $data['qry'] = false;
+            $data['msg'] = 'Please fill in all required fields (Year, Month, Payclass, Paytype)';
+            echo json_encode($data);
+            return;
+        }
+
         $button = '';
 
         if($payrollpayclass != 1){
@@ -7521,37 +7529,46 @@ class Payroll extends CI_Controller
             ->get()->row();
 
         $data['query'] = $this->db->last_query();
+        $data['debug'] = array(
+            'payrollyear' => $payrollyear,
+            'payrollmonth' => $payrollmonth,
+            'payrollpayclass' => $payrollpayclass,
+            'payrollpaytype' => $payrollpaytype
+        );
 
         if($sql){
-            $data['registers']      = $this->model_payroll->get_payroll_register_data($sql->sysid, $payrollyear, $payrollmonth, $payrollpayclass, $payrollpaytype);
-            $data['earnings']       = $this->model_payroll->get_earnings_report($sql->sysid, $payrollyear, $payrollmonth, $payrollpayclass, $payrollpaytype);
-            $data['deductions']     = $this->model_payroll->get_deductions_report($sql->sysid, $payrollyear, $payrollmonth, $payrollpayclass, $payrollpaytype);
-            $data['overtimes']      = $this->model_payroll->get_overtime_report($sql->sysid, $payrollyear, $payrollmonth, $payrollpayclass, $payrollpaytype);
+            try {
+                $data['registers']      = $this->model_payroll->get_payroll_register_data($sql->sysid, $payrollyear, $payrollmonth, $payrollpayclass, $payrollpaytype);
+                $data['earnings']       = $this->model_payroll->get_earnings_report($sql->sysid, $payrollyear, $payrollmonth, $payrollpayclass, $payrollpaytype);
+                $data['deductions']     = $this->model_payroll->get_deductions_report($sql->sysid, $payrollyear, $payrollmonth, $payrollpayclass, $payrollpaytype);
+                $data['overtimes']      = $this->model_payroll->get_overtime_report($sql->sysid, $payrollyear, $payrollmonth, $payrollpayclass, $payrollpaytype);
 
-            $data['userid'] = user_id();
-            $data['qry'] = true;
-            $data['groupid'] = $sql->sysid;
-            $data['payclass'] = $payrollpayclass;
+                $data['userid'] = user_id();
+                $data['qry'] = true;
+                $data['groupid'] = $sql->sysid;
+                $data['payclass'] = $payrollpayclass;
 
-
-
-            if(count(array_intersect(array(36,54), get_users_roles_matrix_id_arr())) || super_admin()) {
-                $data['access'] = true;
-                if (!in_array($sql->status,array(301,302))) {
-                    $button .= '<button id="approvebtn" class="btn btn-primary"><i class="fa fa-check"></i> Approve</button>';
-                    $button .= '<button id="disapprovebtn" class="btn btn-danger pull-right"><i class="fa fa-times"></i> Disapprove</button>';
-                }else{
-                    if ($sql->status == 301){
-                        $button .= '<h4 class="text-success pull-right"><i class="fa fa-check"></i> Approved</h4>';
+                if(count(array_intersect(array(36,54), get_users_roles_matrix_id_arr())) || super_admin()) {
+                    $data['access'] = true;
+                    if (!in_array($sql->status,array(301,302))) {
+                        $button .= '<button id="approvebtn" class="btn btn-primary"><i class="fa fa-check"></i> Approve</button>';
+                        $button .= '<button id="disapprovebtn" class="btn btn-danger pull-right"><i class="fa fa-times"></i> Disapprove</button>';
+                    }else{
+                        if ($sql->status == 301){
+                            $button .= '<h4 class="text-success pull-right"><i class="fa fa-check"></i> Approved</h4>';
+                        }
                     }
+                }else{
+                    $data['access'] = false;
                 }
-            }else{
-                $data['access'] = false;
+            } catch (Exception $e) {
+                $data['qry'] = false;
+                $data['msg'] = 'Database error: ' . $e->getMessage();
+                $data['error'] = $e->getMessage();
             }
-
         }else{
             $data['qry'] = false;
-            $data['msg'] = 'No record found!';
+            $data['msg'] = 'No record found for the selected criteria!';
         }
 
 
