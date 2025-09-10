@@ -3,6 +3,28 @@
 if (!defined('BASEPATH'))
     exit('No direct script access allowed');
 
+/**
+ * CodeIgniter Instance Type Definitions for Intelephense
+ * 
+ * @property CI_Loader $load
+ * @property CI_DB_query_builder $db
+ * @property CI_URI $uri
+ * @property CI_Input $input
+ * @property CI_Output $output
+ * @property CI_Config $config
+ * @property CI_Session $session
+ * @property CI_Router $router
+ * @property object $model_admin
+ * @property object $model_auth
+ */
+class CI_Controller {}
+
+/**
+ * Get CodeIgniter instance
+ * @return CI_Controller
+ */
+function &get_instance() {}
+
 /*
 if(!function_exists('pecoapps_conn')) {
     function pecoapps_conn(){
@@ -1385,7 +1407,7 @@ if (!function_exists('update_stats')) {
         $ci->db->where('sysid', $id);
         $up = $ci->db->update($tbl, $arr);
         $ret = (object) array('ret' => $stat, 'upd' => $up);
-        return ( $get_stat ) ? ( $up ) ? $ret : false : false;
+        return ( $get_stat ) ? (( $up ) ? $ret : false) : false;
     }
 
 }
@@ -4038,7 +4060,8 @@ if (!function_exists('time_elapsed_string')) {
         $ago = new DateTime($datetime);
         $diff = $now->diff($ago);
 
-        $diff->w = floor($diff->d / 7);
+        /** @var object $diff */
+        $diff->w = floor($diff->d / 7); // @phpstan-ignore-line
         $diff->d -= $diff->w * 7;
 
         $string = array(
@@ -4785,7 +4808,7 @@ if (!function_exists('compute_bill')) {
                         if ($qry_list_charges->num_rows() > 0) {
                             foreach ($qry_list_charges->result() as $rrow) {
                                 // GET IF HAVING SUB
-                                $qry_list_subs = $ci->db->select()->from('trn_billing_rates_group_list')->where(array('groupid' => $row->sysid, 'parentid' => $rrow->sysid, 'status' => 1))->get();
+                                $qry_list_subs = $ci->db->select()->from('trn_billing_rates_group_list')->where(array('groupid' => $charges_main->sysid, 'parentid' => $rrow->sysid, 'status' => 1))->get();
                                 if ($qry_list_subs->num_rows() > 0) {
                                     $arr_list_subs = array();
                                     $amt_total_subs = 0;
