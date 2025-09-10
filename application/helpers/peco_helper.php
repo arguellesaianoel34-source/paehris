@@ -2067,6 +2067,33 @@ if (!function_exists('get_users_info')) {
     }
 
 }
+if (!function_exists('get_user_basic')) {
+
+    function get_user_basic($id = NULL) {
+        $ci = & get_instance();
+        $userid = ($id == NULL) ? user_id() : $id;
+        
+        $q = $ci->db->select('u.sysid, u.username, u.firstname, u.lastname, u.status, u.type')
+            ->from('prime_system_users AS u')
+            ->where('u.sysid', $userid)
+            ->get()->row();
+            
+        if($q) {
+            $data = array(
+                'id' => $q->sysid,
+                'text' => $q->firstname . ' ' . $q->lastname,
+                'username' => $q->username,
+                'firstname' => $q->firstname,
+                'lastname' => $q->lastname,
+                'status' => $q->status,
+                'type' => $q->type
+            );
+            return json_encode($data);
+        }
+        return false;
+    }
+
+}
 if (!function_exists('get_person_info')) {
 
     function get_person_info($id) {
@@ -4403,6 +4430,29 @@ if (!function_exists('get_dist_list_select')) {
         if ($qry->num_rows() > 0) {
             foreach ($qry->result() as $row) {
                 $data['list'][] = array('id' => $row->sysid, 'text' => $row->codes . ' - ' . $row->names);
+            }
+        }
+        return json_encode($data);
+    }
+}
+
+if (!function_exists('select2_rate_class')) {
+    function select2_rate_class($filter = array()) {
+        $ci = &get_instance();
+        $data = array();
+        $ci->db->select('sysid, codes, classifications');
+        $ci->db->from('prime_system_rate_class_main');
+        $ci->db->where('status', 1);
+        if (!empty($filter)) {
+            $ci->db->where_in('sysid', $filter);
+        }
+        $qry = $ci->db->get();
+        if ($qry->num_rows() > 0) {
+            foreach ($qry->result() as $row) {
+                $data['list'][] = array(
+                    'id' => $row->sysid,
+                    'text' => $row->codes . ' - ' . $row->classifications
+                );
             }
         }
         return json_encode($data);

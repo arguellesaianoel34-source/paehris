@@ -4,6 +4,19 @@ if (!defined('BASEPATH'))
     exit('No direct script access allowed');
 session_start(); // STARTING SESSION DATA
 
+/**
+ * @property CI_DB_query_builder $db
+ * @property CI_Session $session
+ * @property CI_Input $input
+ * @property CI_Load $load
+ * @property Model_admin $model_admin
+ * @property Model_auth $model_auth
+ * @property Model_pages $model_pages
+ * @property Model_dashboard $model_dashboard
+ * @property CI_Upload $upload
+ * @property CI_Zip $zip
+ * @property CI_Email $email
+ */
 class Admin extends CI_Controller {
 
     private $user_login;
@@ -12,6 +25,11 @@ class Admin extends CI_Controller {
         parent::__construct();
         $this->load->model('model_admin');
         $this->load->model('model_auth');
+        $this->load->model('model_pages');
+        $this->load->model('model_dashboard');
+        $this->load->library('upload');
+        $this->load->library('zip');
+        $this->load->library('email');
         $this->user_login = $this->session->userdata('logged_in');
 
         // LOCK SCREEN
@@ -1416,7 +1434,8 @@ class Admin extends CI_Controller {
             $file_directory = FCPATH . $upload_path;
             $file_url = base_url() . $upload_path;
 
-            $this->zip->compression_level = 2;
+            // Note: CI_Zip library doesn't support compression_level property
+            // $this->zip->compression_level = 2;
             $files = glob($file_directory .'*.{jpg,jpeg,png,gif,JPG,JPEG,PNG,GIF,pdf,doc,docx,xls,xlsx}', GLOB_BRACE);
             foreach($files as $file) {
                 $this->zip->read_file($file);
@@ -1540,16 +1559,16 @@ class Admin extends CI_Controller {
         $data['inputs'] = $this->input->post();
         if(count($emp_arr) > 1) {
             foreach($emp_arr as $row) {
-                $deduct_arr[] = compute_employee_netpay($row, $month, $year, $paytype, 1, $payclass);
+                $deduct_arr[] = compute_employee_netpay($row, $month, $year, $paytype, 1, $payclass, 1);
             }
         }else{
-            $deduct_arr[] = compute_employee_netpay($empid, $month, $year, $paytype, 1, $payclass);
+            $deduct_arr[] = compute_employee_netpay($empid, $month, $year, $paytype, 1, $payclass, 1);
         }
         $data['compute'] = $deduct_arr;
         echo print_r($data);
     }
     function testing() {
-        $deduct_arr = get_employee_transactions(260, 3, 2018, 1, 1, 128);
+        $deduct_arr = get_employee_transactions(260, 3, 2018, 1, 1, 128, 1);
         echo '<pre>';
         print_r($deduct_arr);
 
