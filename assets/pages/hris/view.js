@@ -1369,7 +1369,12 @@ var HRIS = function () {
                     data:{"dataid" : dataid},
                     dataType:'json'
                 }).done(function (d) {
-                    init_employee_tbl(0, $('#emptable'), modulehash);
+                    // Get current active tab status instead of hardcoding to 0
+                    var current_stat = $('.emp-stat-btn').find('li.active').data("stat");
+                    var empjobcat = $(document).find('#empjobcat').val();
+                    var emppayclass = $(document).find('#emppayclass').val();
+                    var departmentview = $(document).find('#departmentview').val();
+                    init_employee_tbl(current_stat, $('#emptable'), modulehash, departmentview, false, emppayclass, empjobcat);
                     PECO.initAlerts(d.msg, "PECO.net", d.func);
                 }).fail(function () {
                     PECO.phpError();
@@ -1458,6 +1463,12 @@ var HRIS = function () {
                         data: {"sysid": sysid, "stat": stat},
                         dataType: 'json'
                     }).done(function (d) {
+                        // Get current active tab status and refresh table
+                        var current_stat = $('.emp-stat-btn').find('li.active').data("stat");
+                        var empjobcat = $(document).find('#empjobcat').val();
+                        var emppayclass = $(document).find('#emppayclass').val();
+                        var departmentview = $(document).find('#departmentview').val();
+                        init_employee_tbl(current_stat, $('#emptable'), modulehash, departmentview, false, emppayclass, empjobcat);
                         PECO.initAlerts(d.msg, "PECO.net", d.func);
                         swal.close();
                     }).fail(function () {

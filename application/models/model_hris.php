@@ -860,9 +860,9 @@ Class Model_hris extends CI_Model {
                                     if($qry_trns) {
                                         $payspec = $qry_trns->payspec;
                                     }
-                                    //only bunos will be inserted here.
+                                    //only bonus and LWOP will be inserted here.
 
-                                    if($trn_type == 264){
+                                    if($trn_type == 264 || $trn_type == 262){
                                         $trn_ins_arr = array(
                                             'payrollid' => $payrollid,
                                             'trntype' => $trn_type,
