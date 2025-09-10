@@ -49,8 +49,8 @@ class Test extends CI_Controller
     }
     function getemployeettransactions(){
         $data = array();
-        $data['datas'] =  get_employee_transactions(150, 1, 2019, 1, 1, 129);
-        //  $data['data2'] = get_employee_transactions(159, 9, 2018, 1, 0, 129) ;
+        $data['datas'] =  get_employee_transactions(150, 1, 2019, 1, 1, 129, 1);
+        //  $data['data2'] = get_employee_transactions(159, 9, 2018, 1, 0, 129, 1) ;
         echo json_encode($data);
     }
     function displaypayslip(){
