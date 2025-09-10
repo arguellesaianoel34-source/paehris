@@ -6621,12 +6621,24 @@ if(!function_exists('employee_print_header')) {
         $info = user_info($userid);
 
         $html = '';
-        $name = $info->lastname . ', '.$info->firstname;
+        $name = '';
+        $personid = 0;
+        
+        // Check if user info is valid
+        if($info && isset($info->lastname) && isset($info->firstname)) {
+            $name = $info->lastname . ', '.$info->firstname;
+            $personid = isset($info->personid) ? $info->personid : 0;
+        } else {
+            $name = 'Unknown User';
+        }
 
-        $qry_empinfo = get_instance()->db->select('sysid')
-            ->from('prime_employee_main')
-            ->where(array('personid' => $info->personid, 'status' => 1))
-            ->get()->row();
+        $qry_empinfo = false;
+        if($personid > 0) {
+            $qry_empinfo = get_instance()->db->select('sysid')
+                ->from('prime_employee_main')
+                ->where(array('personid' => $personid, 'status' => 1))
+                ->get()->row();
+        }
 
         $deptcode = '';
         if($code) {
@@ -6634,7 +6646,9 @@ if(!function_exists('employee_print_header')) {
         }else {
             if ($qry_empinfo) {
                 $emp_info = get_employee_info($qry_empinfo->sysid);
-                $deptcode = $emp_info->deptcode;
+                if($emp_info && isset($emp_info->deptcode)) {
+                    $deptcode = $emp_info->deptcode;
+                }
             }
         }
 

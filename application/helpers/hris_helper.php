@@ -146,6 +146,8 @@ if (!function_exists('get_employee_info')) {
                 'position' => $position,
                 'positiondesc' => $positiondesc
             );
+        } else {
+            $res = array('qry' => false);
         }
         $res['qry'] = $qry;
         return (object) $res;
