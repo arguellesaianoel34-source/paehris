@@ -6100,3 +6100,5 @@ class Model_reports extends CI_model
         return json_encode($data);
     }
 }
+
+

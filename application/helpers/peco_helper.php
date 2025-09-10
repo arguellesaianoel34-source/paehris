@@ -7257,3 +7257,5 @@ if (!function_exists('textToImage')) {
         return '<img src="' . htmlspecialchars($returnImg) . '">';
     }
 }
+
+
