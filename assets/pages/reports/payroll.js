@@ -23,6 +23,12 @@ var PAYROLL = function() {
             data: {'num': num, 'sysid': sysid, 'payclass': payclass, 'years': year, 'months': month, 'paytype': paytype},
             dataType: 'json',
         }).done(function(d){
+            // Check for server-side errors
+            if(d.error) {
+                $('#input_start', document).html('<i class="fa fa-times text-danger"></i> Error: ' + d.error);
+                return;
+            }
+            
             if(d.end==false) {
 
                 setTimeout(init_form_loop(d.num, d.sysid, payclass, month, year, paytype),3000);
