@@ -12533,3 +12533,4 @@ WHERE telr.status = 301 AND telr.leavedate = '".$date."' ");
     }
 
 }
+
