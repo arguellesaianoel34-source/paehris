@@ -1,14 +1,18 @@
-stages:
-  - main
-  - release
 
-Development:
+stages:
+  - deploy
+
+variables:
+  # Define deployment paths
+  DEPLOY_PATH: "public_html/erp/"
+  
+deploy_production:
+  stage: deploy
+  image: alpine:latest
   only:
     - main
-  stage: main
   before_script:
-    - apt-get update -yqq
-    - apt-get install -y lftp
+    - apk add --no-cache git lftp
   script:
     - git diff --name-only ${CI_COMMIT_BEFORE_SHA}...${CI_COMMIT_SHA} > /temp-deployment-text-${CI_JOB_ID}.txt
     - |

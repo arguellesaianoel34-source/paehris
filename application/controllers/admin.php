@@ -4,6 +4,7 @@ if (!defined('BASEPATH'))
     exit('No direct script access allowed');
 session_start(); // STARTING SESSION DATA
 
+
 class Admin extends CI_Controller {
 
     private $user_login;
