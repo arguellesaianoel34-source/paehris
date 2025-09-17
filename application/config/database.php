@@ -4,7 +4,7 @@ if (!defined('BASEPATH')) exit('No direct script access allowed');
 
 $active_group               = 'pae';
 $active_group_audit         = 'audit';
-$connect                    = 'dev';
+$connect                    = 'online';
 
 $db_config = array();
 
@@ -13,20 +13,12 @@ if( $connect == 'dev' ) {
     $db_config['host_server']            = 'localhost';
     $db_config['host_user']              = 'root';
     $db_config['host_db']                = 'pae_erp';
-<<<<<<< HEAD
-    $db_config['host_pass']              = 'F4D3R0N88';
-=======
     $db_config['host_pass']              = 'iF4D3R0N88!';
->>>>>>> 19dbe28 (added database config)
 
     $db_config['audit_server']           = 'localhost';
     $db_config['audit_user']             = 'root';
     $db_config['audit_db']               = 'pae_erp_audit';
-<<<<<<< HEAD
-    $db_config['audit_pass']             = 'F4D3R0N88';
-=======
     $db_config['audit_pass']             = 'iF4D3R0N88!';
->>>>>>> 19dbe28 (added database config)
 
 } else if( $connect == 'online' ) {
     // Turbify
@@ -55,12 +47,9 @@ if( $connect == 'dev' ) {
 
 $query_builder = TRUE;
 
-<<<<<<< HEAD
-=======
 $db[$active_group]['sysmode'] = $active_group;
 $db[$active_group]['sysaudit'] = $active_group_audit;
 
->>>>>>> 19dbe28 (added database config)
 // Default settings for all databases
 $default_db_config = array(
     'dbdriver' => 'mysqli',
@@ -101,12 +90,7 @@ $db['audit'] = array_merge($default_db_config, array(
 // ############### PECO MAIN #########################
 // ###################################################
 $db['peco'] = array_merge($default_db_config, array(
-<<<<<<< HEAD
-    'hostname' => '172.174.114.142',
-    //'hostname' => '44.195.210.193',
-=======
     'hostname' => '44.195.210.193',
->>>>>>> 19dbe28 (added database config)
     'username' => 'rwlisxy9bxboh4qh_pecoerp',
     'password' => 'P3c0!2022web##',
     'database' => 'rwlisxy9bxboh4qh_peco_erp',
@@ -120,12 +104,4 @@ $db['tvi'] = array_merge($default_db_config, array(
     'username' => 'uub4rmw23inpzxn9_pae_root',
     'password' => '959@M+U1GOat',
     'database' => 'uub4rmw23inpzxn9_tvi_erp',
-<<<<<<< HEAD
 ));
-
-
-$db[$active_group]['sysmode'] = $active_group;
-$db[$active_group]['sysaudit'] = $active_group_audit;
-=======
-));
->>>>>>> 19dbe28 (added database config)
