@@ -4,7 +4,7 @@ if (!defined('BASEPATH')) exit('No direct script access allowed');
 
 $active_group               = 'pae';
 $active_group_audit         = 'audit';
-$connect                    = 'online';
+$connect                    = 'dev';
 
 $db_config = array();
 
@@ -13,12 +13,12 @@ if( $connect == 'dev' ) {
     $db_config['host_server']            = 'localhost';
     $db_config['host_user']              = 'root';
     $db_config['host_db']                = 'pae_erp';
-    $db_config['host_pass']              = 'iF4D3R0N88!';
+    $db_config['host_pass']              = 'F4D3R0N88';
 
     $db_config['audit_server']           = 'localhost';
     $db_config['audit_user']             = 'root';
     $db_config['audit_db']               = 'pae_erp_audit';
-    $db_config['audit_pass']             = 'iF4D3R0N88!';
+    $db_config['audit_pass']             = 'F4D3R0N88';
 
 } else if( $connect == 'online' ) {
     // Turbify
