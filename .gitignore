@@ -9,6 +9,7 @@ dist/
 /.vscode/
 /.idea/
 /server/
+/application/config/database.php
 
 
 # Compiled Java class files
