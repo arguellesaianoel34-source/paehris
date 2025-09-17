@@ -4,7 +4,7 @@ if (!defined('BASEPATH')) exit('No direct script access allowed');
 
 $active_group               = 'pae';
 $active_group_audit         = 'audit';
-$connect                    = 'online';
+$connect                    = 'dev';
 
 $db_config = array();
 
