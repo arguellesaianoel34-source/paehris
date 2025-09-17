@@ -5876,6 +5876,7 @@ class Model_reports extends CI_model
             $type_qry = $this->db->select('names')
                 ->from('prime_types_parameter')
                 ->where('sysid',$type)->get()->row();
+                
             $payclass_arr = array('Confi-SA','RF-Tiered');
             $excelmonth = ($month) ? '_'.date('M',mktime(0,0,0,$month,1)) : '';
             $excelyear = ($year) ? '_'.$year : '';
