@@ -181,6 +181,18 @@ $flowid = $qry_stg->flowid;
                 </div>
                 <div class="tab-pane fade in " id="inverter_sn">
                     <form id="frm_inverter_details" class="row" method="post" action="<?php echo base_url(); ?>installation/addinverterdetails">
+                        <div class="p-3" style="border: 1px dashed #ddd !important; margin: 15px !important;">
+                            <!-- add item lookup and details here using modal and text hidden input when items is already pick from modal -->
+                            <button type="button" class="btn btn-default" data-toggle="modal" data-target="#modal_item_lookup">Add Item</button>
+                            <!-- display item details based from lookuped from modal -->
+                            <!--- IGNORE --->
+                            <input type="hidden" name="dataid" value="<?php echo $dataid; ?>">
+                            <input type="hidden" name="itemid" id="item_id">
+                            <input type="hidden" name="itemcode" id="item_code">
+                            <input type="hidden" name="itemname" id="item_name">
+                            <input type="hidden" name="itemuom" id="item_uom">
+                            <h3>Item Selected: <span id="item_selected"></span></h3>
+                        </div>
                         <div class="col-sm-4" style="padding-right: 0 !important;">
                             <label class="form-label bold"><i class="fa fa-bolt"></i> Inverter</td></label>
                             <input class="form-control" id="inverter_type" name="invertertype">
@@ -221,7 +233,101 @@ $flowid = $qry_stg->flowid;
         </div>
     </div>
 </div>
-<script type="text/javascript" src="<?php echo base_url(); ?>assets/pages/installation/main.js"></script>
+
+<!-- Item Lookup Modal -->
+<div class="modal fade" id="modal_item_lookup" tabindex="-1" role="dialog" aria-labelledby="itemLookupModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="itemLookupModalLabel">Add or Select Item</h4>
+            </div>
+            <div class="modal-body">
+                <ul class="nav nav-tabs" role="tablist">
+                    <li role="presentation" class="active"><a href="#selectItem" aria-controls="selectItem" role="tab" data-toggle="tab">Select Item</a></li>
+                    <li role="presentation"><a href="#createItem" aria-controls="createItem" role="tab" data-toggle="tab">Create New Item</a></li>
+                </ul>
+                <div class="tab-content" style="padding-top: 20px;">
+                    <div role="tabpanel" class="tab-pane active" id="selectItem">
+                        <div class="form-group">
+                            <input type="text" class="form-control" id="itemSearchInput" placeholder="Search for an item...">
+                        </div>
+                        <div class="list-group" id="itemListGroup" style="max-height: 300px; overflow-y: auto;">
+                            <!-- Items will be loaded here via AJAX -->
+                        </div>
+                        <div id="itemPagination" class="text-center">
+                            <!-- Pagination will be loaded here -->
+                        </div>
+                    </div>
+                    <div role="tabpanel" class="tab-pane" id="createItem">
+                        <form id="createItemForm">
+                            <div class="form-group">
+                                <label for="itemName">Item Name</label>
+                                <input type="text" class="form-control" id="itemName" placeholder="Enter item name">
+                            </div>
+                            <div class="form-group">
+                                <label for="itemQty">Quantity</label>
+                                <input type="number" class="form-control" id="itemQty" placeholder="Enter quantity">
+                            </div>
+                            <div class="form-group">
+                                <label for="itemUnit">Unit</label>
+                                <input type="text" class="form-control" id="itemUnit" placeholder="e.g., pcs, set, m">
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary">Add Item</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <script type="text/javascript">
     INSTALLATION.application(<?php echo $dataid; ?>);
+
+    $(document).ready(function() {
+        function loadItems() {
+            $.ajax({
+                url: '<?php echo base_url(); ?>installation/getitems',
+                type: 'GET',
+                dataType: 'json',
+                success: function(response) {
+                    $('#itemListGroup').empty();
+                    if (response && response.results && response.results.length > 0) {
+                        $.each(response.results, function(index, item) {
+                            var listItem = '<a href="#" class="list-group-item" data-item-id="' + item.id + '" data-item-name="' + item.text + '">' + item.text + '</a>';
+                            $('#itemListGroup').append(listItem);
+                        });
+                    } else {
+                        $('#itemListGroup').append('<p class="text-center">No items found.</p>');
+                    }
+                },
+                error: function(xhr, status, error) {
+                    $('#itemListGroup').empty();
+                    $('#itemListGroup').append('<p class="text-center text-danger">Error loading items. Please try again.</p>');
+                    console.error("AJAX Error: ", status, error);
+                    console.log(xhr.responseText);
+                }
+            });
+        }
+
+        $('#modal_item_lookup').on('show.bs.modal', function () {
+            loadItems();
+        });
+
+        $(document).on('click', '#itemListGroup a', function(e) {
+            e.preventDefault();
+            var itemId = $(this).data('itemId');
+            var itemName = $(this).data('itemName');
+            
+            $('#item_id').val(itemId);
+            $('#item_name').val(itemName);
+            $('#item_selected').text(itemName);
+            
+            $('#modal_item_lookup').modal('hide');
+        });
+    });
 </script>
