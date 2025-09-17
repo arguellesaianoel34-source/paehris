@@ -1282,4 +1282,47 @@ class Model_installation extends CI_Model
 
         return json_encode($data);
     }
+
+
+    public function add_inverter_details() {
+        return json_encode(array('status' => 'success', 'message' => 'Inverter details added successfully.'));
+    }
+
+    public function get_items() {
+        $search = $this->input->get('term');
+        $page = $this->input->get('page') ?: 1;
+        $limit = 20;
+        $offset = ($page - 1) * $limit;
+
+        $this->db->select('sysid as id, fulldescription AS text');
+        $this->db->from('items_main_description');
+        $this->db->where('status', 1);
+
+        if ($search) {
+            $this->db->like('fulldescription', $search);
+        }
+
+        // Clone the query builder object to get the total count
+        $count_db = clone $this->db;
+        $total_count = $count_db->count_all_results();
+
+        $this->db->limit($limit, $offset);
+        $items_qry = $this->db->get();
+
+        $items = [];
+        if ($items_qry->num_rows() > 0) {
+            $items = $items_qry->result_array();
+        }
+
+        $more = ($page * $limit) < $total_count;
+
+        $data = [
+            'results' => $items,
+            'pagination' => [
+                'more' => $more
+            ]
+        ];
+
+        return json_encode($data);
+    }
 }

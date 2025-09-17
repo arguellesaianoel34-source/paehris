@@ -269,7 +269,7 @@ var INSTALLATION = function () {
                     dt_inverter_details(dataid);
                 }
             }).fail(function (d) {
-
+                alert('Error ')
             });
         });
 
@@ -283,9 +283,9 @@ var INSTALLATION = function () {
             console.log('dates: ' + dates.length);
             console.log('inverters: ' + inverters.length);
 
-            if (dates.length > 0 || inverters.length > 0) {
-                swal("Ooops!", "It seems like some details are still lacking. Please complete them and try again!", "warning");
-            } else {
+            // if (dates.length > 0 || inverters.length > 0) {
+            //     swal("Ooops!", "It seems like some details are still lacking. Please complete them and try again!", "warning");
+            // } else {
                 swal({
                     title: "Finalize Customer Installation",
                     text: "All installation details are complete. Do you want to finalize installation and the application process?",
@@ -329,7 +329,7 @@ var INSTALLATION = function () {
                         swal("Cancelled!", "You choose not to proceed.", "error");
                     }
                 });
-            }
+            //}
         });
     }
 

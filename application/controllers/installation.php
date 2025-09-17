@@ -49,4 +49,12 @@ class Installation extends CI_Controller
     function finalizecustomerapplication() {
         echo $this->installation->finalize_customer_application();
     }
+
+    public function addinverterdetails() {
+        echo $this->installation->add_inverter_details();
+    }
+
+    public function getitems() {
+        echo $this->installation->get_items();
+    }
 }
