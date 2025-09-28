@@ -184,7 +184,6 @@ var PECO = function () {
 
     // * BEGIN: ADITIONAL PLUGINS *//
     var init_fancybox = function() {
-
         $("<link/>", {
             rel: "stylesheet",
             type: "text/css",
