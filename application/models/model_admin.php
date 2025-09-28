@@ -352,52 +352,69 @@ Class Model_admin extends CI_Model {
         return json_encode($data);
     }
 
+    private function get_all_files($data, &$file_paths) {
+        if (is_array($data) || is_object($data)) {
+            foreach ($data as $value) {
+                if (is_string($value)) {
+                    $file_paths[] = $value;
+                } elseif (is_array($value) || is_object($value)) {
+                    $this->get_all_files($value, $file_paths);
+                }
+            }
+        }
+    }
+
     function dt_docs_list() {
-        $data = array();
-        $folder = $this->input->post('folder');
-        $viewing = $this->input->post('viewing');
-        $textlength = $this->input->post('textlength');
-
-        $file_directory = FCPATH.'uploads/attachments/'.$folder;
-        $file_url = base_url().'uploads/attachments/'.$folder;
-
+        $this->load->helper('directory');
+        $this->load->helper('file');
+        $file_directory = './uploads/attachments/' . $this->input->post('type') . '/' . $this->input->post('id') . '/';
+        $file_url = base_url() . 'uploads/attachments/' . $this->input->post('type') . '/' . $this->input->post('id') . '/';
 
         $map = directory_map($file_directory, FALSE, TRUE);
         $files = array();
+        
+        $file_paths = array();
+        if (is_array($map)) {
+            $this->get_all_files($map, $file_paths);
+        }
 
-        if ($map && count($map) > 0) {
+        if (!empty($file_paths)) {
             $count = 0;
-            foreach ($map as $file) {
+            foreach ($file_paths as $filename) {
+                if(empty($filename)) continue;
+
                 $control = '';
                 $count++;
-                $icon = draw_file_icon(basename($file));
-                if (@is_array(getimagesize($file_url . $file))) {
-                    $link = '<a class="btn btn-primary btn-sm preview" href="' . $file_url . $file . '"><i class="icon-magnifier"></i></a>';
+                $icon = '';
+                //$icon = draw_file_icon(basename($filename));
+                if (@is_array(getimagesize($file_url . $filename))) {
+                    $link = '<a class="btn btn-primary btn-sm preview" href="' . $file_url . $filename . '"><i class="icon-magnifier"></i></a>';
                     $target = '';
                 } else {
-                    $link = '<a href="'.$file_url . $file.'" class="btn btn-primary btn-sm preview iframe" target="_blank"><i class="icon-magnifier"></i></a>';
+                    $link = '<a href="'.$file_url . $filename.'" class="btn btn-primary btn-sm preview iframe" target="_blank"><i class="icon-magnifier"></i></a>';
                     $target = 'target="_blank"';
                 }
                 $control .= '<div class="btn-group center" id="item_controls" style="width: 80px !important;">';
-                $control .= '<a href="' . $file_url . $file . '" class="btn btn-sm btn-primary inline preview" id="btn_view_item" '.$target.'><i class="fa fa-search"></i> </a>';
-                if (!$viewing || super_admin()) {
-                    $control .= '<a href="javascript:;" class="btn btn-sm btn-danger inline" id="btn_delete_file" data-file="' . $folder . $file . '"><i class="fa fa-trash"></i> </a>';
-                }
+                $control .= '<a href="' . $file_url . $filename . '" class="btn btn-sm btn-primary inline preview" id="btn_view_item" '.$target.'><i class="fa fa-search"></i> </a>';
+                $control .= '<a class="btn btn-danger btn-sm delete" href="#" data-file="' . $filename . '"><i class="fa fa-trash-o"></i></a>';
                 $control .= '</div>';
 
-                $basename = basename($file);
-                $namelength = ($textlength > 0) ? floor(($textlength/12)*50) : 50;
-                $filename = (strlen($basename) > $namelength) ? substr($basename,0,$namelength).'...' : $basename;
-
-                $data['list'][] = array(
-                    'count' => $count,
-                    'name' => '<span title="'.$basename.'"><i class="fa '.$icon->icon.' '.$icon->color.' "></i> '.$filename.'</span>',
-                    'control' => $control
+                $files[] = array(
+                    $count,
+                    $icon . ' ' . $filename,
+                    $control
                 );
             }
         }
 
-        return json_encode($data);
+        $results = array(
+            'draw' => intval($this->input->post('draw')),
+            'recordsTotal' => count($files),
+            'recordsFiltered' => count($files),
+            'data' => $files
+        );
+
+        return json_encode($results);
     }
 
     function delete_doc_list_file() {
@@ -785,7 +802,7 @@ Class Model_admin extends CI_Model {
                 if ($comment->userid == user_id()) {
                     $html .= '<div id="comment_row" class="col-md-12 margin-top-10 '.$uniqueid.'">';
                     $html .= '<div class="comment-you">';
-                    $html .= '<span class="bold" id="commenter">You</span>'.$reply_to;
+                    $html .= '<span class="bold" id="commenter">You</span> '.$reply_to;
                     $html .= $reply_message;
                     $html .= '<div class="comment-content">';
                     $html .= '<p>'.$comment->messages.'</p>';
@@ -799,7 +816,7 @@ Class Model_admin extends CI_Model {
 
                     $html .= '<div id="comment_row" class="col-md-12 margin-top-10 '.$uniqueid.'">';
                     $html .= '<div class="comment-them">';
-                    $html .= '<span class="bold" id="commenter">'.$name.'</span>'.$reply_to;
+                    $html .= '<span class="bold" id="commenter">'.$name.'</span> '.$reply_to;
                     $html .= $reply_message;
                     $html .= '<div class="comment-content">';
                     $html .= '<p>'.$comment->messages.'</p>';

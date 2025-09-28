@@ -6,11 +6,6 @@
 # Node artifact files
 node_modules/
 dist/
-/.vscode/
-/.idea/
-/server/
-/application/config/database.php
-
 
 
 # Compiled Java class files
@@ -54,10 +49,14 @@ Thumbs.db
 *.mov
 *.wmv
 
-# /application/config/database.php
+/application/config/database.php
 /uploads/
 /.stfolder/
+.vscode/
+.github/
 /php/
+/.idea/
+/server/
 
 # PHP configuration files
 

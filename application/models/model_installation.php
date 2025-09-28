@@ -1179,6 +1179,9 @@ class Model_installation extends CI_Model
 
                         foreach ($req_qry->result() as $img) {
                             $image = FCPATH.$img->fileurl;
+                            if (!file_exists($image)) {
+                                continue; // Skip if image file does not exist
+                            }
                             list($width, $height, $type, $attr) = getimagesize($image);
                             $pdf->SetSize(($width / 2) + 10, ($height * 50 / 100)); //Custom function
                             $pdf->AddPage('', 'custom');
