@@ -113,6 +113,17 @@
         margin-left: 4px;
         font-weight: 600;
     }
+    
+    .client-card .category-label.residential {
+        background: #d4e6f1 !important;
+        color: #0A2342;
+    }
+
+    .client-card .category-label.corporation {
+        background: #007bff !important;
+        color: #fff;
+    }
+    
     .client-card .action-btns {
         position: absolute;
         top: 10px;
@@ -269,22 +280,31 @@
             card.className = 'col-xs-12 col-sm-6 col-md-4 col-lg-4';
             var name = client.app_name || client.name || '';
             var id = client.app_id || client.id || '';
-            var status = client.status_id || '';
+            var status = client.status || '';
             var address = client.address || '';
             var system = client.system || '';
             var category = client.category || (client.is_corporate === 'YES' ? 'corporation' : 'residential');
+            var category_class = client.is_corporate === 'YES' ? 'corporation' : 'residential';
+            var avatar_name = encodeURIComponent(
+                name
+                    .split(/\s+/)
+                    .filter(Boolean)
+                    .slice(0, 2)
+                    .join(' ')
+            );
+            var avatar_color = client.is_corporate === 'YES' ? 'blue' : 'orange';
             card.innerHTML =
                 '<div class="client-card">' +
-                '<div class="avatar-section" style="background-image: url(https://ui-avatars.com/api/?name=' + encodeURIComponent(name) + '&background=0A2342&color=fff&size=128)">' +
+                '<div class="avatar-section bg-secondary" style="background-color: #e8e8e8; background-image: url(\'<?php echo base_url(); ?>avatar/generate/' + avatar_name + '/' + avatar_color + '\')">' +
                 '</div>' +
                 '<div class="details-section">' +
                 '<div class="client-name"><a href="view/' + id + '">' + name + '</a>' +
-                '<span class="label label-' + getStatusLabel(status) + ' status-badge">' + capitalize(status) + '</span>' +
+                '<span class="label label-' + getStatusLabel(client.status_id) + ' status-badge">' + capitalize(status) + '</span>' +
                 '</div>' +
                 '<div class="client-meta"><strong>ID:</strong> PAE-CUST-' + (84000 + parseInt(id)) + '</div>' +
                 (system ? '<div class="client-meta"><strong>System:</strong> ' + system + '</div>' : '') +
                 '<div class="client-meta small"><span class="glyphicon glyphicon-map-marker text-muted"></span> ' + address + '</div>' +
-                '<div class="client-meta"><span class="category-label">' + capitalize(category) + '</span></div>' +
+                '<div class="client-meta"><span class="category-label ' + category_class + '">' + capitalize(category) + '</span></div>' +
                 '</div>' +
                 '</div>';
             // Add animation class with staggered delay
