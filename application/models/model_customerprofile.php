@@ -11,69 +11,6 @@ class Model_customerprofile extends CI_Model
 
   public function get_customer_details($customer_id)
   {
-    /**
-     * SELECT
-              cd.sysid AS app_id,
-              IF ( c.sysid IS NOT NULL, 'YES', 'NO' ) AS is_corporate,
-              IF ( c.sysid IS NOT NULL, IF ( c.descs IS NULL, 'UNKNOWN', c.descs ), CONCAT( p.firstname, ' ', p.lastname ) ) AS app_name,
-              cd.personid AS person_id,
-              c.sysid AS corp_id,
-              c.descs AS corp_name,
-              cd.addrspec AS address,
-              s.description AS status,
-              cd.`status` AS status_id,
-              cd.datecreated AS date_created,
-              cd.dateupdated AS date_updated,
-              cd.contactmobile AS contact_mobile,
-              cd.contactphone AS contact_phone,
-              cd.jobtype AS job_type,
-              cd.aveusage AS average_usage,
-              cd.avebill AS average_bill,
-              cd.bill,
-              cd.types,
-              IF ( c.sysid IS NOT NULL, CONCAT( p2.firstname, ' ', p2.lastname ), NULL ) AS corp_person,
-              country.country,
-              address_region.descs AS region,
-              address_province.descs AS province,
-              address_city.`names` AS city,
-              acg.lat AS latitude,
-              acg.lon AS longitude,
-              acg.url AS map_url,
-
-              -- SYSTEM SIZE --
-              acss.power AS system_power,
-              acss.nop AS number_of_panels,
-              rcs.descs AS rate_class,
-              spt.descs AS panel_type,
-              acss.roofinclination AS roof_inclination,
-              acss.inspectiondate AS inspection_date,
-              acss.remarks AS system_size_remarks
-              -- END SYSTEM SIZE --
-
-            FROM application_customers_details AS cd
-              LEFT JOIN application_customers_corporation AS cc ON cd.sysid = cc.appid
-              LEFT JOIN corporation AS c ON cc.corpid = c.sysid
-              LEFT JOIN person AS p ON cd.personid = p.sysid
-              LEFT JOIN prime_system_status_parameter AS s ON cd.`status` = s.sysid
-              LEFT JOIN corporation_representative AS cp ON c.sysid = cp.corpid
-              LEFT JOIN person AS p2 ON cp.personid = p2.sysid
-              LEFT JOIN address_country AS country ON cd.country = country.sysid
-              LEFT JOIN address_region ON cd.region = address_region.sysid
-              LEFT JOIN address_province ON cd.province = address_province.sysid
-              LEFT JOIN address_city ON cd.city = address_city.sysid 
-              LEFT JOIN application_customers_geodata AS acg ON cd.sysid = acg.appid
-              
-              -- SYSTEM SIZE --
-              LEFT JOIN application_customers_system_size AS acss ON cd.sysid = acss.appid
-              LEFT JOIN rate_class_specification AS rcs ON acss.rateclass = rcs.sysid
-              LEFT JOIN solar_panel_types AS spt ON acss.paneltype = spt.sysid
-              -- END SYSTEM SIZE --
-
-
-            WHERE ( c.sysid IS NOT NULL OR p.sysid IS NOT NULL ) AND cd.sysid = ?
-            GROUP BY IF ( p.sysid IS NOT NULL AND p.sysid > 0, p.sysid, c.sysid ) 
-     * 
-     */
     $query = $this->db->query(
       "SELECT
         cam.sysid AS app_id,

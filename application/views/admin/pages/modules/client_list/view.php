@@ -15,6 +15,10 @@ $CI->load->model('model_customerprofile', 'client', TRUE);
 
 $details = $CI->client->get_customer_details($dataid);
 
+$app_name = safe($details, 'app_name', 'Customer');
+// get the first two words of the $app_name
+$app_name = implode(' ', array_slice(explode(' ', $app_name), 0, 2));
+$app_avatar_color = safe($details, 'is_corporate', 'NO') === 'YES' ? 'blue' : 'orange';
 // echo '<pre>';
 // print_r($details); // Debugging line to check the details array
 
@@ -39,8 +43,6 @@ $details = $CI->client->get_customer_details($dataid);
     .profile-hero .avatar {
         width: 110px;
         height: 110px;
-        border-radius: 50%;
-        border: 4px solid #fff;
         box-shadow: 0 2px 12px rgba(10, 35, 66, 0.13);
         object-fit: cover;
         background: #eaf2f8;
@@ -286,7 +288,7 @@ $details = $CI->client->get_customer_details($dataid);
 </style>
 <div class="container-fluid">
     <div class="profile-hero" style="position: relative;">
-        <img class="avatar" src="https://ui-avatars.com/api/?name=<?= urlencode(safe($details, 'app_name', 'Customer')) ?>&background=0A2342&color=fff&size=256" alt="Avatar">
+        <img class="avatar" src="<?php echo base_url(); ?>avatar/generate/<?= urlencode($app_name) ?>/<?= $app_avatar_color ?>" alt="Avatar">
         <div class="profile-info">
             <h1><?= htmlspecialchars(safe($details, 'app_name', 'Customer')) ?>
                 <span class="status-badge">
