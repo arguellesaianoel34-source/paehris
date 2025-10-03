@@ -365,56 +365,51 @@ Class Model_admin extends CI_Model {
     }
 
     function dt_docs_list() {
-        $this->load->helper('directory');
-        $this->load->helper('file');
-        $file_directory = './uploads/attachments/' . $this->input->post('type') . '/' . $this->input->post('id') . '/';
-        $file_url = base_url() . 'uploads/attachments/' . $this->input->post('type') . '/' . $this->input->post('id') . '/';
+        $data = array();
+        $folder = $this->input->post('folder');
+        $viewing = $this->input->post('viewing');
+        $textlength = $this->input->post('textlength');
+
+        $file_directory = FCPATH.'uploads/attachments/'.$folder;
+        $file_url = base_url().'uploads/attachments/'.$folder;
+
 
         $map = directory_map($file_directory, FALSE, TRUE);
         $files = array();
-        
-        $file_paths = array();
-        if (is_array($map)) {
-            $this->get_all_files($map, $file_paths);
-        }
 
-        if (!empty($file_paths)) {
+        if ($map && count($map) > 0) {
             $count = 0;
-            foreach ($file_paths as $filename) {
-                if(empty($filename)) continue;
-
+            foreach ($map as $file) {
                 $control = '';
                 $count++;
-                $icon = '';
-                //$icon = draw_file_icon(basename($filename));
-                if (@is_array(getimagesize($file_url . $filename))) {
-                    $link = '<a class="btn btn-primary btn-sm preview" href="' . $file_url . $filename . '"><i class="icon-magnifier"></i></a>';
+                $icon = draw_file_icon(basename($file));
+                if (@is_array(getimagesize($file_url . $file))) {
+                    $link = '<a class="btn btn-primary btn-sm preview" href="' . $file_url . $file . '"><i class="icon-magnifier"></i></a>';
                     $target = '';
                 } else {
-                    $link = '<a href="'.$file_url . $filename.'" class="btn btn-primary btn-sm preview iframe" target="_blank"><i class="icon-magnifier"></i></a>';
+                    $link = '<a href="'.$file_url . $file.'" class="btn btn-primary btn-sm preview iframe" target="_blank"><i class="icon-magnifier"></i></a>';
                     $target = 'target="_blank"';
                 }
                 $control .= '<div class="btn-group center" id="item_controls" style="width: 80px !important;">';
-                $control .= '<a href="' . $file_url . $filename . '" class="btn btn-sm btn-primary inline preview" id="btn_view_item" '.$target.'><i class="fa fa-search"></i> </a>';
-                $control .= '<a class="btn btn-danger btn-sm delete" href="#" data-file="' . $filename . '"><i class="fa fa-trash-o"></i></a>';
+                $control .= '<a href="' . $file_url . $file . '" class="btn btn-sm btn-primary inline preview" id="btn_view_item" '.$target.'><i class="fa fa-search"></i> </a>';
+                if (!$viewing || super_admin()) {
+                    $control .= '<a href="javascript:;" class="btn btn-sm btn-danger inline" id="btn_delete_file" data-file="' . $folder . $file . '"><i class="fa fa-trash"></i> </a>';
+                }
                 $control .= '</div>';
 
-                $files[] = array(
-                    $count,
-                    $icon . ' ' . $filename,
-                    $control
+                $basename = basename($file);
+                $namelength = ($textlength > 0) ? floor(($textlength/12)*50) : 50;
+                $filename = (strlen($basename) > $namelength) ? substr($basename,0,$namelength).'...' : $basename;
+
+                $data['list'][] = array(
+                    'count' => $count,
+                    'name' => '<span title="'.$basename.'"><i class="fa '.$icon->icon.' '.$icon->color.' "></i> '.$filename.'</span>',
+                    'control' => $control
                 );
             }
         }
 
-        $results = array(
-            'draw' => intval($this->input->post('draw')),
-            'recordsTotal' => count($files),
-            'recordsFiltered' => count($files),
-            'data' => $files
-        );
-
-        return json_encode($results);
+        return json_encode($data);
     }
 
     function delete_doc_list_file() {
