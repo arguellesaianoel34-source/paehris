@@ -101,7 +101,7 @@ $db['peco'] = array_merge($default_db_config, array(
 // ###################################################
 $db['tvi'] = array_merge($default_db_config, array(
     'hostname' => 'localhost',
-    'username' => 'uub4rmw23inpzxn9_pae_root',
-    'password' => '959@M+U1GOat',
     'database' => 'uub4rmw23inpzxn9_tvi_erp',
+    'username' => 'uub4rmw23inpzxn9_tvi_root',
+    'password' => 'TN@uE!]FgyrQ',
 ));
