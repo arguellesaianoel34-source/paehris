@@ -81,14 +81,11 @@ $uploadurl = 'hris/attlogs';
             -->
 
             <?php
-                            
-            $tviDB = $this->load->database('tvi',true);
-            $tviDB->select()->from('prime_employee_attendance_timelogs')->limit(1);
-            $tviDB->get();
-            if ($tviDB->conn_id) {
-                echo '<div class="alert alert-success">TVI Database Connection: <strong>SUCCESSFUL</strong></div>';
-            } else {
+            try {
+                $tviDB = $this->load->database('tvi',true);
+            } catch (Exception $e) {
                 echo '<div class="alert alert-danger">TVI Database Connection: <strong>FAILED</strong></div>';
+                $tviDB = null;
             }
             ?>
             <hr>
