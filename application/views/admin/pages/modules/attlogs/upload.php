@@ -71,6 +71,26 @@ $uploadurl = 'hris/attlogs';
     <div class="col-md-6">
         <div class="form-group">
             <h4>Upload Log File</h4>
+            <!-- 
+            // check database connection for TVI:
+                
+            $tviDB = $this->load->database('tvi',true);
+            $tviDB->select()->from('some_table')->where('some_condition', true);
+            $tviDB->get();
+            */
+            -->
+
+            <?php
+                            
+            $tviDB = $this->load->database('tvi',true);
+            $tviDB->select()->from('prime_employee_attendance_timelogs')->limit(1);
+            $tviDB->get();
+            if ($tviDB->conn_id) {
+                echo '<div class="alert alert-success">TVI Database Connection: <strong>SUCCESSFUL</strong></div>';
+            } else {
+                echo '<div class="alert alert-danger">TVI Database Connection: <strong>FAILED</strong></div>';
+            }
+            ?>
             <hr>
             Browse File
             <input id="attfiledrop" placeholder="Browse file..." name="attfiledrop[]" data-upload-url="<?php echo base_url($uploadurl); ?>" class="file" type="file" data-preview-file-type="any" multiple />
