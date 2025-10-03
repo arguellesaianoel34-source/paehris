@@ -3833,11 +3833,11 @@ WHERE telr.status = 301 AND telra.status = 301 AND empid = ".$empid." AND ('".$d
             $allInsert = true;
             foreach ($batches as $batch) {
                 $pae = $this->db->insert_batch('prime_employee_attendance_timelogs', $batch);
-                //$tvi = $tviDB->insert_batch('prime_employee_attendance_timelogs', $batch);
+                $tvi = $tviDB->insert_batch('prime_employee_attendance_timelogs', $batch);
                 $peco = $pecoDB->insert_batch('prime_employee_attendance_timelogs', $batch);
 
                 if (!$pae 
-                //|| !$tvi 
+                || !$tvi 
                 || !$peco
                 ) {
                     $allInsert = false;
@@ -3865,12 +3865,12 @@ WHERE telr.status = 301 AND telra.status = 301 AND empid = ".$empid." AND ('".$d
 
             if ($allInsert 
                 && $this->db->trans_status() 
-                //&& $tviDB->trans_status() 
+                && $tviDB->trans_status() 
                 && $pecoDB->trans_status()
             ) {
                 $this->db->trans_commit();
                 $pecoDB->trans_commit();
-                //$tviDB->trans_commit();
+                $tviDB->trans_commit();
 
                 $msg = 'Attendance logs has been recorded!';
                 $func = 'success';
@@ -3878,7 +3878,7 @@ WHERE telr.status = 301 AND telra.status = 301 AND empid = ".$empid." AND ('".$d
             } else {
                 $this->db->trans_rollback();
                 $pecoDB->trans_rollback();
-                //$tviDB->trans_rollback();
+                $tviDB->trans_rollback();
 
                 $msg = 'There was an error while logs are being recorded.';
                 $func = 'error';
