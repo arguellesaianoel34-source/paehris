@@ -179,9 +179,11 @@ class Printer extends CI_Controller {
 
                 foreach ($signpane AS $sign) {
                     $id = $sign->getAttribute('data-id');
-                    $sign->setAttribute('src', $signature[$id]['sign']);
-                    $signstyle = 'width: '.$signature[$id]['width'].'; height: auto; position: absolute; margin-top: -35px; display: block; margin-left: auto; margin-right: auto;';
-                    $sign->setAttribute('style', $signstyle);
+                    if (isset($signature[$id]) && !empty($signature[$id])) {
+                        $sign->setAttribute('src', $signature[$id]['sign']);
+                        $signstyle = 'width: '.$signature[$id]['width'].'; height: auto; position: absolute; margin-top: -35px; display: block; margin-left: auto; margin-right: auto;';
+                        $sign->setAttribute('style', $signstyle);
+                    }
                 }
                 $hashed = $domDoc->saveHTML();
             }
