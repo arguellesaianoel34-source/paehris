@@ -71,6 +71,7 @@ $uploadurl = 'hris/attlogs';
     <div class="col-md-6">
         <div class="form-group">
             <h4>Upload Log File</h4>
+
             <hr>
             Browse File
             <input id="attfiledrop" placeholder="Browse file..." name="attfiledrop[]" data-upload-url="<?php echo base_url($uploadurl); ?>" class="file" type="file" data-preview-file-type="any" multiple />

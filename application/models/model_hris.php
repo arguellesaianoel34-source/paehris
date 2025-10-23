@@ -3836,7 +3836,9 @@ WHERE telr.status = 301 AND telra.status = 301 AND empid = ".$empid." AND ('".$d
                 $tvi = $tviDB->insert_batch('prime_employee_attendance_timelogs', $batch);
                 $peco = $pecoDB->insert_batch('prime_employee_attendance_timelogs', $batch);
 
-                if (!$pae || !$tvi || !$peco
+                if (!$pae 
+                || !$tvi 
+                || !$peco
                 ) {
                     $allInsert = false;
                     break;
@@ -3861,7 +3863,9 @@ WHERE telr.status = 301 AND telra.status = 301 AND empid = ".$empid." AND ('".$d
 
             }
 
-            if ($allInsert && $this->db->trans_status() && $tviDB->trans_status() 
+            if ($allInsert 
+                && $this->db->trans_status() 
+                && $tviDB->trans_status() 
                 && $pecoDB->trans_status()
             ) {
                 $this->db->trans_commit();
