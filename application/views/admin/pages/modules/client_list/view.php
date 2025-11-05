@@ -324,11 +324,12 @@ $app_avatar_color = safe($details, 'is_corporate', 'NO') === 'YES' ? 'blue' : 'o
             <a href="/module/<?= $hashcode ?>/" class="btn btn-default"><span class="glyphicon glyphicon-file"></span> Back</a>
         </div>
         <!-- Project Dropdown Menu (bottom right of header) -->
-        <div style="position: absolute; bottom: 18px; right: 10px; z-index: 10;">
+        <!-- <div style="position: absolute; bottom: 18px; right: 10px; z-index: 10;">
             <div class="dropdown">
                 <button class="btn btn-default dropdown-toggle" type="button" id="projectDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="min-width: 240px; font-weight:600;">
                     <span id="selectedProject">Project 1: BKL27, LOT92, Lizandra</span>
                     <span class="caret"></span>
+                    
                 </button>
                 <ul class="dropdown-menu dropdown-menu-right" aria-labelledby="projectDropdown" style="min-width: 240px;">
                     <li><a href="#" onclick="selectProject('Project 1: BKL27, LOT92, Lizandra'); return false;">Project 1: BKL27, LOT92, Lizandra</a></li>
@@ -337,7 +338,7 @@ $app_avatar_color = safe($details, 'is_corporate', 'NO') === 'YES' ? 'blue' : 'o
                     <li><a href="#" onclick="selectProject('Project 4: BKL30, LOT95, Lizandra'); return false;">Project 4: BKL30, LOT95, Lizandra</a></li>
                 </ul>
             </div>
-        </div>
+        </div> -->
     </div>
     <div class="row">
         <!-- Left Column -->
