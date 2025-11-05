@@ -3826,19 +3826,19 @@ WHERE telr.status = 301 AND telra.status = 301 AND empid = ".$empid." AND ('".$d
         if (count($logs) > 0) {
             $batches = array_chunk($logs, 500);
             $tviDB = $this->load->database('tvi',true);
-            $pecoDB = $this->load->database('peco',true);
+            //$pecoDB = $this->load->database('peco',true);
             $this->db->trans_begin();
-            $pecoDB->trans_begin();
+            //$pecoDB->trans_begin();
             $tviDB->trans_begin();
             $allInsert = true;
             foreach ($batches as $batch) {
                 $pae = $this->db->insert_batch('prime_employee_attendance_timelogs', $batch);
                 $tvi = $tviDB->insert_batch('prime_employee_attendance_timelogs', $batch);
-                $peco = $pecoDB->insert_batch('prime_employee_attendance_timelogs', $batch);
+                //$peco = $pecoDB->insert_batch('prime_employee_attendance_timelogs', $batch);
 
                 if (!$pae 
                 || !$tvi 
-                || !$peco
+                //|| !$peco
                 ) {
                     $allInsert = false;
                     break;
@@ -3866,10 +3866,10 @@ WHERE telr.status = 301 AND telra.status = 301 AND empid = ".$empid." AND ('".$d
             if ($allInsert 
                 && $this->db->trans_status() 
                 && $tviDB->trans_status() 
-                && $pecoDB->trans_status()
+                //&& $pecoDB->trans_status()
             ) {
                 $this->db->trans_commit();
-                $pecoDB->trans_commit();
+                //$pecoDB->trans_commit();
                 $tviDB->trans_commit();
 
                 $msg = 'Attendance logs has been recorded!';
@@ -3877,7 +3877,7 @@ WHERE telr.status = 301 AND telra.status = 301 AND empid = ".$empid." AND ('".$d
                 $title = 'Attlogs Uploaded!';
             } else {
                 $this->db->trans_rollback();
-                $pecoDB->trans_rollback();
+                //$pecoDB->trans_rollback();
                 $tviDB->trans_rollback();
 
                 $msg = 'There was an error while logs are being recorded.';
