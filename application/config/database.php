@@ -92,8 +92,8 @@ $db['audit'] = array_merge($default_db_config, array(
 $db['peco'] = array_merge($default_db_config, array(
     'hostname' => '172.174.114.142',
     'database' => 'rwlisxy9bxboh4qh_peco_erp',
-    'username' => 'rwlisxy9bxboh4qh_peco_root',
-    'password' => 'ajLu}^RkQ8#p',
+    'username' => 'rwlisxy9bxboh4qh_api',
+    'password' => 'qU^2YU8yHRGhb%&6',
 ));
 
 // ###################################################
@@ -102,6 +102,6 @@ $db['peco'] = array_merge($default_db_config, array(
 $db['tvi'] = array_merge($default_db_config, array(
     'hostname' => 'localhost',
     'database' => 'uub4rmw23inpzxn9_tvi_erp',
-    'username' => 'uub4rmw23inpzxn9_tvi_root',
-    'password' => 'TN@uE!]FgyrQ',
+    'username' => 'uub4rmw23inpzxn9_api',
+    'password' => 'P@3API2025',
 ));
