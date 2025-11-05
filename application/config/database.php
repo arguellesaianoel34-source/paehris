@@ -93,7 +93,7 @@ $db['peco'] = array_merge($default_db_config, array(
     'hostname' => '172.174.114.142',
     'database' => 'rwlisxy9bxboh4qh_peco_erp',
     'username' => 'rwlisxy9bxboh4qh_api',
-    'password' => 'qU^2YU8yHRGhb%&6',
+    'password' => 'h0dOfrABk%RhiH4H',
 ));
 
 // ###################################################
