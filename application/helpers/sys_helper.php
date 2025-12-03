@@ -779,7 +779,9 @@ if(!function_exists('echo_dbf')) {
 
 if (!function_exists('google_api_key')) {
     function google_api_key() {
-        return 'AIzaSyDqC5lmJR1TtWTnySj2psx8-3JynOFUyYE';
+        //return 'AIzaSyDqC5lmJR1TtWTnySj2psx8-3JynOFUyYE';
+
+        return 'AIzaSyDToh2girQBWfTTLTupN0CJS6D3Y1ao4fQ';
     }
 }
 
