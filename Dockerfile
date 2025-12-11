@@ -23,7 +23,10 @@ RUN a2enmod rewrite
 COPY . /var/www/html/
 
 # Set permissions
-RUN chown -R www-data:www-data /var/www/html \
+RUN mkdir -p /var/www/html/uploads \
+    && mkdir -p /var/www/html/application/logs \
+    && mkdir -p /var/www/html/application/cache \
+    && chown -R www-data:www-data /var/www/html \
     && chmod -R 755 /var/www/html \
     && chmod -R 777 /var/www/html/application/logs \
     && chmod -R 777 /var/www/html/application/cache \
