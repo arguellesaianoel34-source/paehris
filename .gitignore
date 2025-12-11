@@ -9,7 +9,6 @@ dist/
 /.vscode/
 /.idea/
 /server/
-/application/config/database.php
 
 # Compiled Java class files
 *.class
@@ -52,8 +51,7 @@ Thumbs.db
 *.mov
 *.wmv
 
-# Database configuration (excluded to protect live credentials)
-/application/config/database.php
+# Database configuration is now included in git (uses same config for Docker and live)
 
 # Uploads and logs
 /uploads/
