@@ -62,8 +62,9 @@ Thumbs.db
 # PHP directory (removed, using Docker)
 /php/
 
-# PHP configuration files
+# Old run scripts (replaced by Docker)
 run.ps1
+run.sh
 
 # Docker
 .env
