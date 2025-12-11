@@ -52,15 +52,27 @@ Thumbs.db
 *.mov
 *.wmv
 
-# /application/config/database.php
+# Database configuration (excluded to protect live credentials)
+/application/config/database.php
+
+# Uploads and logs
 /uploads/
 /.stfolder/
-<<<<<<< HEAD
-run.ps1
-=======
+
+# PHP directory (removed, using Docker)
 /php/
 
 # PHP configuration files
-
 run.ps1
->>>>>>> phase1
+
+# Docker
+.env
+.env.local
+docker-compose.override.yml
+
+# Database SQL files (too large for git)
+db/main/*.sql
+db/audit/*.sql
+!db/main/.gitkeep
+!db/audit/.gitkeep
+*.sql.backup
