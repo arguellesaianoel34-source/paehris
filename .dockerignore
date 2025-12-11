@@ -1,0 +1,23 @@
+.git
+.gitignore
+.php
+node_modules
+.vscode
+.idea
+*.log
+*.md
+.DS_Store
+nbproject
+application/logs/*
+application/cache/*
+uploads/*
+!uploads/.gitkeep
+!application/logs/.gitkeep
+!application/cache/.gitkeep
+
+# Exclude large SQL files from Docker build (not needed in production image)
+db/main/*.sql
+db/audit/*.sql
+!db/main/.gitkeep
+!db/audit/.gitkeep
+
