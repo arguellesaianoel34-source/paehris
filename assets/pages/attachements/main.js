@@ -194,9 +194,12 @@ var ATTACHEMENTS = function() {
     };
 
     var iframe_docs_preview = function(dataid) {
-        var doc_preview_tabs = $('#doc_preview_tabs',document);
+        
+        var doc_preview_tabs = $('#doc_preview_tabs', document);
         var tab = $('a[data-toggle="tab"]',doc_preview_tabs);
-        create_iframe_preview('tssr',dataid,3436);
+
+        create_iframe_preview('tssr', dataid, 3436);
+
         tab.on('shown.bs.tab',function (e) {
             var target = $(e.target).attr('href');
             var id = $(e.target).attr('data-id');
