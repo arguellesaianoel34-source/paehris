@@ -388,10 +388,9 @@ $user_role = get_users_roles_matrix_id_arr();
 
                     </div>
                     <div class="portlet-footer btn-group" id="preview_actions">
-<?php
-                                    echo user_info()->user_id;
-                                ?>
-
+                        <?php
+                            echo user_info()->user_id ?? '';
+                        ?>
                     </div>
                 </div>
             </div>
@@ -472,7 +471,7 @@ $user_role = get_users_roles_matrix_id_arr();
 
         <script type="text/javascript">
             SALES.init(<?php echo $dataid; ?>);
-            CAD.requirements(<?php echo $dataid; ?>,true);
+            CAD.requirements(<?php echo $dataid; ?>, true);
             INSPECTION.application(<?php echo $dataid; ?>);
         </script>
     <?php }?>
