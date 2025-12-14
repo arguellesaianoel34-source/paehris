@@ -7,7 +7,6 @@
 node_modules/
 dist/
 
-
 # Compiled Java class files
 *.class
 
@@ -49,15 +48,29 @@ Thumbs.db
 *.mov
 *.wmv
 
-/application/config/database.php
+# Database configuration is now included in git (uses same config for Docker and live)
+
+# Uploads and logs
 /uploads/
 /.stfolder/
-.vscode/
-.github/
+
+# PHP directory (removed, using Docker)
 /php/
 /.idea/
 /server/
 
-# PHP configuration files
-
+# Old run scripts (replaced by Docker)
 run.ps1
+run.sh
+
+# Docker
+.env
+.env.local
+docker-compose.override.yml
+
+# Database SQL files (too large for git)
+db/main/*.sql
+db/audit/*.sql
+!db/main/.gitkeep
+!db/audit/.gitkeep
+*.sql.backup

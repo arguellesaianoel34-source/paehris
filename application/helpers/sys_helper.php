@@ -1487,6 +1487,11 @@ if (!function_exists('arrayed_ajax_alert')) {
 
 if (!function_exists('rehash_pdf_img')) {
     function rehash_pdf_img($html) {
+        // Handle empty input to prevent DOMDocument warning
+        if (empty($html) || trim($html) === '') {
+            return '';
+        }
+        
         $domDoc = new DOMDocument();
         $domDoc->loadHTML($html, LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD | LIBXML_NOWARNING | LIBXML_NOERROR);
         $xpath = new DOMXPath($domDoc);
