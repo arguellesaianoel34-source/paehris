@@ -4844,6 +4844,7 @@ var PECO = function () {
 
     return {
         //main function to initiate the theme
+        
         init: function () {
             init_shortcut_button();
             init_fancybox_all();

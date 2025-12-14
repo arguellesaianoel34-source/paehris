@@ -68,19 +68,19 @@ if($sysmode=='dev') {
     ?>
 
     <div class="pull-right text-success" style="margin-right: 30px;">
-        <a class="icon-footer icon-footer-offline" href="javascript:;" title="" id="internet_connect">
-            <span class="internet-text">Offline</span>
-            <i class="fa fa-wifi"></i>&nbsp;|&nbsp;
+        <a class="icon-footer icon-footer-online" href="javascript:;" title="" id="internet_connect">
+            <span class="internet-text">Online</span>
+            <i class="fa fa-wifi"></i>
         </a>
 
         <!-- Server Disk Space: <span id="diskspace"></span> | -->
-        <?php echo $sysmode_msg; ?>
+        <!-- <?php echo $sysmode_msg; ?>
 
         <?php
         if($this->uri->segment(3) && $qry_nav_file->sysid>0) {
             echo '<a href="javascript:;" data-id="'.$qry_nav_file->sysid.'" data-toggle="shortcut" class="btn btn-success inline btn-xs btn-fw tooltips" title="Add this page to shortcut?" style="margin: 0px 0px; margin-top: -5px; margin-right: -10px;" ><i class="fa fa-plus" ></i ></a >';
         }
-        ?>
+        ?> -->
     </div>
     <div class="scroll-to-top tooltips " data-container="body" data-placement="left" data-html="true" data-original-title="Scroll to top">
         <i  class="fa fa-angle-double-up"></i>
