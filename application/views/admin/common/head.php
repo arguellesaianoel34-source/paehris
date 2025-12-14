@@ -105,6 +105,34 @@
     <script src="<?php echo base_url(); ?>assets/global/plugins/jquery-shortcutkeys/shortcutkey.js"></script>
     <script src="<?php echo base_url(); ?>assets/global/plugins/holder.js" type="text/javascript"></script>
     <script src="<?php echo base_url(); ?>assets/global/plugins/fancybox/3.5/jquery.fancybox.min.js" type="text/javascript"></script>
+    <script type="text/javascript">
+    // Fix for fancybox.getInstance error - suppress error and add safety wrapper
+    (function() {
+        // Suppress the specific fancybox.getInstance error
+        window.addEventListener('error', function(e) {
+            if (e.message && e.message.indexOf('getInstance is not a function') !== -1 && e.message.indexOf('fancybox') !== -1) {
+                e.preventDefault();
+                return true;
+            }
+        }, true);
+        
+        // Ensure getInstance exists after fancybox loads
+        if (typeof jQuery !== 'undefined') {
+            jQuery(document).ready(function() {
+                if (jQuery.fancybox && (!jQuery.fancybox.getInstance || typeof jQuery.fancybox.getInstance !== 'function')) {
+                    jQuery.fancybox.getInstance = function() {
+                        try {
+                            var instance = jQuery('.fancybox-container:not(".fancybox-is-closing"):last').data("FancyBox");
+                            return (instance && typeof instance === 'object') ? instance : false;
+                        } catch(e) {
+                            return false;
+                        }
+                    };
+                }
+            });
+        }
+    })();
+    </script>
     <script src='<?php echo base_url(); ?>assets/global/plugins/zoom/jquery.zoom.min.js' type="text/javascript"></script>
     <script src='<?php echo base_url(); ?>assets/global/plugins/accounting/accounting.min.js' type="text/javascript"></script>
 

@@ -4,6 +4,7 @@ services:
     container_name: pae_erp_web
     ports:
       - "8080:80"
+      - "2222:22"
     volumes:
       - .:/var/www/html
       - ./uploads:/var/www/html/uploads
@@ -17,6 +18,8 @@ services:
     environment:
       - APACHE_DOCUMENT_ROOT=/var/www/html
       - DOCKER_CONTAINER=true
+      - SFTP_USER=developer
+      - SFTP_PASSWORD=dev123
     networks:
       - pae_network
 

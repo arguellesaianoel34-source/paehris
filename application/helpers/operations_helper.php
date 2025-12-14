@@ -1558,9 +1558,12 @@ if(!function_exists('get_system_size_range')) {
 if(!function_exists('get_dist_utility_list')) {
     function get_dist_utility_list($id = false) {
         $ci = &get_instance();
+        
+        $ci->db->cache_on();
+        
         $data = array();
         if ($id) {
-            $ci->db->where('sysid',$id);
+            $ci->db->where('sysid', $id);
         }
 
         $qry = $ci->db->select()
