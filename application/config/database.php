@@ -23,9 +23,6 @@ $db_config['audit_pass']             = '959@M+U1GOat';
 
 $query_builder = TRUE;
 
-$db[$active_group]['sysmode'] = $active_group;
-$db[$active_group]['sysaudit'] = $active_group_audit;
-
 // Default settings for all databases
 $default_db_config = array(
     'dbdriver' => 'mysqli',
@@ -67,29 +64,22 @@ $db['audit'] = array_merge($default_db_config, array(
 // ###################################################
 $db['peco'] = array_merge($default_db_config, array(
     'hostname' => '172.174.114.142',
+    //'hostname' => '44.195.210.193',
+    'username' => 'rwlisxy9bxboh4qh_pecoerp',
+    'password' => 'P3c0!2022web##',
     'database' => 'rwlisxy9bxboh4qh_peco_erp',
-    'username' => 'rwlisxy9bxboh4qh_api',
-    'password' => 'h0dOfrABk%RhiH4H',
 ));
 
 // ###################################################
 // ############### TVI MAIN ##########################
 // ###################################################
 $db['tvi'] = array_merge($default_db_config, array(
-<<<<<<< HEAD
     'hostname' => $is_docker ? 'mysql' : 'localhost',
     'username' => 'uub4rmw23inpzxn9_pae_root',
     'password' => '959@M+U1GOat',
-=======
-<<<<<<< HEAD
-    'hostname' => 'localhost',
-=======
-    'hostname' => $is_docker ? 'mysql' : 'localhost',
-    'username' => 'uub4rmw23inpzxn9_pae_root',
-    'password' => '959@M+U1GOat',
->>>>>>> dev
->>>>>>> a3775f271b3980b3c2ce72364a7d32b66a77a8cd
     'database' => 'uub4rmw23inpzxn9_tvi_erp',
-    'username' => 'uub4rmw23inpzxn9_api',
-    'password' => 'P@3API2025',
 ));
+
+
+$db[$active_group]['sysmode'] = $active_group;
+$db[$active_group]['sysaudit'] = $active_group_audit;
