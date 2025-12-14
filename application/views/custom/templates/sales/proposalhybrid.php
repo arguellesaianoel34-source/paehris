@@ -94,7 +94,10 @@ if ($app->duid > 0 && $app->durate > 0) {
     if (isset($id)) {
         $pvdir = FCPATH . 'uploads/attachments/cad/applications/' . str_pad($id, 6, '0', STR_PAD_LEFT) . '/Assessment/Docs/';
         //$bullet = FCPATH . 'assets/global/img/check-list.png';
-        $files = scandir($pvdir);
+        $files = array();
+        if (is_dir($pvdir) && is_readable($pvdir)) {
+            $files = scandir($pvdir);
+        }
 
         foreach ($files as $file) {
             if (strpos(strtolower($file), 'pv_layout') !== false || strpos(strtolower($file), 'pv_roof') !== false) {

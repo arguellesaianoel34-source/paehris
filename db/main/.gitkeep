@@ -1,0 +1,4 @@
+# This directory contains database migration files
+# For local development, place pae_erp.sql here
+# These files are excluded from git due to size
+
