@@ -23,6 +23,9 @@ $db_config['audit_pass']             = '959@M+U1GOat';
 
 $query_builder = TRUE;
 
+$db[$active_group]['sysmode'] = $active_group;
+$db[$active_group]['sysaudit'] = $active_group_audit;
+
 // Default settings for all databases
 $default_db_config = array(
     'dbdriver' => 'mysqli',
@@ -75,11 +78,7 @@ $db['peco'] = array_merge($default_db_config, array(
 // ###################################################
 $db['tvi'] = array_merge($default_db_config, array(
     'hostname' => $is_docker ? 'mysql' : 'localhost',
-    'username' => 'uub4rmw23inpzxn9_pae_root',
-    'password' => '959@M+U1GOat',
     'database' => 'uub4rmw23inpzxn9_tvi_erp',
-));
-
-
-$db[$active_group]['sysmode'] = $active_group;
-$db[$active_group]['sysaudit'] = $active_group_audit;
+    'username' => 'uub4rmw23inpzxn9_api',
+    'password' => 'P@3API2025',
+}));
