@@ -1,0 +1,4 @@
+# This directory contains audit database migration files
+# For local development, place pae_erp_audit_backup.sql here
+# These files are excluded from git due to size
+
