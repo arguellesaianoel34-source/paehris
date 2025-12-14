@@ -76,9 +76,19 @@ $db['peco'] = array_merge($default_db_config, array(
 // ############### TVI MAIN ##########################
 // ###################################################
 $db['tvi'] = array_merge($default_db_config, array(
+<<<<<<< HEAD
     'hostname' => $is_docker ? 'mysql' : 'localhost',
     'username' => 'uub4rmw23inpzxn9_pae_root',
     'password' => '959@M+U1GOat',
+=======
+<<<<<<< HEAD
+    'hostname' => 'localhost',
+=======
+    'hostname' => $is_docker ? 'mysql' : 'localhost',
+    'username' => 'uub4rmw23inpzxn9_pae_root',
+    'password' => '959@M+U1GOat',
+>>>>>>> dev
+>>>>>>> a3775f271b3980b3c2ce72364a7d32b66a77a8cd
     'database' => 'uub4rmw23inpzxn9_tvi_erp',
     'username' => 'uub4rmw23inpzxn9_api',
     'password' => 'P@3API2025',
