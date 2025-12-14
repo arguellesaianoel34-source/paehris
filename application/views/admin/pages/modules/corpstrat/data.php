@@ -339,10 +339,6 @@ $user_role = get_users_roles_matrix_id_arr();
     </div>
 
 
-    <?php
-        echo print_r(user_info()->sysid, true);
-    ?>
-
 </div>
 
 
@@ -360,17 +356,11 @@ $user_role = get_users_roles_matrix_id_arr();
 <script src="<?php echo base_url(); ?>assets/global/plugins/jquery.input-ip-address-control-1.0.min.js"></script>
 <script src="<?php echo base_url(); ?>assets/global/plugins/bootstrap-pwstrength/pwstrength-bootstrap.min.js"
     type="text/javascript"></script>
-<script src="<?php echo base_url(); ?>assets/global/plugins/bootstrap-switch/js/bootstrap-switch.min.js"
-    type="text/javascript"></script>
 <script src="<?php echo base_url(); ?>assets/global/plugins/jquery-tags-input/jquery.tagsinput.min.js"
     type="text/javascript"></script>
 <script src="<?php echo base_url(); ?>assets/global/plugins/bootstrap-maxlength/bootstrap-maxlength.min.js"
     type="text/javascript"></script>
 <script src="<?php echo base_url(); ?>assets/global/plugins/bootstrap-touchspin/bootstrap.touchspin.js"
-    type="text/javascript"></script>
-<script src="<?php echo base_url(); ?>assets/global/plugins/typeahead/handlebars.min.js"
-    type="text/javascript"></script>
-<script src="<?php echo base_url(); ?>assets/global/plugins/typeahead/typeahead.bundle.min.js"
     type="text/javascript"></script>
 <script src="<?php echo base_url(); ?>assets/global/plugins/ckeditor/ckeditor.js"></script>
 <script src="<?php echo base_url(); ?>assets/global/plugins/bootstrap-select/bootstrap-select.min.js"></script>
