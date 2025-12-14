@@ -1287,7 +1287,7 @@ class Cad extends CI_Controller
         $dompdf->add_info('Creator', 'ITD');
         $dompdf->add_info('Keywords', $title);
 
-        // Clean (discard) any output so far, then stream
+        // Stream PDF - CodeIgniter will handle output buffering
         $dompdf->stream($filename, array('Attachment' => false));
     }
 

@@ -5549,8 +5549,11 @@ Class Model_cad extends CI_Model {
             $html .= $tssr->html;
         }
         $data['html'] = $html;
-        $data['title'] = $docname->names.' - '.ucwords(strtolower($app->appname));
-        $data['filename'] = $docname->names.' - '.ucwords(strtolower($app->appname));
+        // Check if docname exists before accessing its properties
+        $docname_str = ($docname && isset($docname->names)) ? $docname->names : 'Document';
+        $appname_str = ($app && isset($app->appname)) ? ucwords(strtolower($app->appname)) : '';
+        $data['title'] = $docname_str . ($appname_str ? ' - ' . $appname_str : '');
+        $data['filename'] = $docname_str . ($appname_str ? ' - ' . $appname_str : '');
         $data['papersize'] = ($doctype == 3434) ? 'folio' : false;
 
         return (object)$data;
@@ -5650,8 +5653,11 @@ Class Model_cad extends CI_Model {
             $html .= $tssr->html;
         }
         $data['html'] = $html;
-        $data['title'] = $docname->names.' - '.ucwords(strtolower($app->appname));
-        $data['filename'] = $docname->names.' - '.ucwords(strtolower($app->appname));
+        // Check if docname exists before accessing its properties
+        $docname_str = ($docname && isset($docname->names)) ? $docname->names : 'Document';
+        $appname_str = ($app && isset($app->appname)) ? ucwords(strtolower($app->appname)) : '';
+        $data['title'] = $docname_str . ($appname_str ? ' - ' . $appname_str : '');
+        $data['filename'] = $docname_str . ($appname_str ? ' - ' . $appname_str : '');
         $data['papersize'] = ($doctype == 3434) ? 'folio' : false;
 
         return (object)$data;
