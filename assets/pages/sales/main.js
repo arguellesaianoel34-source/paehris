@@ -163,7 +163,10 @@ var SALES = function () {
             data : {
                 appid : dataid,
                 edit : edit
-            }
+            }, 
+            beforeSend: function () {
+                application_sales_officer.html('<div class="text-center"><i class="fa fa-spinner fa-spin fa-pulse"></i> Loading...</div>');
+            },
         }).done(function (d) {
             //if exists, change div content to
             //console.log(d);
