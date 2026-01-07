@@ -2029,6 +2029,12 @@ var EPRS = function () {
                     suppid : this_id
                 }
             }).done(function (d) {
+                
+                if (!d) {
+                    console.error('Invalid response from server');
+                    return;
+                }
+
                 let title = d.title || 'PO Preview';
                 let html = d.html || '';
                 let papersize = d.papersize || false;
