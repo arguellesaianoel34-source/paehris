@@ -1,0 +1,83 @@
+<?php
+// Docker-specific database configuration override
+// This file should be copied to application/config/database.php when running in Docker
+// Or use environment detection in the main database.php file
+
+if (!defined('BASEPATH')) exit('No direct script access allowed');
+
+$active_group               = 'pae';
+$active_group_audit         = 'audit';
+
+// Docker Configuration - uses 'mysql' as hostname (Docker service name)
+$db_config['host_server']            = 'mysql';  // Docker service name
+$db_config['host_user']              = 'uub4rmw23inpzxn9_pae_root';
+$db_config['host_db']                = 'uub4rmw23inpzxn9_erp';
+$db_config['host_pass']              = '959@M+U1GOat';
+
+$db_config['audit_server']           = 'mysql';  // Docker service name
+$db_config['audit_user']             = 'uub4rmw23inpzxn9_pae_root';
+$db_config['audit_db']               = 'uub4rmw23inpzxn9_erp_audit';
+$db_config['audit_pass']             = '959@M+U1GOat';
+
+$query_builder = TRUE;
+
+$db[$active_group]['sysmode'] = $active_group;
+$db[$active_group]['sysaudit'] = $active_group_audit;
+
+// Default settings for all databases
+$default_db_config = array(
+    'dbdriver' => 'mysqli',
+    'dbprefix' => '',
+    'pconnect' => TRUE,
+    'db_debug' => TRUE,
+    'cache_on' => FALSE,
+    'cachedir' => '',
+    'char_set' => 'utf8',
+    'dbcollat' => 'utf8_general_ci',
+    'swap_pre' => '',
+    'autoinit' => TRUE,
+    'stricton' => FALSE,
+);
+
+// ###################################################
+// ############### ERP DOCKER ########################
+// ###################################################
+$db['pae'] = array_merge($default_db_config, array(
+    'hostname' => $db_config['host_server'],
+    'username' => $db_config['host_user'],
+    'password' => $db_config['host_pass'],
+    'database' => $db_config['host_db'],
+    'port'     => '3306',
+));
+
+// ###################################################
+// ############### ERP AUDIT DOCKER ##################
+// ###################################################
+$db['audit'] = array_merge($default_db_config, array(
+    'hostname' => $db_config['audit_server'],
+    'username' => $db_config['audit_user'],
+    'password' => $db_config['audit_pass'],
+    'database' => $db_config['audit_db'],
+));
+
+// ###################################################
+// ############### PECO MAIN #########################
+// ###################################################
+$db['peco'] = array_merge($default_db_config, array(
+    'hostname' => '172.174.114.142',
+    'database' => 'rwlisxy9bxboh4qh_peco_erp',
+    'username' => 'rwlisxy9bxboh4qh_api',
+    'password' => 'h0dOfrABk%RhiH4H',
+));
+
+// ###################################################
+// ############### TVI MAIN ##########################
+// ###################################################
+$db['tvi'] = array_merge($default_db_config, array(
+    'hostname' => 'host.docker.internal',  // Access host machine from Docker
+    'database' => 'uub4rmw23inpzxn9_tvi_erp',
+    'username' => 'uub4rmw23inpzxn9_api',
+    'password' => 'P@3API2025',
+));
+
+

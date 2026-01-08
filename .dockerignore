@@ -1,0 +1,68 @@
+# Git
+.git
+.gitignore
+.gitattributes
+
+# Docker
+Dockerfile
+docker-compose.yml
+.dockerignore
+
+# IDE
+.idea
+.vscode
+*.swp
+*.swo
+*~
+.project
+.classpath
+.settings
+nbproject
+
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Logs
+*.log
+logs/
+application/logs/
+
+# Cache
+application/cache/*
+!application/cache/index.html
+*.cache
+
+# Node modules (if any)
+node_modules/
+npm-debug.log
+yarn-error.log
+
+# Environment files
+.env
+.env.local
+.env.*.local
+
+# Documentation
+docs/
+*.md
+!docker/README.md
+
+# Database backups (keep SQL files, ignore backups)
+db/*.nb3
+db/*.backup
+
+# PHP binaries (not needed in container)
+php/
+
+# NetBeans
+nbproject/
+
+# Temporary files
+*.tmp
+*.temp
+*.bak
+*.swp
+
+
