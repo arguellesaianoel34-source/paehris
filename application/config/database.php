@@ -4,46 +4,22 @@ if (!defined('BASEPATH')) exit('No direct script access allowed');
 
 $active_group               = 'pae';
 $active_group_audit         = 'audit';
-$connect                    = 'online';
 
+// Check if running in Docker container
+$is_docker = getenv('DOCKER_CONTAINER') === 'true' || gethostname() === 'pae_erp_web' || isset($_SERVER['DOCKER_CONTAINER']);
+
+// ONLINE CONFIGURATION (Turbify/Production)
+// Use Docker container hostnames when in Docker, otherwise use localhost
 $db_config = array();
+$db_config['host_server']            = $is_docker ? 'mysql' : 'localhost';
+$db_config['host_user']              = 'uub4rmw23inpzxn9_pae_root';
+$db_config['host_db']                = 'uub4rmw23inpzxn9_erp';
+$db_config['host_pass']              = '959@M+U1GOat';
 
-if( $connect == 'dev' ) {
-    // LOCALHOST
-    $db_config['host_server']            = 'localhost';
-    $db_config['host_user']              = 'root';
-    $db_config['host_db']                = 'pae_erp';
-    $db_config['host_pass']              = 'iF4D3R0N88!';
-
-    $db_config['audit_server']           = 'localhost';
-    $db_config['audit_user']             = 'root';
-    $db_config['audit_db']               = 'pae_erp_audit';
-    $db_config['audit_pass']             = 'iF4D3R0N88!';
-
-} else if( $connect == 'online' ) {
-    // Turbify
-    $db_config['host_server']            = 'localhost';
-    $db_config['host_user']              = 'uub4rmw23inpzxn9_pae_root';
-    $db_config['host_db']                = 'uub4rmw23inpzxn9_erp';
-    $db_config['host_pass']              = '959@M+U1GOat';
-
-    $db_config['audit_server']           = 'localhost';
-    $db_config['audit_user']             = 'uub4rmw23inpzxn9_pae_root';
-    $db_config['audit_db']               = 'uub4rmw23inpzxn9_erp_audit';
-    $db_config['audit_pass']             = '959@M+U1GOat';
-
-} else {
-    // PAE SERVER
-    $db_config['host_server']            = '172.20.224.5';
-    $db_config['host_user']              = 'lucky';
-    $db_config['host_db']                = 'pae';
-    $db_config['host_pass']              = 'F4D3R0N88';
-
-    $db_config['audit_server']           = '172.20.224.5';
-    $db_config['audit_user']             = 'lucky';
-    $db_config['audit_db']               = 'pae_audit';
-    $db_config['audit_pass']             = 'F4D3R0N88';
-}
+$db_config['audit_server']           = $is_docker ? 'mysql_audit' : 'localhost';
+$db_config['audit_user']             = 'uub4rmw23inpzxn9_pae_root';
+$db_config['audit_db']               = 'uub4rmw23inpzxn9_erp_audit';
+$db_config['audit_pass']             = '959@M+U1GOat';
 
 $query_builder = TRUE;
 
@@ -91,16 +67,17 @@ $db['audit'] = array_merge($default_db_config, array(
 // ###################################################
 $db['peco'] = array_merge($default_db_config, array(
     'hostname' => '172.174.114.142',
+    //'hostname' => '44.195.210.193',
+    'username' => 'rwlisxy9bxboh4qh_pecoerp',
+    'password' => 'P3c0!2022web##',
     'database' => 'rwlisxy9bxboh4qh_peco_erp',
-    'username' => 'rwlisxy9bxboh4qh_api',
-    'password' => 'h0dOfrABk%RhiH4H',
 ));
 
 // ###################################################
 // ############### TVI MAIN ##########################
 // ###################################################
 $db['tvi'] = array_merge($default_db_config, array(
-    'hostname' => 'localhost',
+    'hostname' => $is_docker ? 'mysql' : 'localhost',
     'database' => 'uub4rmw23inpzxn9_tvi_erp',
     'username' => 'uub4rmw23inpzxn9_api',
     'password' => 'P@3API2025',

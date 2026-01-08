@@ -2029,7 +2029,17 @@ var EPRS = function () {
                     suppid : this_id
                 }
             }).done(function (d) {
-                PECO.pdfPreview(d.title,d.html,d.papersize);
+                
+                if (!d) {
+                    console.error('Invalid response from server');
+                    return;
+                }
+
+                let title = d.title || 'PO Preview';
+                let html = d.html || '';
+                let papersize = d.papersize || false;
+                
+                PECO.pdfPreview(title, html, papersize);
             }).fail(function () {
 
             });

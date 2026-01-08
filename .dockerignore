@@ -27,11 +27,13 @@ desktop.ini
 # Logs
 *.log
 logs/
-application/logs/
+application/logs/*
+!application/logs/.gitkeep
 
 # Cache
 application/cache/*
 !application/cache/index.html
+!application/cache/.gitkeep
 *.cache
 
 # Node modules (if any)
@@ -52,17 +54,23 @@ docs/
 # Database backups (keep SQL files, ignore backups)
 db/*.nb3
 db/*.backup
+# Exclude large SQL files from Docker build (not needed in production image)
+db/main/*.sql
+db/audit/*.sql
+!db/main/.gitkeep
+!db/audit/.gitkeep
 
 # PHP binaries (not needed in container)
+.php
 php/
 
-# NetBeans
-nbproject/
+# Uploads
+uploads/*
+!uploads/.gitkeep
 
 # Temporary files
 *.tmp
 *.temp
 *.bak
 *.swp
-
 

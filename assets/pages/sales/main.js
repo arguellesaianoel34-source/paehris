@@ -17,19 +17,31 @@ var SALES = function () {
 
         $('#btn_open_preview',document).on('click',function () {
             var doctype = iframe_box.attr('data-id');
-            $.ajax({
-                url: PECO.base_url() + 'cad/getdocumentlayout',
-                type: 'post',
-                dataType: 'json',
-                data: {
-                    id: dataid,
-                    doctype: doctype
-                }
-            }).done(function (d) {
-                PECO.pdfPreview(d.title,d.html,d.papersize);
-            }).fail(function () {
+            
+            // Create a temporary form in the current document
+            const form = document.createElement('form');
+            form.method = 'post';
+            form.action = PECO.base_url() + 'cad/getdocumentpreview';
+            form.target = '_blank'; // Open in new tab
 
-            });
+            const idField = document.createElement('input');
+            idField.type = 'hidden';
+            idField.name = 'id';
+            idField.value = dataid;
+
+            form.appendChild(idField);
+
+            const doctypeField = document.createElement('input');
+            doctypeField.type = 'hidden';
+            doctypeField.name = 'doctype';
+            doctypeField.value = doctype;
+
+            form.appendChild(doctypeField);
+
+            // Append form to body, submit, then remove
+            document.body.appendChild(form);
+            form.submit();
+            document.body.removeChild(form);
         });
 
         $('#frm_rate_update',document).on('submit',function (e) {
@@ -163,7 +175,10 @@ var SALES = function () {
             data : {
                 appid : dataid,
                 edit : edit
-            }
+            }, 
+            beforeSend: function () {
+                application_sales_officer.html('<div class="text-center"><i class="fa fa-spinner fa-spin fa-pulse"></i> Loading...</div>');
+            },
         }).done(function (d) {
             //if exists, change div content to
             //console.log(d);
@@ -320,53 +335,332 @@ var SALES = function () {
     var create_docs_preview = function (dataid,params) {
         var iframe_box = $('#iframe_box',document);
 
-        var new_ifrm = $('<iframe></iframe>').attr({
-            id: 'iframe_doc_preview',
-            src: '',
-            style: 'width:100%; height:75vh;'
-        });
+        // Remove any existing content (loading indicator, iframe, PDF canvas container, and all canvas elements)
+        iframe_box.find('.iframe-loading-indicator, #iframe_doc_preview, #pdf-canvas-container, canvas').remove();
+        iframe_box.empty(); // Clear everything to ensure no duplicates
+        
+        // Show loading indicator
+        var loadingIndicator = $('<div class="iframe-loading-indicator" style="text-align: center; padding: 50px; background-color: #f5f5f5; border: 1px solid #ddd; border-radius: 4px; margin: 10px 0;">' +
+            '<h3><i class="fa fa-spinner fa-spin fa-pulse text-info"></i> Loading document preview...</h3>' +
+            '<p class="text-muted">Please wait while the document is being generated.</p>' +
+            '</div>');
+        iframe_box.append(loadingIndicator);
 
-        iframe_box.children('#iframe_doc_preview').remove();
-
-        iframe_box.append(new_ifrm);
-        var ifrm = $('#iframe_doc_preview',document);
-        var body = ifrm.contents().find('body');
-
-        var form = $('<form></form>').attr({
-            method: 'post',
-            action: PECO.base_url() + 'cad/getdocumentpreview'
-        });
-
-        var idfield = $('<input>').attr({
-            type: 'hidden',
-            name: 'id',
-            value: dataid
-        });
-
-        form.append(idfield);
-
-        var doctypefield = $('<input>').attr({
-            type: 'hidden',
-            name: 'doctype',
-            value: iframe_box.attr('data-id')
-        });
-
-        form.append(doctypefield);
+        // Prepare form data
+        var formData = new FormData();
+        formData.append('id', dataid);
+        formData.append('doctype', iframe_box.attr('data-id'));
 
         if (params && typeof params === 'object') {
-            $.each(params,function (index,value) {
-                var paramfield = $('<input>').attr({
-                    type: 'hidden',
-                    name: index,
-                    value: value
-                });
-
-                form.append(paramfield);
-            })
+            $.each(params, function(index, value) {
+                formData.append(index, value);
+            });
         }
 
-        body.append(form);
-        form.submit();
+        // Function to load PDF.js and render PDF
+        var loadAndRenderPDF = function(pdfBlob) {
+            // Load PDF.js from CDN if not already loaded
+            if (typeof pdfjsLib === 'undefined') {
+                var script = document.createElement('script');
+                script.src = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js';
+                script.onload = function() {
+                    pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+                    renderPDF(pdfBlob);
+                };
+                script.onerror = function() {
+                    fallbackToIframe();
+                };
+                document.head.appendChild(script);
+            } else {
+                renderPDF(pdfBlob);
+            }
+        };
+
+        // Function to render PDF using PDF.js
+        var renderPDF = function(pdfBlob) {
+            var reader = new FileReader();
+            reader.onload = function(e) {
+                var typedArray = new Uint8Array(e.target.result);
+                
+                pdfjsLib.getDocument({data: typedArray}).promise.then(function(pdf) {
+                    // Create container for PDF viewer
+                    var container = $('<div id="pdf-canvas-container" style="width: 100%; height: 75vh; overflow-y: auto; overflow-x: hidden; background: #fff; padding: 0; box-sizing: border-box;"></div>');
+                    var canvasContainer = $('<div style="text-align: center; width: 100%;"></div>');
+                    
+                    // Add container to DOM first to get accurate width
+                    iframe_box.append(container);
+                    container.append(canvasContainer);
+                    
+                    // Calculate initial scale based on container width
+                    var containerWidth = container.innerWidth();
+                    var baseScale = 1.0;
+                    var currentScale = baseScale;
+                    
+                    // Render first page
+                    var pageNum = 1;
+                    var renderPage = function(num) {
+                        pdf.getPage(num).then(function(page) {
+                            // Calculate scale to fit container width
+                            var viewport = page.getViewport({scale: 1.0});
+                            var pageWidth = viewport.width;
+                            var calculatedScale = containerWidth / pageWidth;
+                            var scale = Math.min(calculatedScale * currentScale, 3.0); // Max scale of 3x
+                            
+                            var scaledViewport = page.getViewport({scale: scale});
+                            var canvas = $('<canvas></canvas>').attr({
+                                id: 'pdf-canvas-' + num
+                            })[0];
+                            var context = canvas.getContext('2d');
+                            canvas.height = scaledViewport.height;
+                            canvas.width = scaledViewport.width;
+                            
+                            // Ensure canvas doesn't exceed container width
+                            if (canvas.width > containerWidth) {
+                                var scaleRatio = containerWidth / canvas.width;
+                                canvas.style.width = containerWidth + 'px';
+                                canvas.style.height = (canvas.height * scaleRatio) + 'px';
+                            } else {
+                                canvas.style.width = canvas.width + 'px';
+                                canvas.style.height = canvas.height + 'px';
+                            }
+                            
+                            var pageDiv = $('<div style="margin-bottom: 20px; width: 100%; text-align: center;"></div>');
+                            pageDiv.append(canvas);
+                            canvasContainer.append(pageDiv);
+                            
+                            var renderContext = {
+                                canvasContext: context,
+                                viewport: scaledViewport
+                            };
+                            
+                            page.render(renderContext).promise.then(function() {
+                                // Render next page if exists
+                                if (num < pdf.numPages) {
+                                    renderPage(num + 1);
+                                } else {
+                                    // All pages rendered, show the container
+                                    // canvasContainer is already appended
+                                    
+                                    // Add navigation controls
+                                    if (pdf.numPages > 1) {
+                                        var controls = $('<div style="text-align: center; padding: 10px; background: #f5f5f5; border-bottom: 1px solid #ddd;">' +
+                                            '<button class="btn btn-sm btn-default" id="pdf-prev" style="margin-right: 10px;"><i class="fa fa-arrow-up"></i> Previous</button>' +
+                                            '<span id="pdf-page-info" style="margin: 0 10px;">Page 1 of ' + pdf.numPages + '</span>' +
+                                            '<button class="btn btn-sm btn-default" id="pdf-next"><i class="fa fa-arrow-down"></i> Next</button>' +
+                                            '<button class="btn btn-sm btn-default" id="pdf-zoom-out" style="margin-left: 10px;"><i class="fa fa-search-minus"></i></button>' +
+                                            '<button class="btn btn-sm btn-default" id="pdf-zoom-in"><i class="fa fa-search-plus"></i></button>' +
+                                            '</div>');
+                                        container.prepend(controls);
+                                        
+                                        var currentPage = 1;
+                                        var scrollToPage = function(pageNum) {
+                                            var targetCanvas = $('#pdf-canvas-' + pageNum);
+                                            if (targetCanvas.length) {
+                                                var targetOffset = targetCanvas.offset().top - container.offset().top + container.scrollTop() - 50;
+                                                container.animate({
+                                                    scrollTop: targetOffset
+                                                }, 300);
+                                                $('#pdf-page-info').text('Page ' + pageNum + ' of ' + pdf.numPages);
+                                                currentPage = pageNum;
+                                            }
+                                        };
+                                        
+                                        // Track scroll position to update current page
+                                        container.on('scroll', function() {
+                                            var scrollTop = container.scrollTop();
+                                            var foundPage = 1;
+                                            for (var i = 1; i <= pdf.numPages; i++) {
+                                                var canvas = $('#pdf-canvas-' + i);
+                                                if (canvas.length) {
+                                                    var canvasTop = canvas.offset().top - container.offset().top + container.scrollTop();
+                                                    if (scrollTop >= canvasTop - 100) {
+                                                        foundPage = i;
+                                                    }
+                                                }
+                                            }
+                                            if (foundPage !== currentPage) {
+                                                currentPage = foundPage;
+                                                $('#pdf-page-info').text('Page ' + currentPage + ' of ' + pdf.numPages);
+                                            }
+                                        });
+                                        
+                                        $('#pdf-prev', container).on('click', function() {
+                                            if (currentPage > 1) {
+                                                scrollToPage(currentPage - 1);
+                                            }
+                                        });
+                                        
+                                        $('#pdf-next', container).on('click', function() {
+                                            if (currentPage < pdf.numPages) {
+                                                scrollToPage(currentPage + 1);
+                                            }
+                                        });
+                                        
+                                        var reRenderPDF = function(scaleMultiplier) {
+                                            currentScale = Math.max(0.5, Math.min(scaleMultiplier, 3.0)); // Clamp between 0.5x and 3x
+                                            var zoomLoading = $('<div style="text-align: center; padding: 20px; background: rgba(0,0,0,0.5); color: white; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 1000; border-radius: 4px;"><i class="fa fa-spinner fa-spin"></i> Rendering...</div>');
+                                            container.css('position', 'relative').append(zoomLoading);
+                                            canvasContainer.empty();
+                                            
+                                            // Re-render all pages
+                                            var renderPageZoom = function(num) {
+                                                pdf.getPage(num).then(function(page) {
+                                                    // Calculate scale to fit container width with multiplier
+                                                    var viewport = page.getViewport({scale: 1.0});
+                                                    var pageWidth = viewport.width;
+                                                    var calculatedScale = containerWidth / pageWidth;
+                                                    var scale = Math.min(calculatedScale * currentScale, 3.0);
+                                                    
+                                                    var scaledViewport = page.getViewport({scale: scale});
+                                                    var canvas = $('<canvas></canvas>').attr({
+                                                        id: 'pdf-canvas-' + num
+                                                    })[0];
+                                                    var context = canvas.getContext('2d');
+                                                    canvas.height = scaledViewport.height;
+                                                    canvas.width = scaledViewport.width;
+                                                    
+                                                    // Ensure canvas doesn't exceed container width
+                                                    if (canvas.width > containerWidth) {
+                                                        var scaleRatio = containerWidth / canvas.width;
+                                                        canvas.style.width = containerWidth + 'px';
+                                                        canvas.style.height = (canvas.height * scaleRatio) + 'px';
+                                                    } else {
+                                                        canvas.style.width = canvas.width + 'px';
+                                                        canvas.style.height = canvas.height + 'px';
+                                                    }
+                                                    
+                                                    var pageDiv = $('<div style="margin-bottom: 20px; width: 100%; text-align: center;"></div>');
+                                                    pageDiv.append(canvas);
+                                                    canvasContainer.append(pageDiv);
+                                                    
+                                                    var renderContext = {
+                                                        canvasContext: context,
+                                                        viewport: scaledViewport
+                                                    };
+                                                    
+                                                    page.render(renderContext).promise.then(function() {
+                                                        if (num < pdf.numPages) {
+                                                            renderPageZoom(num + 1);
+                                                        } else {
+                                                            zoomLoading.remove();
+                                                            scrollToPage(currentPage);
+                                                        }
+                                                    });
+                                                });
+                                            };
+                                            renderPageZoom(1);
+                                        };
+                                        
+                                        $('#pdf-zoom-in', container).on('click', function() {
+                                            reRenderPDF(currentScale + 0.25);
+                                        });
+                                        
+                                        $('#pdf-zoom-out', container).on('click', function() {
+                                            reRenderPDF(currentScale - 0.25);
+                                        });
+                                    }
+                                    
+                                    // Hide loading and show PDF
+                                    loadingIndicator.fadeOut(300, function() {
+                                        $(this).remove();
+                                        iframe_box.append(container);
+                                        container.fadeIn(300);
+                                    });
+                                }
+                            });
+                        });
+                    };
+                    
+                    renderPage(1);
+                }).catch(function(error) {
+                    console.error('Error loading PDF:', error);
+                    loadingIndicator.html('<h3 class="text-danger"><i class="fa fa-exclamation-circle"></i> Error loading PDF</h3>' +
+                        '<p class="text-muted">' + error.message + '</p>');
+                    fallbackToIframe();
+                });
+            };
+            reader.readAsArrayBuffer(pdfBlob);
+        };
+
+        // Fallback to iframe if PDF.js fails
+        var fallbackToIframe = function() {
+            loadingIndicator.html('<h3><i class="fa fa-spinner fa-spin fa-pulse text-info"></i> Loading document preview...</h3>' +
+                '<p class="text-muted">Please wait while the document is being generated.</p>');
+            
+            var new_ifrm = $('<iframe></iframe>').attr({
+                id: 'iframe_doc_preview',
+                src: 'about:blank',
+                style: 'width:100%; height:75vh; display: none;'
+            });
+
+            iframe_box.children('#iframe_doc_preview').remove();
+            iframe_box.append(new_ifrm);
+            
+            var ifrm = $('#iframe_doc_preview',document);
+            var formSubmitted = false;
+            
+            ifrm.on('load', function() {
+                if (!formSubmitted) {
+                    formSubmitted = true;
+                    try {
+                        var body = ifrm.contents().find('body');
+                        if (body.length > 0) {
+                            var form = $('<form></form>').attr({
+                                method: 'post',
+                                action: PECO.base_url() + 'cad/getdocumentpreview'
+                            });
+
+                            form.append($('<input>').attr({type: 'hidden', name: 'id', value: dataid}));
+                            form.append($('<input>').attr({type: 'hidden', name: 'doctype', value: iframe_box.attr('data-id')}));
+
+                            if (params && typeof params === 'object') {
+                                $.each(params, function(index, value) {
+                                    form.append($('<input>').attr({type: 'hidden', name: index, value: value}));
+                                });
+                            }
+
+                            body.append(form);
+                            form.submit();
+                        }
+                    } catch(e) {
+                        console.error('Error accessing iframe contents:', e);
+                        loadingIndicator.html('<h3 class="text-danger"><i class="fa fa-exclamation-circle"></i> Error loading document</h3>');
+                    }
+                } else {
+                    loadingIndicator.fadeOut(300, function() {
+                        $(this).remove();
+                        ifrm.fadeIn(300);
+                    });
+                }
+            });
+        };
+
+        // Fetch PDF as blob
+        fetch(PECO.base_url() + 'cad/getdocumentpreview', {
+            method: 'POST',
+            body: formData
+        })
+        .then(function(response) {
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            return response.blob();
+        })
+        .then(function(blob) {
+            if (blob.type === 'application/pdf' || blob.type === '') {
+                loadAndRenderPDF(blob);
+            } else {
+                // If not PDF, fallback to iframe
+                fallbackToIframe();
+            }
+        })
+        .catch(function(error) {
+            console.error('Error fetching PDF:', error);
+            loadingIndicator.html('<h3 class="text-danger"><i class="fa fa-exclamation-circle"></i> Error loading document</h3>' +
+                '<p class="text-muted">' + error.message + '</p>');
+            // Fallback to iframe after a delay
+            setTimeout(fallbackToIframe, 2000);
+        });
     };
 
     var contract_handler = function (dataid) {

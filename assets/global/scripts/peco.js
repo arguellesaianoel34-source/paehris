@@ -4844,6 +4844,7 @@ var PECO = function () {
 
     return {
         //main function to initiate the theme
+        
         init: function () {
             init_shortcut_button();
             init_fancybox_all();
@@ -6831,9 +6832,14 @@ var PECO = function () {
             init_swal_notif(title,message,func);
         },
 
-        pdfPreview: function (title,html,papersize) {
+        pdfPreview: function (title = false, html = false, papersize = false) {
             var win = window.open('','');
-            win.document.title = (title) ? title : 'Print Preview';
+            
+            if (title && title != '') {
+                win.document.title = title;
+            } else {
+                win.document.title = 'Print Preview';
+            }
 
             const form = document.createElement('form');
             form.method = 'post';
