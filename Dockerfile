@@ -1,4 +1,4 @@
-FROM php:8.2-fpm
+FROM php:8.2-apache
 
 # Note: Using PHP 8.2 for better CodeIgniter 3 compatibility
 # PHP 8.3+ has many deprecation warnings with CodeIgniter 3
@@ -7,6 +7,9 @@ FROM php:8.2-fpm
 
 # Set working directory
 WORKDIR /var/www/html
+
+# Enable Apache mod_rewrite for CodeIgniter
+RUN a2enmod rewrite headers
 
 # Install system dependencies
 RUN apt-get update && apt-get install -y \
@@ -58,8 +61,13 @@ RUN echo "error_reporting = E_ALL & ~E_DEPRECATED & ~E_STRICT & ~E_WARNING" >> /
     && echo "display_errors = On" >> /usr/local/etc/php/conf.d/ci3-compat.ini \
     && echo "display_startup_errors = On" >> /usr/local/etc/php/conf.d/ci3-compat.ini
 
-# Expose port 9000 for PHP-FPM
-EXPOSE 9000
+# Configure Apache DocumentRoot
+ENV APACHE_DOCUMENT_ROOT /var/www/html
+RUN sed -ri -e 's!/var/www/html!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/sites-available/*.conf
+RUN sed -ri -e 's!/var/www/!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/apache2.conf /etc/apache2/conf-available/*.conf
 
-CMD ["php-fpm"]
+# Expose port 80 for Apache
+EXPOSE 80
+
+CMD ["apache2-foreground"]
 
