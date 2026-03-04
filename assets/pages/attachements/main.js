@@ -457,84 +457,80 @@ var ATTACHEMENTS = function() {
         tab.find('#iframe_' + elem + '_preview').each(function () {
             $(this).remove();
         });
-        
-        // Remove any existing loading indicator
+
         tab.find('.iframe-loading-indicator').remove();
-        
-        // Show loading indicator
+
         var loadingIndicator = $('<div class="iframe-loading-indicator" style="text-align: center; padding: 50px; background-color: #f5f5f5; border: 1px solid #ddd; border-radius: 4px; margin: 10px 0;">' +
             '<h3><i class="fa fa-spinner fa-spin fa-pulse text-info"></i> Loading document preview...</h3>' +
             '<p class="text-muted">Please wait while the document is being generated.</p>' +
             '</div>');
         tab.append(loadingIndicator);
-        
+
         var new_ifrm = $('<iframe frameborder="0" border="0"></iframe>').attr({
             id: 'iframe_' + elem + '_preview',
-            src: 'about:blank',
             style: 'width:100%; height:500px; display: none;'
         });
-
         tab.append(new_ifrm);
-        var ifrm = $('#iframe_'+elem+'_preview',document);
-        
-        var formSubmitted = false;
-        
-        // Wait for iframe to load (first load is about:blank)
-        ifrm.on('load', function() {
-            if (!formSubmitted) {
-                // First load - iframe is ready, now submit the form
-                formSubmitted = true;
-                try {
-                    var body = ifrm.contents().find('body');
-                    
-                    if (body.length > 0) {
-                        var form = $('<form></form>').attr({
-                            method: 'post',
-                            action: PECO.base_url() + 'cad/getdocumentpreview'
-                        });
+        var ifrm = $('#iframe_' + elem + '_preview', document);
 
-                        var idfield = $('<input>').attr({
-                            type: 'hidden',
-                            name: 'id',
-                            value: dataid
-                        });
-
-                        form.append(idfield);
-
-                        var doctypefield = $('<input>').attr({
-                            type: 'hidden',
-                            name: 'doctype',
-                            value: doctype
-                        });
-
-                        form.append(doctypefield);
-                        body.append(form);
-                        form.submit();
-                    } else {
-                        throw new Error('Cannot access iframe body');
-                    }
-                } catch(e) {
-                    console.error('Error accessing iframe contents:', e);
-                    loadingIndicator.html('<h3 class="text-danger"><i class="fa fa-exclamation-circle"></i> Error loading document</h3>' +
-                        '<p class="text-muted">Please try refreshing the page.</p>');
-                }
-            } else {
-                // Second load - document content has loaded
-                loadingIndicator.fadeOut(300, function() {
-                    $(this).remove();
-                    ifrm.fadeIn(300);
-                });
+        var loadTimeout = setTimeout(function () {
+            if (loadingIndicator.length && loadingIndicator.is(':visible')) {
+                loadingIndicator.html('<h3 class="text-warning"><i class="fa fa-exclamation-circle"></i> Preview could not be loaded</h3>' +
+                    '<p class="text-muted">The document could not be shown inline. Use <strong>Open in Tab</strong> above to view it.</p>');
             }
-        });
-        
-        // Fallback timeout in case iframe doesn't load
-        setTimeout(function() {
-            if (loadingIndicator.is(':visible')) {
+        }, 60000);
+
+        var formData = new FormData();
+        formData.append('id', dataid);
+        formData.append('doctype', doctype);
+
+        fetch(PECO.base_url() + 'cad/getdocumentpreview', {
+            method: 'POST',
+            body: formData,
+            credentials: 'same-origin'
+        })
+            .then(function (response) {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok (' + response.status + ')');
+                }
+                return response.blob();
+            })
+            .then(function (blob) {
+                clearTimeout(loadTimeout);
+                if (!blob || blob.size === 0) {
+                    loadingIndicator.html('<h3 class="text-warning"><i class="fa fa-file-o"></i> No document found</h3>' +
+                        '<p class="text-muted">The server returned no content.</p>');
+                    return;
+                }
+                var blobUrl = URL.createObjectURL(blob);
+                var shown = false;
+                var done = function () {
+                    if (shown) { return; }
+                    shown = true;
+                    ifrm.off('load');
+                    loadingIndicator.fadeOut(300, function () {
+                        $(this).remove();
+                        ifrm.fadeIn(300);
+                    });
+                    URL.revokeObjectURL(blobUrl);
+                };
+                ifrm.on('load', done);
+                ifrm[0].src = blobUrl;
+                setTimeout(done, 3000);
+            })
+            .catch(function (error) {
+                clearTimeout(loadTimeout);
+                console.error('Error fetching document preview:', error);
+                loadingIndicator.html('<h3 class="text-danger"><i class="fa fa-exclamation-circle"></i> Error loading document</h3>' +
+                    '<p class="text-muted">' + (error.message || 'Network or server error.') + ' Use <strong>Open in Tab</strong> above to view.</p>');
+            });
+
+        setTimeout(function () {
+            if (loadingIndicator.is(':visible') && loadingIndicator.find('.text-warning').length === 0 && loadingIndicator.find('.text-danger').length === 0) {
                 loadingIndicator.html('<h3><i class="fa fa-spinner fa-spin fa-pulse text-info"></i> Still loading...</h3>' +
                     '<p class="text-muted">This may take a few moments.</p>');
             }
         }, 5000);
-
     };
 
     function tabbed_upload_handler(dataid) {
