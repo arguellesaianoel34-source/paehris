@@ -464,6 +464,8 @@ $nav_groups = [
     [16, 'legal',        'Legal',            'Legal Department',             'fa-gavel',        'orange',   16],
     [17, 'bos',          'BOS',              'Back Office System',           'fa-university',   'teal',     17],
     [18, 'itd',          'ITD',              'IT Department',                'fa-laptop',       'blue',     18],
+    [19, 'administration','Administration', 'Administration Menu',           'fa-cogs',         'blue',     19],
+    [21, 'finance',      'Finance',          'Finance Menu',                 'fa-money',        'green',    21],
 ];
 foreach ($nav_groups as $g) {
     [$sid, $code, $name, $desc, $icon, $hclass, $sort] = $g;
@@ -564,6 +566,16 @@ $nav_items = [
     [1702,17, 'bos-pceo',   'PCEO',                 'PCEO management',               'bospceo',         2],
     // ITD (parent=18)
     [1801,18, 'itd-main',   'ITD',                  'IT department main',            'itd',             1],
+    // Administration (parent=19)
+    [1901,19, 'adm-itd',    'ITD Menu',             'IT Department Menu',            'itd',             1],
+    [1902,19, 'adm-hr',     'HR Info Sys',          'Human Resources Info System',   'hrmain',          2],
+    [1903,19, 'adm-purch',  'Purchasing',           'Purchasing / Procurement',      'eprslist',        3],
+    [1904,19, 'adm-inv',    'Inventory',            'Inventory Management',          'inventory',       4],
+    [1905,19, 'adm-cal',    'Calendar',             'Calendar',                      'calendar',        5],
+    [1906,19, 'adm-audit',  'Audit',                'Audit Management',              'audit',           6],
+    // Finance (parent=21)
+    [2101,21, 'fin-acctg',  'Accounting',           'Accounting Module',             'acctg',           1],
+    [2102,21, 'fin-admin',  'Admin',                'Finance Admin',                 'financeadmin',    2],
 ];
 foreach ($nav_items as $item) {
     [$sid, $parent, $code, $name, $desc, $pagefile, $sort] = $item;
