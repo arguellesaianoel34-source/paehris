@@ -261,6 +261,7 @@ $sqls[] = "CREATE TABLE IF NOT EXISTS `prime_module_main` (
   `sysid` int(11) NOT NULL AUTO_INCREMENT,
   `code` varchar(50) DEFAULT NULL,
   `name` varchar(100) DEFAULT NULL,
+  `desc` varchar(255) DEFAULT NULL,
   `icon` varchar(100) DEFAULT NULL,
   `hashcode` varchar(100) DEFAULT NULL,
   `parent` int(11) DEFAULT 0,
@@ -437,6 +438,10 @@ echo "prime_system_users_info_main: " . ($conn->error ?: "OK") . "\n";
 $conn->query("INSERT IGNORE INTO `prime_system_users_roles_matrix`
   (`userid`,`roleid`,`type`,`status`) VALUES (1,1,1,1)");
 echo "prime_system_users_roles_matrix: " . ($conn->error ?: "OK") . "\n";
+
+// ── Add missing `desc` column to prime_module_main ─────────────────────────
+$conn->query("ALTER TABLE `prime_module_main` ADD COLUMN IF NOT EXISTS `desc` varchar(255) DEFAULT NULL AFTER `name`");
+echo "prime_module_main desc column: " . ($conn->error ?: "OK") . "\n";
 
 // ── Add missing `desc` column to prime_module_navigations_main ─────────────
 $conn->query("ALTER TABLE `prime_module_navigations_main` ADD COLUMN IF NOT EXISTS `desc` varchar(255) DEFAULT NULL AFTER `name`");
