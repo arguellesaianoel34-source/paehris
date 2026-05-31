@@ -51,14 +51,16 @@ const SYSTEM_GOOGLE_API = 'AIzaSyDqC5lmJR1TtWTnySj2psx8-3JynOFUyYE';
 // Use HTTP_HOST (from proxy) if available, otherwise fall back to SERVER_NAME
 $_app_host = isset($_SERVER['HTTP_HOST']) && $_SERVER['HTTP_HOST'] !== ''
     ? $_SERVER['HTTP_HOST']
-    : $_SERVER['SERVER_NAME'];
+    : (getenv('REPLIT_DEV_DOMAIN') ?: $_SERVER['SERVER_NAME']);
 $_app_scheme = (isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO'] === 'https')
     ? 'https'
     : (($_SERVER['SERVER_PORT'] == 443) ? 'https' : 'http');
-define('APP_URL', 
-    $_app_scheme . '://' . $_app_host . '/' .
-    ltrim(str_replace(basename($_SERVER['SCRIPT_NAME']), "", $_SERVER['SCRIPT_NAME']), '/')
-);
+
+// Always build base URL as scheme://host/ (app lives at root, never in a subdirectory).
+// Using SCRIPT_NAME to derive the path is unreliable with PHP built-in server's router
+// script — for requests to missing static files, SCRIPT_NAME can equal the request URI,
+// which would make base_url() return a nested path and cause infinite redirect loops.
+define('APP_URL', $_app_scheme . '://' . $_app_host . '/');
 
 /* End of file constants.php */
 /* Location: ./application/config/constants.php */
