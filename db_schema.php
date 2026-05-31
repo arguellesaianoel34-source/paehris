@@ -586,8 +586,8 @@ foreach ($nav_items as $item) {
     [$sid, $parent, $code, $name, $desc, $pagefile, $sort] = $item;
     $hashcode = sha1($code . '_nav');
     $conn->query("INSERT IGNORE INTO `prime_module_navigations_main`
-        (`sysid`,`parent`,`code`,`name`,`desc`,`icon`,`htmlclass`,`hashcode`,`pagefile`,`levels`,`type`,`sorting`,`status`)
-        VALUES ($sid, $parent, '$code', '$name', '$desc', 'fa-circle-o', 'default', '$hashcode', '$pagefile', 2, 1, $sort, 1)");
+        (`sysid`,`parent`,`code`,`name`,`desc`,`icon`,`htmlclass`,`hashcode`,`url`,`pagefile`,`levels`,`type`,`sorting`,`status`)
+        VALUES ($sid, $parent, '$code', '$name', '$desc', 'fa-circle-o', 'default', '$hashcode', '$pagefile', '$pagefile', 2, 1, $sort, 1)");
     if ($conn->error) { echo "Nav item $sid error: " . $conn->error . "\n"; }
 }
 echo "Level-2 nav items seeded\n";

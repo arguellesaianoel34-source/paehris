@@ -188,7 +188,7 @@ if (super_admin() || user_id() == 1) {
                 nm.status
             ')
                     ->from('prime_module_navigations_main AS nm')
-                    ->where(array('nm.status' => 1, 'nm.type' => 1))
+                    ->where(array('nm.status' => 1, 'nm.type' => 1, 'nm.levels' => 1))
                     ->group_by('
                     nm.sysid,
                     nm.code,
@@ -207,6 +207,7 @@ if (super_admin() || user_id() == 1) {
                     nm.withpay,
                     nm.status
                 ')
+                    ->order_by('nm.sorting', 'ASC')
                     ->get();
 
                 foreach ($nav_main->result() as $row) {
@@ -224,11 +225,11 @@ if (super_admin() || user_id() == 1) {
                             $url_str = base_url('module/' . $row->hashcode);
 
                             echo '<li class="' . $sub_menu_class->class . '" >
-								<a href="' . $url_str . '">
-									<i class="fa ' . $row->icon . '"></i> <span class="title">' . $row->name . '</span> <span class="arrow "></span>
-								' . $selected . '
-								</a>
-								';
+                                                                <a href="' . $url_str . '">
+                                                                        <i class="fa ' . $row->icon . '"></i> <span class="title">' . $row->name . '</span> <span class="arrow "></span>
+                                                                ' . $selected . '
+                                                                </a>
+                                                                ';
                             echo nav_children($row->sysid, 2);
                             echo '<li>';
                         } else {
@@ -246,11 +247,11 @@ if (super_admin() || user_id() == 1) {
                             $selected = ($sub_menu_class->mode == 'open') ? '<span class="selected"></span>' : '';
 
                             echo '<li class=" tooltips ' . $sub_menu_class->class . '" data-container="body" data-placement="right" data-html="true" data-original-title="' . $navdesc . '">
-						<a href="' . base_url('module/' . $row->hashcode . '') . '">
-							<i class="fa ' . $navicon . '"></i> <span class="title"> ' . $row->name . '</span>
-							' . $selected . '
-						</a>
-						<li>';
+                                                <a href="' . base_url('module/' . $row->hashcode . '') . '">
+                                                        <i class="fa ' . $navicon . '"></i> <span class="title"> ' . $row->name . '</span>
+                                                        ' . $selected . '
+                                                </a>
+                                                <li>';
                         }
 
                     }
@@ -353,25 +354,25 @@ if (super_admin() || user_id() == 1) {
 
 
                 echo '<li class="'.check_nav_uri('settings').'">
-					<a href="javascript:;">
-					<i class="fa fa-gear"></i>
-					<span class="title">Settings</span>
-					<span class="arrow "></span>
-					<span class="selected"></span>
-					</a>
-					<ul class="sub-menu">
+                                        <a href="javascript:;">
+                                        <i class="fa fa-gear"></i>
+                                        <span class="title">Settings</span>
+                                        <span class="arrow "></span>
+                                        <span class="selected"></span>
+                                        </a>
+                                        <ul class="sub-menu">
                         <li class="'.check_nav_sub('projectmon').' tooltips" data-container="body" data-placement="right" data-html="true" data-original-title="Project Monitoring System">
-							<a href="'.base_url('settings/projectmon').'">
-							<i class="fa fa-tasks text-danger"></i>
-							<span class="menu-name">Project Monitoring</span></a>
-						</li>
-						<li class="'.check_nav_sub('flow').' tooltips" data-container="body" data-placement="right" data-html="true" data-original-title="Transaction Flow Controls">
-							<a href="'.base_url('settings/flow').'">
-							<i class="fa fa-exchange text-danger"></i>
-							<span class="menu-name">TRN Flow</span></a>
-						</li>
-						<li >							
-							<a href="javascript:;">
+                                                        <a href="'.base_url('settings/projectmon').'">
+                                                        <i class="fa fa-tasks text-danger"></i>
+                                                        <span class="menu-name">Project Monitoring</span></a>
+                                                </li>
+                                                <li class="'.check_nav_sub('flow').' tooltips" data-container="body" data-placement="right" data-html="true" data-original-title="Transaction Flow Controls">
+                                                        <a href="'.base_url('settings/flow').'">
+                                                        <i class="fa fa-exchange text-danger"></i>
+                                                        <span class="menu-name">TRN Flow</span></a>
+                                                </li>
+                                                <li >                                                   
+                                                        <a href="javascript:;">
                             <i class="fa fa-gear text-danger"></i>
                             <span class="title">Maintenance</span>
                             <span class="arrow "></span>
@@ -398,25 +399,25 @@ if (super_admin() || user_id() == 1) {
                                     <i class="fa fa-tag"></i> Roles Management</a>
                                 </li>
                             </ul>
-						</li>
-						<li class="'.check_nav_sub('modules').'">
-							<a href="'.base_url('settings/modules').'">
-							<i class="fa fa-cube text-danger"></i>
-							<span class="menu-name">Modules</span></a>
-						</li>
-						<li class="'.check_nav_sub('access').'">
-							<a href="'.base_url('settings/access').'">
-							<i class="fa fa-check-circle-o text-danger"></i>
-							<span class="menu-name">Access</span><span class="selected"></span></a>
-						</li>
-						<li class="'.check_nav_sub('database').'">
-							<a href="'.base_url('settings/database').'">
-							<i class="fa fa-database text-danger"></i>
-							<span class="menu-name">Database</span>
-							<span class="selected"></span>
-							</a>
-						</li>					
-						<li class="nav-item '.check_nav_sub('migration').'">
+                                                </li>
+                                                <li class="'.check_nav_sub('modules').'">
+                                                        <a href="'.base_url('settings/modules').'">
+                                                        <i class="fa fa-cube text-danger"></i>
+                                                        <span class="menu-name">Modules</span></a>
+                                                </li>
+                                                <li class="'.check_nav_sub('access').'">
+                                                        <a href="'.base_url('settings/access').'">
+                                                        <i class="fa fa-check-circle-o text-danger"></i>
+                                                        <span class="menu-name">Access</span><span class="selected"></span></a>
+                                                </li>
+                                                <li class="'.check_nav_sub('database').'">
+                                                        <a href="'.base_url('settings/database').'">
+                                                        <i class="fa fa-database text-danger"></i>
+                                                        <span class="menu-name">Database</span>
+                                                        <span class="selected"></span>
+                                                        </a>
+                                                </li>                                   
+                                                <li class="nav-item '.check_nav_sub('migration').'">
                             <a href="javascript:;" class="nav-link nav-toggle">
                                 <i class="fa fa-database text-danger"></i>
                                 <span class="title">Migration</span>
@@ -435,29 +436,29 @@ if (super_admin() || user_id() == 1) {
                                 </li>
                             </ul>
                         </li>
-						
-						<li class="'.check_nav_sub('tables').'">
-							<a href="'.base_url('settings/tables').'">
-							<i class="fa fa-table text-danger"></i>
-							<span class="menu-name">Tables</span>
-							<span class="selected"></span>
-							</a>
-						</li>
-						
-						<li class="'.check_nav_sub('database').'">
-							<a href="'.base_url('settings/testing').'">
-							<i class="fa fa-edit text-danger"></i>
-							<span class="menu-name">Testing</span>
-							<span class="selected"></span>
-							</a>
-						</li>
-					    <li class="">
-							<a href="http://pecodevserver/templates/metronic/metronic_v4.7.5/" target="_blank">
-							<i class="fa fa-file-text text-danger"></i>
-							<span class="menu-name">Templates</span></a>
-						</li>
-					</ul>
-				</li>';
+                                                
+                                                <li class="'.check_nav_sub('tables').'">
+                                                        <a href="'.base_url('settings/tables').'">
+                                                        <i class="fa fa-table text-danger"></i>
+                                                        <span class="menu-name">Tables</span>
+                                                        <span class="selected"></span>
+                                                        </a>
+                                                </li>
+                                                
+                                                <li class="'.check_nav_sub('database').'">
+                                                        <a href="'.base_url('settings/testing').'">
+                                                        <i class="fa fa-edit text-danger"></i>
+                                                        <span class="menu-name">Testing</span>
+                                                        <span class="selected"></span>
+                                                        </a>
+                                                </li>
+                                            <li class="">
+                                                        <a href="http://pecodevserver/templates/metronic/metronic_v4.7.5/" target="_blank">
+                                                        <i class="fa fa-file-text text-danger"></i>
+                                                        <span class="menu-name">Templates</span></a>
+                                                </li>
+                                        </ul>
+                                </li>';
             }
             ?>
 
@@ -585,40 +586,40 @@ if (super_admin() || user_id() == 1) {
                 <span class="arrow "></span>
                 </a>
                 <ul class="sub-menu">
-							<li>
-								<a href="javascript:;">
-								<i class="icon-settings"></i> Request<span class="arrow"></span>
-								</a>
-								<ul class="sub-menu">
-									<li>
-										<a href="#"><i class="icon-docs"></i> PRF</a>
-									</li>
-									<li>
-										<a href="#"><i class="icon-docs"></i> PRS</a>
-									</li>
-									<li>
-										<a href="#"><i class="icon-docs"></i> PO</a>
-									</li>
-								</ul>
-							</li>
-							<li>
-								<a href="javascript:;">
-								<i class="icon-globe"></i> Reports <span class="arrow"></span>
-								</a>
-								<ul class="sub-menu">
-									<li>
-										<a href="#"><i class="icon-tag"></i> Sample Link 1</a>
-									</li>
-									<li>
-										<a href="#"><i class="icon-pencil"></i> Sample Link 1</a>
-									</li>
-									<li>
-										<a href="#"><i class="icon-graph"></i> Sample Link 1</a>
-									</li>
-								</ul>
-							</li>
-	
-						</ul>
+                                                        <li>
+                                                                <a href="javascript:;">
+                                                                <i class="icon-settings"></i> Request<span class="arrow"></span>
+                                                                </a>
+                                                                <ul class="sub-menu">
+                                                                        <li>
+                                                                                <a href="#"><i class="icon-docs"></i> PRF</a>
+                                                                        </li>
+                                                                        <li>
+                                                                                <a href="#"><i class="icon-docs"></i> PRS</a>
+                                                                        </li>
+                                                                        <li>
+                                                                                <a href="#"><i class="icon-docs"></i> PO</a>
+                                                                        </li>
+                                                                </ul>
+                                                        </li>
+                                                        <li>
+                                                                <a href="javascript:;">
+                                                                <i class="icon-globe"></i> Reports <span class="arrow"></span>
+                                                                </a>
+                                                                <ul class="sub-menu">
+                                                                        <li>
+                                                                                <a href="#"><i class="icon-tag"></i> Sample Link 1</a>
+                                                                        </li>
+                                                                        <li>
+                                                                                <a href="#"><i class="icon-pencil"></i> Sample Link 1</a>
+                                                                        </li>
+                                                                        <li>
+                                                                                <a href="#"><i class="icon-graph"></i> Sample Link 1</a>
+                                                                        </li>
+                                                                </ul>
+                                                        </li>
+        
+                                                </ul>
             </li>
             
             <li>
