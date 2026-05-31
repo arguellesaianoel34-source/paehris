@@ -256,6 +256,145 @@ $sqls[] = "CREATE TABLE IF NOT EXISTS `prime_system_roles_dashboards` (
   PRIMARY KEY (`sysid`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8";
 
+// ── Public Navigation Access ──────────────────────────────────────────────────
+$sqls[] = "CREATE TABLE IF NOT EXISTS `prime_module_navigations_public` (
+  `sysid`  int(11) NOT NULL AUTO_INCREMENT,
+  `navid`  int(11) NOT NULL DEFAULT 0,
+  `status` tinyint(1) NOT NULL DEFAULT 1,
+  PRIMARY KEY (`sysid`),
+  KEY `idx_navid` (`navid`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4";
+
+// ── Navigation Departments ────────────────────────────────────────────────────
+$sqls[] = "CREATE TABLE IF NOT EXISTS `prime_module_navigations_departments` (
+  `sysid`  int(11) NOT NULL AUTO_INCREMENT,
+  `navid`  int(11) NOT NULL DEFAULT 0,
+  `deptid` int(11) NOT NULL DEFAULT 0,
+  `status` tinyint(1) NOT NULL DEFAULT 1,
+  PRIMARY KEY (`sysid`),
+  KEY `idx_navid` (`navid`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4";
+
+// ── User Module Shortcuts ─────────────────────────────────────────────────────
+$sqls[] = "CREATE TABLE IF NOT EXISTS `prime_system_users_module_shortcut` (
+  `sysid`    int(11) NOT NULL AUTO_INCREMENT,
+  `moduleid` int(11) NOT NULL DEFAULT 0,
+  `userid`   int(11) NOT NULL DEFAULT 0,
+  `status`   tinyint(1) NOT NULL DEFAULT 1,
+  PRIMARY KEY (`sysid`),
+  KEY `idx_userid` (`userid`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4";
+
+// ── Quick Launch ──────────────────────────────────────────────────────────────
+$sqls[] = "CREATE TABLE IF NOT EXISTS `system_quick_launch_main` (
+  `sysid`   int(11) NOT NULL AUTO_INCREMENT,
+  `sorting` int(11) NOT NULL DEFAULT 0,
+  `types`   tinyint(1) NOT NULL DEFAULT 1,
+  `toggle`  varchar(100) DEFAULT '',
+  `target`  varchar(100) DEFAULT '',
+  `href`    varchar(255) DEFAULT '',
+  `titles`  varchar(255) DEFAULT '',
+  `icons`   varchar(100) DEFAULT '',
+  `texts`   varchar(255) DEFAULT '',
+  `labels`  varchar(100) DEFAULT '',
+  `status`  tinyint(1) NOT NULL DEFAULT 1,
+  PRIMARY KEY (`sysid`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4";
+
+$sqls[] = "CREATE TABLE IF NOT EXISTS `system_quick_launch_role_matrix` (
+  `sysid`  int(11) NOT NULL AUTO_INCREMENT,
+  `navid`  int(11) NOT NULL DEFAULT 0,
+  `roleid` int(11) NOT NULL DEFAULT 0,
+  `status` tinyint(1) NOT NULL DEFAULT 1,
+  PRIMARY KEY (`sysid`),
+  KEY `idx_navid` (`navid`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4";
+
+// ── Messaging ─────────────────────────────────────────────────────────────────
+$sqls[] = "CREATE TABLE IF NOT EXISTS `system_users_conversation_messages` (
+  `sysid`       int(11) NOT NULL AUTO_INCREMENT,
+  `cid`         int(11) NOT NULL DEFAULT 0,
+  `userid`      int(11) NOT NULL DEFAULT 0,
+  `texts`       text DEFAULT NULL,
+  `datecreated` datetime DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`sysid`),
+  KEY `idx_cid` (`cid`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4";
+
+// ── Tagging System ────────────────────────────────────────────────────────────
+$sqls[] = "CREATE TABLE IF NOT EXISTS `prime_system_tags` (
+  `sysid`    int(11) NOT NULL AUTO_INCREMENT,
+  `moduleid` int(11) NOT NULL DEFAULT 0,
+  `codes`    varchar(100) DEFAULT NULL,
+  `descs`    varchar(255) DEFAULT NULL,
+  `txtcolor` varchar(50) DEFAULT NULL,
+  `bgcolor`  varchar(50) DEFAULT NULL,
+  `icon`     varchar(100) DEFAULT NULL,
+  `status`   tinyint(1) NOT NULL DEFAULT 1,
+  PRIMARY KEY (`sysid`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4";
+
+$sqls[] = "CREATE TABLE IF NOT EXISTS `prime_system_tags_module` (
+  `sysid`    int(11) NOT NULL AUTO_INCREMENT,
+  `moduleid` int(11) NOT NULL DEFAULT 0,
+  `tagid`    int(11) NOT NULL DEFAULT 0,
+  `status`   tinyint(1) NOT NULL DEFAULT 1,
+  PRIMARY KEY (`sysid`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4";
+
+$sqls[] = "CREATE TABLE IF NOT EXISTS `prime_system_tagging` (
+  `sysid`    int(11) NOT NULL AUTO_INCREMENT,
+  `tagid`    int(11) NOT NULL DEFAULT 0,
+  `moduleid` int(11) NOT NULL DEFAULT 0,
+  `acctid`   int(11) NOT NULL DEFAULT 0,
+  `status`   tinyint(1) NOT NULL DEFAULT 1,
+  PRIMARY KEY (`sysid`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4";
+
+// ── Version Monitoring ────────────────────────────────────────────────────────
+$sqls[] = "CREATE TABLE IF NOT EXISTS `system_monitoring_version_details` (
+  `sysid`     int(11) NOT NULL AUTO_INCREMENT,
+  `verid`     int(11) NOT NULL DEFAULT 0,
+  `authid`    int(11) NOT NULL DEFAULT 0,
+  `commits`   int(11) DEFAULT 0,
+  `insertion` int(11) DEFAULT 0,
+  `deletion`  int(11) DEFAULT 0,
+  `changes`   decimal(10,2) DEFAULT 0.00,
+  `status`    tinyint(1) NOT NULL DEFAULT 1,
+  PRIMARY KEY (`sysid`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4";
+
+// ── Address Lookup ────────────────────────────────────────────────────────────
+$sqls[] = "CREATE TABLE IF NOT EXISTS `address_barangay` (
+  `sysid`      int(11) NOT NULL AUTO_INCREMENT,
+  `name`       varchar(255) DEFAULT NULL,
+  `districtid` int(11) DEFAULT 0,
+  `status`     tinyint(1) NOT NULL DEFAULT 1,
+  PRIMARY KEY (`sysid`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4";
+
+$sqls[] = "CREATE TABLE IF NOT EXISTS `address_province` (
+  `sysid`    int(11) NOT NULL AUTO_INCREMENT,
+  `name`     varchar(255) DEFAULT NULL,
+  `regionid` int(11) DEFAULT 0,
+  `status`   tinyint(1) NOT NULL DEFAULT 1,
+  PRIMARY KEY (`sysid`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4";
+
+$sqls[] = "CREATE TABLE IF NOT EXISTS `address_region` (
+  `sysid`  int(11) NOT NULL AUTO_INCREMENT,
+  `name`   varchar(255) DEFAULT NULL,
+  `status` tinyint(1) NOT NULL DEFAULT 1,
+  PRIMARY KEY (`sysid`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4";
+
+$sqls[] = "CREATE TABLE IF NOT EXISTS `address_landmark` (
+  `sysid`  int(11) NOT NULL AUTO_INCREMENT,
+  `name`   varchar(255) DEFAULT NULL,
+  `status` tinyint(1) NOT NULL DEFAULT 1,
+  PRIMARY KEY (`sysid`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4";
+
 // ── Module Navigation ─────────────────────────────────────────────────────────
 $sqls[] = "CREATE TABLE IF NOT EXISTS `prime_module_main` (
   `sysid` int(11) NOT NULL AUTO_INCREMENT,

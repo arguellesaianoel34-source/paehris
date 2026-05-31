@@ -29,6 +29,20 @@ description: Key quirks, decisions, and constraints for the PA Energy Portal (Co
 - `system_logs`
 - `person` (for admin personid FK)
 - Added columns to existing tables: `prime_system_users` (firstname, lastname, allowexternal, idletime, nickname), `prime_module_navigations_main` (desc), `prime_module_navigations_main` original schema (code, name, hashcode, etc.), `prime_system_users_roles_matrix` (type, status), `prime_system_roles_dashboards` (navids)
+- `prime_module_navigations_public` (navid, status) — JOIN target in model_admin get_user_dashboard_access
+- `prime_module_navigations_departments` (navid, deptid, status) — used in tellering module
+- `prime_system_users_module_shortcut` (moduleid, userid, status) — user shortcuts panel
+- `system_quick_launch_main` + `system_quick_launch_role_matrix` — top-bar quick launch menu
+- `system_users_conversation_messages` — in-app messenger
+- `prime_system_tags`, `prime_system_tags_module`, `prime_system_tagging` — module tagging system
+- `system_monitoring_version_details` — settings/version monitoring
+- `address_barangay`, `address_province`, `address_region`, `address_landmark` — address lookup dropdowns
+- All above are now in db_schema.php (CREATE TABLE IF NOT EXISTS) and will be created on fresh runs
+
+## Sidebar nav (leftnav.php) fix applied
+- Query now filters `nm.levels = 1` (only top-level groups) and adds `ORDER BY nm.sorting ASC`
+- Without levels=1, all 80+ nav items were fetched and processed, items appeared in random order
+- Administration (sorting=19) and Finance (sorting=21) now appear consistently after groups 1–18
 
 ## Firebase note
 Replacing MariaDB with Firebase Realtime Database is not practical for this app — CI3 uses Active Record/SQL throughout hundreds of controllers with no Firebase PHP driver.
