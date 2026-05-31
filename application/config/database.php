@@ -5,21 +5,39 @@ if (!defined('BASEPATH')) exit('No direct script access allowed');
 $active_group               = 'pae';
 $active_group_audit         = 'audit';
 
+// Replit local environment: use local MariaDB via socket
+$mysql_socket = '/home/runner/mysql-run/mysql.sock';
+$is_replit = file_exists($mysql_socket) || getenv('REPLIT_DEV_DOMAIN') !== false;
+
 // Check if running in Docker container
 $is_docker = getenv('DOCKER_CONTAINER') === 'true' || gethostname() === 'pae_erp_web' || isset($_SERVER['DOCKER_CONTAINER']);
 
-// ONLINE CONFIGURATION (Turbify/Production)
-// Use Docker container hostnames when in Docker, otherwise use localhost
 $db_config = array();
-$db_config['host_server']            = $is_docker ? 'mysql' : 'localhost';
-$db_config['host_user']              = 'uub4rmw23inpzxn9_pae_root';
-$db_config['host_db']                = 'uub4rmw23inpzxn9_erp';
-$db_config['host_pass']              = '959@M+U1GOat';
+if ($is_replit && !$is_docker) {
+    // Local Replit environment: use local MariaDB via TCP on 127.0.0.1
+    // (using 127.0.0.1 forces TCP; 'localhost' uses socket which may differ)
+    ini_set('mysqli.default_socket', $mysql_socket);
+    $db_config['host_server']        = '127.0.0.1';
+    $db_config['host_user']          = 'uub4rmw23inpzxn9_pae_root';
+    $db_config['host_db']            = 'uub4rmw23inpzxn9_erp';
+    $db_config['host_pass']          = '959@M+U1GOat';
 
-$db_config['audit_server']           = $is_docker ? 'mysql_audit' : 'localhost';
-$db_config['audit_user']             = 'uub4rmw23inpzxn9_pae_root';
-$db_config['audit_db']               = 'uub4rmw23inpzxn9_erp_audit';
-$db_config['audit_pass']             = '959@M+U1GOat';
+    $db_config['audit_server']       = '127.0.0.1';
+    $db_config['audit_user']         = 'uub4rmw23inpzxn9_pae_root';
+    $db_config['audit_db']           = 'uub4rmw23inpzxn9_erp_audit';
+    $db_config['audit_pass']         = '959@M+U1GOat';
+} else {
+    // Docker or remote
+    $db_config['host_server']        = $is_docker ? 'mysql' : 'localhost';
+    $db_config['host_user']          = 'uub4rmw23inpzxn9_pae_root';
+    $db_config['host_db']            = 'uub4rmw23inpzxn9_erp';
+    $db_config['host_pass']          = '959@M+U1GOat';
+
+    $db_config['audit_server']       = $is_docker ? 'mysql_audit' : 'localhost';
+    $db_config['audit_user']         = 'uub4rmw23inpzxn9_pae_root';
+    $db_config['audit_db']           = 'uub4rmw23inpzxn9_erp_audit';
+    $db_config['audit_pass']         = '959@M+U1GOat';
+}
 
 $query_builder = TRUE;
 
@@ -60,6 +78,7 @@ $db['audit'] = array_merge($default_db_config, array(
     'username' => $db_config['audit_user'],
     'password' => $db_config['audit_pass'],
     'database' => $db_config['audit_db'],
+    'port'     => '3306',
 ));
 
 // ###################################################

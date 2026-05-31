@@ -48,15 +48,16 @@ const SYSTEM_DEV_PORT = false; // FALSE if default | add port if 3306 is not the
 const SYSTEM_GOOGLE_API = 'AIzaSyDqC5lmJR1TtWTnySj2psx8-3JynOFUyYE';
 
 
+// Use HTTP_HOST (from proxy) if available, otherwise fall back to SERVER_NAME
+$_app_host = isset($_SERVER['HTTP_HOST']) && $_SERVER['HTTP_HOST'] !== ''
+    ? $_SERVER['HTTP_HOST']
+    : $_SERVER['SERVER_NAME'];
+$_app_scheme = (isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO'] === 'https')
+    ? 'https'
+    : (($_SERVER['SERVER_PORT'] == 443) ? 'https' : 'http');
 define('APP_URL', 
-    (($_SERVER['SERVER_PORT'] == 443 ? 'https' : 'http') . '://' . 
-    $_SERVER['SERVER_NAME'] . 
-    (
-        ($_SERVER['SERVER_PORT'] != 80 && $_SERVER['SERVER_PORT'] != 443) 
-        ? ':' . $_SERVER['SERVER_PORT'] 
-        : ''
-    ) . 
-    str_replace(basename($_SERVER['SCRIPT_NAME']), "", $_SERVER['SCRIPT_NAME']))
+    $_app_scheme . '://' . $_app_host . '/' .
+    ltrim(str_replace(basename($_SERVER['SCRIPT_NAME']), "", $_SERVER['SCRIPT_NAME']), '/')
 );
 
 /* End of file constants.php */

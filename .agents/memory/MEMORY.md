@@ -1,0 +1,1 @@
+- [PAE ERP Setup](pae-erp-setup.md) — CodeIgniter 3 + PHP 8.2 + MariaDB on Replit: key quirks and decisions for running this app.
