@@ -283,6 +283,7 @@ $sqls[] = "CREATE TABLE IF NOT EXISTS `prime_module_navigations_main` (
   `moduleid` int(11) DEFAULT NULL,
   `code` varchar(50) DEFAULT NULL,
   `name` varchar(150) DEFAULT NULL,
+  `desc` varchar(255) DEFAULT NULL,
   `title` varchar(150) DEFAULT NULL,
   `hash` varchar(100) DEFAULT NULL,
   `hashcode` varchar(100) DEFAULT NULL,
@@ -436,6 +437,143 @@ echo "prime_system_users_info_main: " . ($conn->error ?: "OK") . "\n";
 $conn->query("INSERT IGNORE INTO `prime_system_users_roles_matrix`
   (`userid`,`roleid`,`type`,`status`) VALUES (1,1,1,1)");
 echo "prime_system_users_roles_matrix: " . ($conn->error ?: "OK") . "\n";
+
+// ── Add missing `desc` column to prime_module_navigations_main ─────────────
+$conn->query("ALTER TABLE `prime_module_navigations_main` ADD COLUMN IF NOT EXISTS `desc` varchar(255) DEFAULT NULL AFTER `name`");
+echo "prime_module_navigations_main desc column: " . ($conn->error ?: "OK") . "\n";
+
+// ── Module Navigation Seed ─────────────────────────────────────────────────
+// Level-1: top-level sidebar groups (parent=0, type=1, levels=1)
+echo "\nSeeding navigation modules...\n";
+$nav_groups = [
+    [1,  'cad',          'Customer Accounts','Customer Account Division',   'fa-users',        'blue',     1 ],
+    [2,  'billing',      'Billing',          'Billing Management',           'fa-file-text-o',  'green',    2 ],
+    [3,  'ar',           'Collections / AR', 'Collections & Accounts Rec.',  'fa-credit-card',  'teal',     3 ],
+    [4,  'mrd',          'Meter Reading',    'Meter Reading Division',       'fa-tachometer',   'red',      4 ],
+    [5,  'cwdo',         'CWDO',             'Construction & Disconnect',    'fa-wrench',       'yellow',   5 ],
+    [6,  'inspection',   'Inspection',       'Inspection Department',        'fa-search',       'blue-grey',6 ],
+    [7,  'installation', 'Installation',     'Installation Department',      'fa-plug',         'purple',   7 ],
+    [8,  'hris',         'HRIS',             'Human Resources',              'fa-id-badge',     'blue',     8 ],
+    [9,  'payroll',      'Payroll',          'Payroll Management',           'fa-money',        'green',    9 ],
+    [10, 'inventory',    'Inventory',        'Inventory Management',         'fa-archive',      'orange',   10],
+    [11, 'eprs',         'Procurement',      'EPRS / Procurement',          'fa-shopping-cart','teal',     11],
+    [12, 'assets',       'Assets',           'Asset Management',             'fa-building-o',   'blue-grey',12],
+    [13, 'reports',      'Reports',          'System Reports',               'fa-bar-chart',    'red',      13],
+    [14, 'jo',           'Job Orders',       'Job Order Management',         'fa-tasks',        'purple',   14],
+    [15, 'crm',          'CRM',              'Customer Relations',           'fa-handshake-o',  'green',    15],
+    [16, 'legal',        'Legal',            'Legal Department',             'fa-gavel',        'orange',   16],
+    [17, 'bos',          'BOS',              'Back Office System',           'fa-university',   'teal',     17],
+    [18, 'itd',          'ITD',              'IT Department',                'fa-laptop',       'blue',     18],
+];
+foreach ($nav_groups as $g) {
+    [$sid, $code, $name, $desc, $icon, $hclass, $sort] = $g;
+    $hashcode = sha1($code . '_grp');
+    $conn->query("INSERT IGNORE INTO `prime_module_navigations_main`
+        (`sysid`,`parent`,`code`,`name`,`desc`,`icon`,`htmlclass`,`hashcode`,`pagefile`,`levels`,`type`,`sorting`,`status`)
+        VALUES ($sid, 0, '$code', '$name', '$desc', '$icon', '$hclass', '$hashcode', '', 1, 1, $sort, 1)");
+}
+echo "Level-1 groups: " . ($conn->error ?: "OK") . "\n";
+
+// Level-2: sub-items (parent = group sysid, levels=2, type=1)
+// [sysid, parent, code, name, desc, pagefile, sorting]
+$nav_items = [
+    // CAD (parent=1)
+    [101, 1,  'cad-acct',   'Account Management',   'Manage customer accounts',      'cadmain',         1],
+    [102, 1,  'cad-new',    'New Application',      'New service application',       'newaccount',      2],
+    [103, 1,  'cad-arch',   'Archive',              'Account archives',              'cadarchive',      3],
+    [104, 1,  'cad-info',   'Account Info',         'Customer information',          'acctinfo',        4],
+    [105, 1,  'cad-appv',   'Application View',     'View submitted applications',   'appview',         5],
+    // Billing (parent=2)
+    [201, 2,  'bill-main',  'Billing',              'Billing main',                  'billingmain',     1],
+    [202, 2,  'bill-add',   'Add Bill',             'Create billing entries',        'addbill',         2],
+    [203, 2,  'bill-ct',    'Billing CT',           'CT billing entries',            'billingct',       3],
+    [204, 2,  'bill-pae',   'PAE Billing',          'PAE billing module',            'paebilling',      4],
+    // Collections / AR (parent=3)
+    [301, 3,  'ar-rv',      'Revenue Voucher',      'Revenue voucher management',    'rvmenu',          1],
+    [302, 3,  'ar-cash',    'Cash Menu',            'Cashier management',            'cashmenu',        2],
+    [303, 3,  'ar-acctg',   'Accounting',           'Accounting entries',            'acctg',           3],
+    // MRD (parent=4)
+    [401, 4,  'mrd-menu',   'MRD Menu',             'Meter reading main',            'mrdmenu',         1],
+    [402, 4,  'mrd-data',   'Meter Data',           'Meter reading data',            'mrddata',         2],
+    [403, 4,  'mrd-enc',    'Encoding',             'Meter reading encoding',        'mrdenc',          3],
+    [404, 4,  'mrd-bill',   'Add Bill',             'MRD billing',                   'mrdaddbill',      4],
+    [405, 4,  'mrd-rep',    'Reports',              'MRD reports',                   'mrdreports',      5],
+    [406, 4,  'mrd-lot',    'Lot Book',             'Lot book management',           'mrdlotbook',      6],
+    [407, 4,  'mrd-smr',    'Smart Reading',        'Smart meter reading',           'smartreading',    7],
+    // CWDO (parent=5)
+    [501, 5,  'cwdo-main',  'CWDO',                 'Work / disconnect orders',      'cwdo',            1],
+    [502, 5,  'cwdo-rep',   'Reports',              'CWDO reports',                  'cwdorep',         2],
+    // Inspection (parent=6)
+    [601, 6,  'insp-main',  'Inspection',           'Inspection records',            'inspection',      1],
+    [602, 6,  'insp-leg',   'Legal Inspection',     'Legal inspection cases',        'legalinspection', 2],
+    // Installation (parent=7)
+    [701, 7,  'inst-main',  'Installation',         'Installation records',          'installation',    1],
+    [702, 7,  'inst-comm',  'Commercial',           'Commercial new accounts',       'newaccountcomm',  2],
+    [703, 7,  'inst-govt',  'Government',           'Government new accounts',       'newaccountgovt',  3],
+    // HRIS (parent=8)
+    [801, 8,  'hris-emp',   'Employees',            'Employee records',              'employee',        1],
+    [802, 8,  'hris-att',   'Attendance',           'Attendance records',            'attendance',      2],
+    [803, 8,  'hris-lv',    'Leave',                'Leave management',              'hrisleave',       3],
+    [804, 8,  'hris-main',  'HR Main',              'HR administration',             'hrmain',          4],
+    [805, 8,  'hris-rep',   'HR Reports',           'HR reports',                    'hrrep',           5],
+    [806, 8,  'hris-loc',   'HR Locator',           'Employee locator',              'hrislocator',     6],
+    // Payroll (parent=9)
+    [901, 9,  'pay-main',   'Payroll',              'Payroll management',            'payroll',         1],
+    [902, 9,  'pay-rf',     'Rank & File',          'Rank and file payroll',         'payrollranknfile',2],
+    [903, 9,  'pay-t1',     'Tier 1',               'Tier 1 payroll',                'payrolltierd1',   3],
+    [904, 9,  'pay-t2',     'Tier 2',               'Tier 2 payroll',                'payrolltierd2',   4],
+    [905, 9,  'pay-mr',     'Meter Reader',         'Meter reader payroll',          'payrollmeterreader',5],
+    [906, 9,  'pay-conf',   'Confidential',         'Confidential payroll',          'payrollconfi',    6],
+    [907, 9,  'pay-rep',    'Reports',              'Payroll reports',               'payrollreports',  7],
+    // Inventory (parent=10)
+    [1001,10, 'inv-main',   'Inventory',            'Inventory management',          'inventory',       1],
+    [1002,10, 'inv-trn',    'Transactions',         'Inventory transactions',        'invtrn',          2],
+    [1003,10, 'inv-appr',   'Approval',             'Inventory approvals',           'invapprove',      3],
+    [1004,10, 'inv-smr',    'Summary',              'Inventory summary',             'invsmr',          4],
+    // EPRS (parent=11)
+    [1101,11, 'eprs-list',  'PR List',              'Purchase request list',         'eprslist',        1],
+    [1102,11, 'eprs-appr',  'Approval',             'PR approvals',                  'eprsapprove',     2],
+    [1103,11, 'eprs-rfp',   'RFP',                  'Request for proposal',          'eprsrfp',         3],
+    [1104,11, 'eprs-quote', 'Quotation',            'Supplier quotations',           'eprsquote',       4],
+    [1105,11, 'eprs-po',    'Purchase Order',       'Purchase orders',               'eprspo',          5],
+    [1106,11, 'eprs-hcs',   'HCS',                  'HCS management',                'eprshcs',         6],
+    [1107,11, 'eprs-supp',  'Suppliers',            'Supplier management',           'suppliers',       7],
+    // Assets (parent=12)
+    [1201,12, 'ast-main',   'Assets',               'Asset records',                 'asset',           1],
+    [1202,12, 'ast-entry',  'Asset Entry',          'Enter asset records',           'assetentry',      2],
+    [1203,12, 'ast-rep',    'Reports',              'Asset reports',                 'assetreports',    3],
+    // Reports (parent=13)
+    [1301,13, 'rep-main',   'Reports',              'General reports',               'reports',         1],
+    [1302,13, 'rep-apt',    'Aptitude',             'Aptitude reports',              'reportsapt',      2],
+    [1303,13, 'rep-bdg',    'Budget',               'Budget reports',                'reportsbudget',   3],
+    [1304,13, 'rep-col',    'Collection',           'Collection reports',            'reportscollection',4],
+    [1305,13, 'rep-usr',    'User Reports',         'User activity reports',         'reportsuser',     5],
+    [1306,13, 'rep-pay',    'Payroll Reports',      'Payroll summary reports',       'reppayroll',      6],
+    // Job Orders (parent=14)
+    [1401,14, 'jo-main',    'Job Orders',           'Job order list',                'jo',              1],
+    [1402,14, 'jo-dash',    'Dashboard',            'Job order dashboard',           'jodash',          2],
+    // CRM (parent=15)
+    [1501,15, 'crm-menu',   'CRM Menu',             'CRM main menu',                 'crmmenu',         1],
+    [1502,15, 'crm-ass',    'Assessment',           'Customer assessment',           'custassessment',  2],
+    [1503,15, 'crm-trk',    'Tracker',              'Customer tracker',              'custtracker',     3],
+    // Legal (parent=16)
+    [1601,16, 'leg-menu',   'Legal Menu',           'Legal main menu',               'legalmenu',       1],
+    [1602,16, 'leg-ver',    'Verification',         'Legal verification',            'legalver',        2],
+    // BOS (parent=17)
+    [1701,17, 'bos-main',   'BOS',                  'Back office system',            'bos',             1],
+    [1702,17, 'bos-pceo',   'PCEO',                 'PCEO management',               'bospceo',         2],
+    // ITD (parent=18)
+    [1801,18, 'itd-main',   'ITD',                  'IT department main',            'itd',             1],
+];
+foreach ($nav_items as $item) {
+    [$sid, $parent, $code, $name, $desc, $pagefile, $sort] = $item;
+    $hashcode = sha1($code . '_nav');
+    $conn->query("INSERT IGNORE INTO `prime_module_navigations_main`
+        (`sysid`,`parent`,`code`,`name`,`desc`,`icon`,`htmlclass`,`hashcode`,`pagefile`,`levels`,`type`,`sorting`,`status`)
+        VALUES ($sid, $parent, '$code', '$name', '$desc', 'fa-circle-o', 'default', '$hashcode', '$pagefile', 2, 1, $sort, 1)");
+    if ($conn->error) { echo "Nav item $sid error: " . $conn->error . "\n"; }
+}
+echo "Level-2 nav items seeded\n";
 
 $conn->close();
 echo "\nSchema setup complete!\n";

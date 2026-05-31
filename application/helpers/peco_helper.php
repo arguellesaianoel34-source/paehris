@@ -983,11 +983,11 @@ if (!function_exists('row_trn_flow')) {
             $firstname = get_users_info($qry_top->createdby)->firstname;
             $stat_info_top = ( $qry_top->status == 1 ) ? 'Done' : 'Pending';
             $html .= '<div class="row"><div class="col-md-12 row-flow-prime " style="margin-bottom: 5px; padding-right: 20px !important;">
-					  <a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion' . $dataid . '" href="#collapse_' . $dataid . '" style="border-bottom: 1px transparent solid !important; height: 25px; display: inline-block !important; width: 100%; margin-bottom: 0px;">
-					  <span class="pull-left btn" style="margin-right: 10px"><i class="pull fa fa-plus-square-o "></i></span> 
-					  <strong>' . $qry_top->codes . ' - ' . get_module_name($qry_top->moduleid)->desc . '</strong><span class="text-info pull-right">' . $stat_info_top . '</span><br>
-					  <em><i class="fa fa-user"></i> ' . $username . ' / <strong>' . $firstname . '</strong><em class="pull-right" style="font-size: 9px">' . $qry_top->datecreated . '</em></em></a>
-					  </div></div>';
+                                          <a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion' . $dataid . '" href="#collapse_' . $dataid . '" style="border-bottom: 1px transparent solid !important; height: 25px; display: inline-block !important; width: 100%; margin-bottom: 0px;">
+                                          <span class="pull-left btn" style="margin-right: 10px"><i class="pull fa fa-plus-square-o "></i></span> 
+                                          <strong>' . $qry_top->codes . ' - ' . get_module_name($qry_top->moduleid)->desc . '</strong><span class="text-info pull-right">' . $stat_info_top . '</span><br>
+                                          <em><i class="fa fa-user"></i> ' . $username . ' / <strong>' . $firstname . '</strong><em class="pull-right" style="font-size: 9px">' . $qry_top->datecreated . '</em></em></a>
+                                          </div></div>';
 
             $qry_flow = $ci->db->select("*")->from("transaction_request_main")->where($where_arr)->order_by('datecreated', 'desc')->get();
 
@@ -1109,11 +1109,11 @@ if (!function_exists('task_flow_stage_sps')) {
     function task_flow_stage_sps($dataid, $moduleid) {
         $ci = & get_instance();
         $query_flow = $ci->db->query("
-			SELECT * FROM transaction_request_main AS TRN
-			INNER JOIN prime_transaction_flow_main AS MAIN ON MAIN.moduleid = TRN.origid
-			INNER JOIN prime_transaction_flow_main_stages AS STAGES ON STAGES.flowid = MAIN.sysid AND STAGES.moduleid = TRN.moduleid
-			WHERE TRN.dataid = $dataid AND TRN.moduleid = $moduleid AND STAGES.types = 0 ORDER BY TRN.sysid DESC LIMIT 1 
-			")->row();
+                        SELECT * FROM transaction_request_main AS TRN
+                        INNER JOIN prime_transaction_flow_main AS MAIN ON MAIN.moduleid = TRN.origid
+                        INNER JOIN prime_transaction_flow_main_stages AS STAGES ON STAGES.flowid = MAIN.sysid AND STAGES.moduleid = TRN.moduleid
+                        WHERE TRN.dataid = $dataid AND TRN.moduleid = $moduleid AND STAGES.types = 0 ORDER BY TRN.sysid DESC LIMIT 1 
+                        ")->row();
         return ( count($query_flow) > 0 ) ? $query_flow : false;
     }
 
@@ -1341,24 +1341,24 @@ if (!function_exists('status_label')) {
             } else {
                 $return['res'] = false;
                 $return['label'] = ( $st == 1 ) ? '
-				<div class="md-checkbox md-checkbox-inline" style="margin: 0px 0px">
-				<input checked type="checkbox" id="' . $id . '" class="md-check">
-				<label for="' . $id . '">
-				<span class="inc"></span>
-				<span class="check"></span>
-				<span class="box"></span>
-				</label>
-				</div>
-				' : '
-				<div class="md-checkbox md-checkbox-inline" style="margin: 0px 0px">
-				<input type="checkbox" id="' . $id . '" class="md-check">
-				<label for="' . $id . '">
-				<span class="inc"></span>
-				<span class="check"></span>
-				<span class="box"></span>
-				</label>
-				</div>
-				';
+                                <div class="md-checkbox md-checkbox-inline" style="margin: 0px 0px">
+                                <input checked type="checkbox" id="' . $id . '" class="md-check">
+                                <label for="' . $id . '">
+                                <span class="inc"></span>
+                                <span class="check"></span>
+                                <span class="box"></span>
+                                </label>
+                                </div>
+                                ' : '
+                                <div class="md-checkbox md-checkbox-inline" style="margin: 0px 0px">
+                                <input type="checkbox" id="' . $id . '" class="md-check">
+                                <label for="' . $id . '">
+                                <span class="inc"></span>
+                                <span class="check"></span>
+                                <span class="box"></span>
+                                </label>
+                                </div>
+                                ';
             }
         } else {
             $return['res'] = false;
@@ -2805,6 +2805,14 @@ if(!function_exists(('check_nav_parent'))) {
     function check_nav_parent($nav_curr_id)
     {
         $ci = &get_instance();
+
+        if (super_admin()) {
+            $qry_cnt = $ci->db->select('COUNT(*) AS CNT')
+                ->from('prime_module_navigations_main')
+                ->where(array('parent' => $nav_curr_id, 'status' => 1))
+                ->get()->row();
+            return ($qry_cnt && $qry_cnt->CNT > 0) ? (int)$qry_cnt->CNT : 0;
+        }
 
         $user_access_matrix_id_arr = get_users_roles_matrix_id_arr();
         $nav_ids = array();
@@ -6947,10 +6955,10 @@ if(!function_exists('get_job_order_moduleid')) {
     function get_job_order_moduleid($joborders) {
 
 
-        // 3090	JO         CMO
-        // 3091	JO	       OIMR
-        // 3092	JO	       TFDO
-        // 3093	JO	       MRO
+        // 3090 JO         CMO
+        // 3091 JO             OIMR
+        // 3092 JO             TFDO
+        // 3093 JO             MRO
         //  322 APPJOBTYPE TNO
 
 
